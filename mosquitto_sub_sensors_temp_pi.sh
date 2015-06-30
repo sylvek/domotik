@@ -1,2 +1,2 @@
 #!/bin/bash
-./piTempRetriever.sh | mosquitto_pub -t sensors/pi/temp -l
+/home/pi/domotik/piTempRetriever.sh | mosquitto_pub -t sensors/pi/temp -l

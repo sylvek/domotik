@@ -1,2 +1,2 @@
 #!/bin/bash
-./measureItRetriever.py tmpr | mosquitto_pub -t sensors/cc128/temp -l
+/home/pi/domotik/measureItRetriever.py tmpr | mosquitto_pub -t sensors/cc128/temp -l
