@@ -1,2 +1,2 @@
 #!/bin/bash
-mosquitto_sub -t sensors/# | logger &
+mosquitto_sub -v -t sensors/# | logger &
