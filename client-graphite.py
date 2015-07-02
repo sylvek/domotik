@@ -11,7 +11,7 @@ parser.add_argument('port', metavar='port', help='port of graphite server', narg
 args = parser.parse_args()
 
 while sys.stdin:
-	line=sys.stdin.readline().rstrip()
+	line=sys.stdin.readline().replace('/', '.').rstrip()
 	if line:
 		timestamp = int(time.time())
 		message = '%s %d\n' % (line, timestamp)
