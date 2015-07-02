@@ -14,6 +14,6 @@ for line in sys.stdin:
 		message = '%s %d\n' % (line.rstrip(), timestamp)
 
 		sock = socket.socket()
-		sock.connect((args.hostname, args.port))
+		sock.connect((args.hostname, int(args.port)))
 		sock.sendall(message)
 		sock.close()
