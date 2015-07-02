@@ -1,5 +1,15 @@
 # my own domotic project based on raspberrypi+mqtt+graphite
 
+## installation
+### raspberrypi
+assume that you have installed a fresh raspbian…
+
+### mqtt
+sudo apt-get install mosquitto mosquitto-clients python-mosquitto
+
+### graphite
+https://github.com/dockerana/dockerana
+
 ## sensors
 several sensors push data over mqtt (read crontab.txt)
 - pi temperature
