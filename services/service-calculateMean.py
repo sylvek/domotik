@@ -2,9 +2,9 @@
 import paho.mqtt.client as mqtt
 import argparse
 
-parser = argparse.ArgumentParser(description='calculate mean of power consumption')
-parser.add_argument('sensor_in', metavar='sensor_in', help='sensor path given a watt value')
-parser.add_argument('sensor_out', metavar='sensor_out', help='sensor path given a watt mean value')
+parser = argparse.ArgumentParser(description='calculate a mean')
+parser.add_argument('sensor_in', metavar='sensor_in', help='sensor path given')
+parser.add_argument('sensor_out', metavar='sensor_out', help='sensor path given a resulted mean')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
 parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?', default="1883")
 args = parser.parse_args()
