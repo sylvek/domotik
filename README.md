@@ -1,4 +1,4 @@
-# my own domotic project based on raspberrypi+mqtt+graphite
+# my own domotic project based on raspberrypi+mqtt
 
 ## installation
 ### raspberrypi
@@ -7,10 +7,7 @@ assume that you have installed a fresh raspbian…
 ### mqtt
 sudo apt-get install mosquitto mosquitto-clients python-mosquitto
 
-### graphite
-https://github.com/dockerana/dockerana
-
-## sensors
+## sensors (mosquitto_pub)
 several sensors push data over mqtt (read crontab.txt)
 - pi temperature
 - home int. temperature (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
@@ -18,8 +15,9 @@ several sensors push data over mqtt (read crontab.txt)
 - home ext. temperature and wind (via yahoo weather webservice)
 - via bluetooth LE usb dongle (later?)
 
-## analyzers
+## analyzers (mosquitto_sub)
 several analyzers are available
 - push data to syslog
 - push data to csv
 - push data to graphite
+- push data to thinkspeak

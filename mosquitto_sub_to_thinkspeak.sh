@@ -1,2 +1,2 @@
 #!/bin/bash
-mosquitto_sub -t sensors/cc128/temp | ./client-thinkspeak.py <<api>> <<field>> &
+mosquitto_sub -t sensors/cc128/temp | ./clients/client-thinkspeak.py <<api>> <<field>> &
