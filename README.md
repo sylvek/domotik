@@ -17,6 +17,15 @@ sudo dpkg -i mongodb_2.1.1_armhf.deb
 sudo /etc/init.d/mongodb start
 sudo update-rc.d mongodb defaults
 
+### domotik
+cd /home/pi
+git clone https://github.com/sylvek/domotik.git
+cd /home/pi/domotik
+# watch crontab.txt => crontab -e
+cd /home/pi/mosquitto_sub
+./syslog.sh
+./mongodb.sh
+
 ## sensors (mosquitto_pub)
 several sensors push data over mqtt (read crontab.txt)
 - pi temperature
