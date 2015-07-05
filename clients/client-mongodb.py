@@ -15,7 +15,7 @@ while sys.stdin:
 	line=sys.stdin.readline().rstrip().replace('/', '-').split();
 	if line:
 		timestamp = int(time.time())
-		message = {"value":int(line[1]),"timestamp":timestamp}
+		message = {"value":float(line[1]),"timestamp":timestamp}
 		db = client[line[0]]
 		db.values.insert_one(message)
 	else:
