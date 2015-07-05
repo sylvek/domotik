@@ -7,6 +7,16 @@ assume that you have installed a fresh raspbian…
 ### mqtt
 sudo apt-get install mosquitto mosquitto-clients python-mosquitto
 
+### node.js
+wget http://node-arm.herokuapp.com/node_latest_armhf.deb
+sudo dpkg -i node_latest_armhf.deb
+
+### mongodb
+wget https://github.com/tjanson/mongodb-armhf-deb/releases/download/v2.1.1-1/mongodb_2.1.1_armhf.deb
+sudo dpkg -i mongodb_2.1.1_armhf.deb
+sudo /etc/init.d/mongodb start
+sudo update-rc.d mongodb defaults
+
 ## sensors (mosquitto_pub)
 several sensors push data over mqtt (read crontab.txt)
 - pi temperature
@@ -21,3 +31,4 @@ several analyzers are available
 - push data to csv
 - push data to graphite
 - push data to thinkspeak
+- push data to mongodb
