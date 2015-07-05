@@ -14,9 +14,15 @@ while sys.stdin:
 	client = MongoClient(args.hostname, int(args.port))
 	line=sys.stdin.readline().rstrip().replace('/', '-').split();
 	if line:
+		pattern = line[0].split("-");
 		timestamp = int(time.time())
-		message = {"value":float(line[1]),"timestamp":timestamp}
-		db = client[line[0]]
-		db.values.insert_one(message)
+		collection = pattern[0]
+		sensor = pattern[1]
+		type = pattern[2]
+		value = float(line[1])
+
+		message = {"sensor":sensor,"type":type,"value":value,"timestamp":timestamp}
+		db = client.domotik
+		db[collection].insert_one(message)
 	else:
 	    	time.sleep(1)
