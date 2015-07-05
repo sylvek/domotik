@@ -1,2 +1,2 @@
 #!/bin/bash
-mosquitto_sub -v -t sensors/# | /home/pi/domotik/clients/client-mongodb.py &
+mosquitto_sub -v -t sensors/# -t measures/# -t triggers/# | /home/pi/domotik/clients/client-mongodb.py &
