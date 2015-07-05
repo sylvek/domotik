@@ -3,7 +3,6 @@ import socket
 import time
 import sys
 import argparse
-import time
 
 parser = argparse.ArgumentParser(description='send data via pipeline to graphite')
 parser.add_argument('hostname', metavar='hostname', help='hostname of graphite server', nargs='?', default="0.0.0.0")
