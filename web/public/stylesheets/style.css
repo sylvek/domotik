@@ -1,8 +1,14 @@
 body {
-  padding: 50px;
+  padding: 20px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
+}
+
+#last_values {
+  color: #00B7FF;
+  font-weight: bold;
+  font-size: 110%;
 }
