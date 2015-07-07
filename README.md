@@ -1,10 +1,17 @@
-# my own domotic project based on raspberrypi+mqtt
+# domotik
+
+![screenshot](extras/screenshot.png)
+
+Domotik is a very simple home-automation software based on micro-services principle.
+Each service (services folder) does only one thing. A script (mosquitto_pub) pushes the data on MQTT.
+A another process (mosquitto_pub) has the responsability to dispatch the data somewhere.
+An another service (services folder) could calculate the mean or the max value, etc and push it on MQTT, etc, etc.
 
 ## installation
 ### raspberrypi
 assume that you have installed a fresh raspbian…
 
-### mqtt
+### mosquitto
 - sudo apt-get install mosquitto mosquitto-clients python-mosquitto
 
 ### node.js
@@ -21,18 +28,17 @@ assume that you have installed a fresh raspbian…
 - cd /home/pi
 - git clone https://github.com/sylvek/domotik.git
 - cd /home/pi/domotik
-- --> watch crontab.txt => crontab -e
-- cd /home/pi/mosquitto_sub
-- ./syslog.sh
-- ./mongodb.sh
+- --> create an run your own sensors (watch crontab.txt)
+- ./start.sh
+- ...
+- ./stop.sh
 
 ## sensors (mosquitto_pub)
-several sensors push data over mqtt (read crontab.txt)
+several sensors push data over MQTT (read crontab.txt)
 - pi temperature
 - home int. temperature (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
 - power consumption (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
 - home ext. temperature and wind (via yahoo weather webservice)
-- via bluetooth LE usb dongle (later?)
 
 ## analyzers (mosquitto_sub)
 several analyzers are available
