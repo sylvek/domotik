@@ -1,0 +1,39 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  div(ng-controller="domotikIndexCtrl")
+    nvd3-line-chart(
+      data="twenty_four_hours_temp",
+      isArea="false",
+      showLegend="true",
+      showXAxis="true",
+      showYAxis="true",
+      tooltips="true",
+      interactive="true",
+      useInteractiveGuideLine="true",
+      interpolate="basis",
+      xAxisTickFormat="xAxisTickFormat_Time_Format()"
+      yAxisTickFormat="yAxisTickFormat_Temp_Format()"
+      yAxisLabel="Temperature (C)"
+      xAxisLabel="last 24 hours"
+      margin="{left:100,top:20,bottom:20,right:10}"
+      height="400")
+    nvd3-line-chart(
+      data="twenty_four_hours_watt",
+      isArea="false",
+      showLegend="true",
+      showXAxis="true",
+      showYAxis="true",
+      tooltips="true",
+      interactive="true",
+      useInteractiveGuideLine="true",
+      interpolate="basis",
+      xAxisTickFormat="xAxisTickFormat_Time_Format()"
+      yAxisTickFormat="yAxisTickFormat_Watt_Format()"
+      yAxisLabel="Power (Watt)"
+      xAxisLabel="last 24 hours"
+      margin="{left:100,top:20,bottom:20,right:10}"
+      height="400")
