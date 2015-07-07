@@ -10,7 +10,7 @@ var api = require('./routes/api');
 
 var mongo = require('mongodb');
 var monk = require('monk');
-var db = monk('192.168.0.21:27017/domotik');
+var db = monk('127.0.0.1:27017/domotik');
 
 var app = express();
 
