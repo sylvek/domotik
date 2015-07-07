@@ -30,6 +30,7 @@ assume that you have installed a fresh raspbian…
 - cd /home/pi/domotik
 - --> create and run your own sensors (crontab.txt)
 - ./start.sh
+- go to http://[your raspberrypi]:3000
 - ...
 - ./stop.sh
 
