@@ -2,5 +2,4 @@ export.csv
 web/node_modules
 web/npm-debug.log
 web/bower_components
-web/bin
 npm.pid
