@@ -28,7 +28,7 @@ assume that you have installed a fresh raspbian…
 - cd /home/pi
 - git clone https://github.com/sylvek/domotik.git
 - cd /home/pi/domotik
-- --> create an run your own sensors (watch crontab.txt)
+- --> create and run your own sensors (crontab.txt)
 - ./start.sh
 - ...
 - ./stop.sh
