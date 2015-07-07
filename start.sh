@@ -6,6 +6,6 @@ cd $HOME/domotik/mosquitto_sub
 echo "launching web interface"
 cd $HOME/domotik/web
 npm install
-bower install
+node_modules/bower/bin/bower install
 npm start &
 echo "go to http://localhost:3000"
