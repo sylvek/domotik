@@ -14,6 +14,10 @@
   });
 
   app.controller('domotikIndexCtrl', function($scope, $interval, domotikSrv){
+      $scope.twenty_four_hours_temp = [];
+      $scope.twenty_four_hours_watt = [];
+      $scope.lastCapture = "api/last/capture";
+
       domotikSrv.last("24h", "temp").then(function(response) {
         $scope.twenty_four_hours_temp = response.data;
       });
@@ -23,6 +27,7 @@
       });
 
       function update() {
+        $scope.lastCapture = "api/last/capture?" + new Date().getTime();
         domotikSrv.last("20s", "temp").then(function(response) {
           response.data.forEach(function(e1) {
             var d = $scope.twenty_four_hours_temp;
