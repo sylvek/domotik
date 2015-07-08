@@ -14,6 +14,10 @@ assume that you have installed a fresh raspbian…
 ### mosquitto
 - sudo apt-get install mosquitto mosquitto-clients python-mosquitto
 
+- git clone http://git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.python.git
+- cd org.eclipse.paho.mqtt.python.git
+- sudo python setup.py install
+
 ### node.js
 - wget http://node-arm.herokuapp.com/node_latest_armhf.deb
 - sudo dpkg -i node_latest_armhf.deb
@@ -23,6 +27,13 @@ assume that you have installed a fresh raspbian…
 - sudo dpkg -i mongodb_2.1.1_armhf.deb
 - sudo /etc/init.d/mongodb start
 - sudo update-rc.d mongodb defaults
+
+- git clone git://github.com/mongodb/mongo-python-driver.git pymongo
+- cd pymongo/
+- sudo python setup.py install
+
+### others
+- sudo apt-get install fswebcam
 
 ### domotik
 - cd /home/pi

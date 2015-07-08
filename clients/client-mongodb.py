@@ -12,14 +12,13 @@ args = parser.parse_args()
 
 while sys.stdin:
 	client = MongoClient(args.hostname, int(args.port))
-	line=sys.stdin.readline().rstrip().replace('/', '-').split();
+	line=sys.stdin.readline().rstrip().split();
 	if line:
-		pattern = line[0].split("-");
+		pattern = line[0].split("/");
 		timestamp = int(time.time())
 		collection = pattern[0]
 		sensor = pattern[1]
-		type = pattern[2]
-		value = float(line[1])
+		value = str(line[1]) if isinstance(line[1], str) else float(line[1])
 
 		message = {"sensor":sensor,"type":type,"value":value,"timestamp":timestamp}
 		db = client.domotik
