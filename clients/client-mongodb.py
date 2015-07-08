@@ -18,6 +18,7 @@ while sys.stdin:
 		timestamp = int(time.time())
 		collection = pattern[0]
 		sensor = pattern[1]
+		type = pattern[2]
 		value = str(line[1]) if isinstance(line[1], str) else float(line[1])
 
 		message = {"sensor":sensor,"type":type,"value":value,"timestamp":timestamp}
