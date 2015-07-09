@@ -1,5 +1,5 @@
 #!/bin/bash
-FREEBOX=http://hd1.freebox.fr/pub/remote_control?code=3976946&key=
+FREEBOX="http://hd1.freebox.fr/pub/remote_control?code=3976946&key="
 mosquitto_sub -t sensors/+/menu | xargs -i curl -s -L "${FREEBOX}power" &
 mosquitto_sub -t sensors/+/play | xargs -i curl -s -L "${FREEBOX}ok" &
 mosquitto_sub -t sensors/+/plus | xargs -i curl -s -L "${FREEBOX}vol_inc" &
