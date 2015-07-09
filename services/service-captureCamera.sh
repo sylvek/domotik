@@ -1,3 +1,3 @@
 #!/bin/bash
-touch fswebcam.conf
-fswebcam -c fswebcam.conf $1
+touch $HOME/domotik/services/fswebcam.conf
+fswebcam -c $HOME/domotik/services/fswebcam.conf $1
