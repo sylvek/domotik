@@ -1,2 +1,3 @@
 #!/bin/bash
-fswebcam -q $1
+touch fswebcam.conf
+fswebcam -c fswebcam.conf $1
