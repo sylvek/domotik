@@ -2,6 +2,7 @@
 echo "launching mosquitto subscribing..."
 cd $HOME/domotik/mosquitto_sub
 ./mongodb.sh
+./freebox.sh
 echo "launching web interface..."
 cd $HOME/domotik/web
 npm install
