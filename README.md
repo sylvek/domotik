@@ -34,6 +34,8 @@ assume that you have installed a fresh raspbian…
 
 ### others
 - sudo apt-get install fswebcam
+- http://ozzmaker.com/2013/10/24/how-to-control-the-gpio-on-a-raspberry-pi-with-an-ir-remote/
+- http://lirc.sourceforge.net/remotes/apple/A1156
 
 ### domotik
 - cd /home/pi
