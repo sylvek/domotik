@@ -1,2 +1,2 @@
 #!/bin/bash
-fswebcam -b $1
+fswebcam -q $1
