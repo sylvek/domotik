@@ -1,41 +1,41 @@
 begin
     button = KEY_MENU
     prog = irexec
-    config = mosquitto_pub -t sensors/remote/menu -m 1
+    config = mosquitto_pub -t triggers/remote/menu -m 1
     repeat = 0
 end
 
 begin
     button = KEY_PLAY
     prog = irexec
-    config = mosquitto_pub -t sensors/remote/play -m 1
+    config = mosquitto_pub -t triggers/remote/play -m 1
     repeat = 0
 end
 
 begin
     button = KEY_KPPLUS
     prog = irexec
-    config = mosquitto_pub -t sensors/remote/plus -m 1
+    config = mosquitto_pub -t triggers/remote/plus -m 1
     repeat = 0
 end
 
 begin
     button = KEY_FASTFORWARD
     prog = irexec
-    config = mosquitto_pub -t sensors/remote/forward -m 1
+    config = mosquitto_pub -t triggers/remote/forward -m 1
     repeat = 0
 end
 
 begin
     button = KEY_REWIND
     prog = irexec
-    config = mosquitto_pub -t sensors/remote/rewind -m 1
+    config = mosquitto_pub -t triggers/remote/rewind -m 1
     repeat = 0
 end
 
 begin
     button = KEY_KPMINUS
     prog = irexec
-    config = mosquitto_pub -t sensors/remote/minus -m 1
+    config = mosquitto_pub -t triggers/remote/minus -m 1
     repeat = 0
 end
