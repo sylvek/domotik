@@ -33,7 +33,7 @@ assume that you have installed a fresh raspbian…
 - sudo python setup.py install
 
 ### others
-- sudo apt-get install fswebcam
+- sudo apt-get install fswebcam lirc
 - http://ozzmaker.com/2013/10/24/how-to-control-the-gpio-on-a-raspberry-pi-with-an-ir-remote/
 - http://lirc.sourceforge.net/remotes/apple/A1156
 
@@ -53,6 +53,10 @@ several sensors push data over MQTT (read crontab.txt)
 - home int. temperature (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
 - power consumption (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
 - home ext. temperature and wind (via yahoo weather webservice)
+- webcam usb
+
+## triggers (mosquitto_pub)
+- lirc
 
 ## analyzers (mosquitto_sub)
 several analyzers are available
@@ -61,3 +65,4 @@ several analyzers are available
 - push data to graphite
 - push data to thinkspeak
 - push data to mongodb
+- control the freebox HD
