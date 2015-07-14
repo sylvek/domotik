@@ -7,5 +7,5 @@ echo "launching web interface..."
 cd $HOME/domotik/web
 npm install
 node_modules/bower/bin/bower install
-nohup npm start &
+nohup npm start > /dev/null &
 echo "go to http://localhost:3000"
