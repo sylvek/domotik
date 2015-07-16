@@ -7,8 +7,11 @@ a {
   color: #00B7FF;
 }
 
-#last_values {
-  color: #00B7FF;
-  font-weight: bold;
-  font-size: 110%;
+#capture {
+  display: inline;
+}
+
+#history {
+  float:right;
+  text-align: center;
 }

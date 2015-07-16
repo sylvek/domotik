@@ -35,7 +35,6 @@
                 if (e2.key == e1.key) {
                   e1.values.forEach(function(e3) {
                     e2.values.push(e3);
-                    $scope.last_temp = e1.key + " " + e3[1] + "°c";
                   });
                 }
             });
@@ -45,14 +44,18 @@
         domotikSrv.last("20s", "watt").then(function(response) {
           response.data.forEach(function(e1) {
             var d = $scope.twenty_four_hours_watt;
+            var sum_watt = 0;
             d.forEach(function(e2) {
                 if (e2.key == e1.key) {
+                  var last = 0;
                   e1.values.forEach(function(e3) {
                     e2.values.push(e3);
-                    $scope.last_watt = e1.key + " " + e3[1] + "W";
+                    last = e3[1];
                   });
+                  sum_watt += last;
                 }
             });
+            $scope.last_watt = sum_watt;
             $scope.twenty_four_hours_watt = d;
           });
         })

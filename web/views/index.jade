@@ -4,12 +4,22 @@ block content
   h1= title
 
   div(ng-controller="domotikIndexCtrl")
-    p last data (refreshed every 20s)
-    div#last_values {{last_temp}} {{last_watt}}
-    div#last_capture
-      img(ng-src="{{lastCapture}}")
 
-    p last 24h data
+    div#capture
+        img(ng-src="{{lastCapture}}")
+
+    div#history
+      div Power (W)
+      table
+        tr
+          th now
+          th yesterday
+          th last year
+        tr
+          td {{last_watt}}
+          td nc
+          td nc
+
     div
       nvd3-line-chart(
         data="twenty_four_hours_watt",
