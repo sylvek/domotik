@@ -27,7 +27,7 @@ def signal_handler(signal, frame):
     run = False
 
 try:
-    signal.signal(signal.SIGINT, signal_handler)
+	signal.signal(signal.SIGINT, signal_handler)
 	ser = serial.Serial(port=usbport, baudrate=57600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=3)
 	client = mqtt.Client()
 	client.connect(args.hostname, int(args.port), 60)
