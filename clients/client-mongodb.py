@@ -29,4 +29,4 @@ while sys.stdin:
 		db = client.domotik
 		db[collection].insert_one(message)
 	else:
-	    	time.sleep(1)
+		time.sleep(1)

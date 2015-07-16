@@ -5,6 +5,7 @@ import serial
 import sys
 import errno
 import re
+import signal
 
 parser = argparse.ArgumentParser(description='fetch data from cc128 and push it to mqtt')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
@@ -13,6 +14,7 @@ args = parser.parse_args()
 
 system = 'envi' #'classic'
 usbport = '/dev/ttyUSB0'
+run = True
 
 def sensor_data_check( sensor, watt, tmpr ):
     sensor = int(sensor)
@@ -21,15 +23,20 @@ def sensor_data_check( sensor, watt, tmpr ):
     client.publish("sensors/cc128/watt", watt)
     client.publish("sensors/cc128/temp", tmpr)
 
+def signal_handler(signal, frame):
+    run = False
+
 try:
+    signal.signal(signal.SIGINT, signal_handler)
 	ser = serial.Serial(port=usbport, baudrate=57600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=3)
 	client = mqtt.Client()
 	client.connect(args.hostname, int(args.port), 60)
 except:
 	sys.exit(errno.EIO)
 
-while True:
+while run:
 	try:
+		client.loop()
 		line = ser.readline()
 		line = line.rstrip('\r\n')
 		clamps = False
@@ -75,5 +82,3 @@ while True:
 			sensor_data_check( s, watt_sum, tmpr )
 	except:
 		sys.exit(errno.EIO)
-
-client.loop_forever()
