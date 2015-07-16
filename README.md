@@ -15,7 +15,7 @@ assume that you have installed a fresh raspbian…
 - sudo apt-get install mosquitto mosquitto-clients python-mosquitto
 
 - git clone http://git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.python.git
-- cd org.eclipse.paho.mqtt.python.git
+- cd org.eclipse.paho.mqtt.python
 - sudo python setup.py install
 
 ### node.js
