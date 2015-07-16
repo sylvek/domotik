@@ -20,7 +20,6 @@
 # For more information see the manual pages of crontab(5) and cron(8)
 #
 # m h  dom mon dow   command
-*/1 * * * * /home/pi/domotik/cron_cc128.sh
 */5 * * * * /home/pi/domotik/cron_pi.sh
 */15 * * * * /home/pi/domotik/cron_webcam.sh
 */30 * * * * /home/pi/domotik/cron_juvisy.sh

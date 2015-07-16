@@ -1,4 +1,7 @@
 #!/bin/bash
+echo "launching services..."
+cd $HOME/domotik/services
+./service-cc128.py &
 echo "launching mosquitto subscribing..."
 cd $HOME/domotik/mosquitto_sub
 ./mongodb.sh

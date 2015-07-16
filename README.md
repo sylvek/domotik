@@ -50,8 +50,8 @@ assume that you have installed a fresh raspbian…
 ## sensors (mosquitto_pub)
 several sensors push data over MQTT (read crontab.txt)
 - pi temperature
-- home int. temperature (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
-- power consumption (via CurrentCost ENVI cc128, and via ws => https://github.com/lalelunet/measureit)
+- home int. temperature (via CurrentCost ENVI cc128)
+- power consumption (via CurrentCost ENVI cc128)
 - home ext. temperature and wind (via yahoo weather webservice)
 - webcam usb
 
