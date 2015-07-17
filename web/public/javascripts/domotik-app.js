@@ -20,6 +20,9 @@
       $scope.thirty_days_sum_watt = [];
       $scope.lastCapture = "api/last/capture";
 
+      $scope.last_watt = "nc";
+      $scope.sum_watt_yesterday = "nc";
+
       domotikSrv.last("24h", "temp").then(function(response) {
         $scope.twenty_four_hours_temp = response.data;
       });
@@ -34,6 +37,7 @@
 
       domotikSrv.last("30d", "sumPerDay").then(function(response) {
         $scope.thirty_days_sum_watt = response.data;
+        $scope.sum_watt_yesterday = response.data[response.data.length - 1];
       });
 
       function update() {
