@@ -2,6 +2,8 @@
 echo "launching services..."
 cd $HOME/domotik/services
 ./service-cc128.py &
+./service-calculateMeanPerHour.py sensors/cc128/watt sensors/cc128mean/watt measures/meanPerHour/watt &
+./service-calculateSumPerDay.py measures/cc128meanPerHour/watt measures/sumPerDay/watt &
 echo "launching mosquitto subscribing..."
 cd $HOME/domotik/mosquitto_sub
 ./mongodb.sh
