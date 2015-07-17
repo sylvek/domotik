@@ -28,8 +28,8 @@ def on_message(client, userdata, msg):
     client.publish(args.sensor_out, mean)
     currentHour = datetime.datetime.now().hour
     if (currentHour is not hour):
-        count = 0
-        sum = 0
+        count = 1
+        sum = mean
         hour = currentHour
         client.publish(args.measure_out, mean)
 
