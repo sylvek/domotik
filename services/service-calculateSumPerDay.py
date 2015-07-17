@@ -11,21 +11,17 @@ parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt serve
 parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?', default="1883")
 args = parser.parse_args()
 
-count = 0
 sum = 0
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe(args.measure_in)
 
 def on_message(client, userdata, msg):
-    global count
     global sum
     global day
-    count += 1
     sum += int(msg.payload)
     currentDay = datetime.datetime.now().day
     if (currentDay is not day):
-        count = 0
         sum = 0
         day = currentDay
         client.publish(args.measure_out, mean)
