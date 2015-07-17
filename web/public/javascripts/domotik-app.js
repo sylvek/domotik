@@ -16,6 +16,8 @@
   app.controller('domotikIndexCtrl', function($scope, $interval, domotikSrv){
       $scope.twenty_four_hours_temp = [];
       $scope.twenty_four_hours_watt = [];
+      $scope.twenty_four_hours_mean_watt = [];
+      $scope.thirty_days_sum_watt = [];
       $scope.lastCapture = "api/last/capture";
 
       domotikSrv.last("24h", "temp").then(function(response) {
@@ -24,6 +26,14 @@
 
       domotikSrv.last("24h", "watt").then(function(response) {
         $scope.twenty_four_hours_watt = response.data;
+      });
+
+      domotikSrv.last("24h", "meanPerHour").then(function(response) {
+        $scope.twenty_four_hours_mean_watt = response.data;
+      });
+
+      domotikSrv.last("30d", "sumPerDay").then(function(response) {
+        $scope.thirty_days_sum_watt = response.data;
       });
 
       function update() {
@@ -70,6 +80,11 @@
       $scope.xAxisTickFormat_Time_Format = function() {
         return function(d) {
           return d3.time.format('%X')(new Date(d * 1000));
+        }
+      }
+      $scope.xAxisTickFormat_Hour_Format = function() {
+        return function(d) {
+          return d3.time.format('%Hh')(new Date(d * 1000));
         }
       }
       $scope.yAxisTickFormat_Temp_Format = function() {

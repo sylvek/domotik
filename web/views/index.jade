@@ -22,23 +22,6 @@ block content
 
     div
       nvd3-line-chart(
-        data="twenty_four_hours_watt",
-        objectEquality="true",
-        isArea="false",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        interpolate="basis",
-        xAxisTickFormat="xAxisTickFormat_Time_Format()"
-        yAxisTickFormat="yAxisTickFormat_Watt_Format()"
-        yAxisLabel="Power (W)"
-        xAxisLabel="last 24 hours"
-        margin="{left:100,top:20,bottom:20,right:10}"
-        height="300")
-      nvd3-line-chart(
         data="twenty_four_hours_temp",
         objectEquality="true",
         isArea="false",
@@ -49,9 +32,58 @@ block content
         interactive="true",
         useInteractiveGuideLine="true",
         interpolate="basis",
-        xAxisTickFormat="xAxisTickFormat_Time_Format()"
-        yAxisTickFormat="yAxisTickFormat_Temp_Format()"
-        yAxisLabel="Temperature (C)"
-        xAxisLabel="last 24 hours"
-        margin="{left:100,top:20,bottom:20,right:10}"
+        xAxisTickFormat="xAxisTickFormat_Time_Format()",
+        yAxisTickFormat="yAxisTickFormat_Temp_Format()",
+        yAxisLabel="Temperature (C)",
+        xAxisLabel="last 24 hours",
+        margin="{left:100,top:20,bottom:100,right:10}",
+        height="300")
+      nvd3-line-chart(
+        data="twenty_four_hours_watt",
+        objectEquality="true",
+        isArea="false",
+        showLegend="true",
+        showXAxis="true",
+        showYAxis="true",
+        tooltips="true",
+        interactive="true",
+        useInteractiveGuideLine="true",
+        interpolate="basis",
+        xAxisTickFormat="xAxisTickFormat_Time_Format()",
+        yAxisTickFormat="yAxisTickFormat_Watt_Format()",
+        yAxisLabel="Power (W)",
+        xAxisLabel="last 24 hours",
+        margin="{left:100,top:20,bottom:100,right:10}",
+        height="300")
+
+    div
+      nvd3-discrete-bar-chart(
+        data="twenty_four_hours_mean_watt",
+        showLegend="true",
+        showXAxis="true",
+        showYAxis="true",
+        showValues="true",
+        tooltips="true",
+        interactive="true",
+        useInteractiveGuideLine="true",
+        xAxisTickFormat="xAxisTickFormat_Hour_Format()",
+        yAxisTickFormat="yAxisTickFormat_Watt_Format()",
+        yAxisLabel="Power (W)",
+        xAxisLabel="last 24 hours",
+        margin="{left:100,top:20,bottom:100,right:10}"
+        height="300")
+      nvd3-discrete-bar-chart(
+        data="thirty_days_sum_watt",
+        showLegend="true",
+        showXAxis="true",
+        showYAxis="true",
+        showValues="true",
+        tooltips="true",
+        interactive="true",
+        useInteractiveGuideLine="true",
+        xAxisTickFormat="xAxisTickFormat_Date_Format()",
+        yAxisTickFormat="yAxisTickFormat_Watt_Format()",
+        yAxisLabel="Power (W)",
+        xAxisLabel="last 30 days",
+        margin="{left:100,top:20,bottom:100,right:10}"
         height="300")
