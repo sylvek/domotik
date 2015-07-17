@@ -24,7 +24,7 @@ def on_message(client, userdata, msg):
     if (currentDay is not day):
         sum = 0
         day = currentDay
-        client.publish(args.measure_out, mean)
+        client.publish(args.measure_out, sum)
 
 def signal_handler(signal, frame):
     print "Ending and cleaning up"
