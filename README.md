@@ -52,7 +52,7 @@ several sensors push data over MQTT (read crontab.txt)
 - pi temperature
 - home int. temperature (via CurrentCost ENVI cc128)
 - power consumption (via CurrentCost ENVI cc128)
-- home ext. temperature and wind (via yahoo weather webservice)
+- home ext. temperature (via yahoo weather webservice)
 - webcam usb
 
 ## triggers (mosquitto_pub)
