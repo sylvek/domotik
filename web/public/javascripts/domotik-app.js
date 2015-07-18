@@ -37,7 +37,7 @@
       domotikSrv.last("30d", "sumPerDay").then(function(response) {
         $scope.thirty_days_sum_watt = response.data;
         if (response.data.length > 0) {
-          $scope.sum_watt_yesterday = response.data[response.data.length - 1];
+          $scope.sum_watt_yesterday = response.data[response.data.length - 1].values[0][1];
         }
       });
 
