@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 import argparse
 import signal
 from pymongo import MongoClient
+import time
 
 parser = argparse.ArgumentParser(description='store sensors, measures and triggers data to mongodb')
 parser.add_argument('mqtt_hostname', metavar='mqtt_hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
