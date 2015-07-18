@@ -61,8 +61,5 @@ several sensors push data over MQTT (read crontab.txt)
 ## analyzers (mosquitto_sub)
 several analyzers are available
 - push data to syslog
-- push data to csv
-- push data to graphite
-- push data to thinkspeak
 - push data to mongodb
 - control the freebox HD
