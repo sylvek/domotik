@@ -9,14 +9,16 @@ block content
         img(ng-src="{{lastCapture}}")
 
     div#history
-      div Power (W)
+      div Power (kWh)
       table
         tr
+          th now
           th yesterday
           th last year
         tr
+          td {{sum_watt_now}}
           td {{sum_watt_yesterday}}
-          td nc
+          td {{sum_watt_last_year}}
 
     div
       nvd3-line-chart(
@@ -32,7 +34,7 @@ block content
         interpolate="basis",
         xAxisTickFormat="xAxisTickFormat_Time_Format()",
         yAxisTickFormat="yAxisTickFormat_Temp_Format()",
-        yAxisLabel="Temperature (C)",
+        yAxisLabel="Temperature (°c)",
         xAxisLabel="last 24 hours",
         margin="{left:100,top:20,bottom:100,right:10}",
         height="300")
