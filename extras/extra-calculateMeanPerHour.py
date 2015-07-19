@@ -4,7 +4,7 @@ import argparse
 import signal
 import datetime
 
-parser = argparse.ArgumentParser(description='(re)generate measures for sumPerDay')
+parser = argparse.ArgumentParser(description='(re)generate measures for meanPerHour')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mongodb server', nargs='?', default="0.0.0.0")
 parser.add_argument('port', metavar='port', help='port of mongodb server', nargs='?', default="27017")
 args = parser.parse_args()
@@ -16,7 +16,7 @@ def signal_handler(signal, frame):
 
 signal.signal(signal.SIGINT, signal_handler)
 
-currentDay = -1
+currentHour = -1
 sum = 0
 count = 0
 
@@ -24,15 +24,15 @@ client = pymongo.MongoClient(args.hostname, int(args.port))
 db = client.domotik
 for doc in db.sensors.find({ 'type':'watt' }).sort([('timestamp', pymongo.ASCENDING)]):
     timestamp = doc['timestamp']
-    day = datetime.datetime.fromtimestamp(timestamp).day
+    hour = datetime.datetime.fromtimestamp(timestamp).hour
     sum += doc['value']
     count += 1
 
-    if (currentDay is -1):
-        currentDay = day
+    if (currentHour is -1):
+        currentHour = hour
 
-    if (day is not currentDay):
-        print "{timestamp:" + str(timestamp) + ", sensor:'sumPerDay', type:'watt', value:" + str(sum/count*24) + "}"
+    if (hour is not currentHour):
+        print "{timestamp:" + str(timestamp) + ", sensor:'meanPerHour', type:'watt', value:" + str(sum/count) + "}"
         sum = 0
         count = 0
-        currentDay = day
+        currentHour = hour
