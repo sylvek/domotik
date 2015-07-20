@@ -36,6 +36,8 @@ assume that you have installed a fresh raspbian…
 - sudo apt-get install fswebcam lirc
 - http://ozzmaker.com/2013/10/24/how-to-control-the-gpio-on-a-raspberry-pi-with-an-ir-remote/
 - http://lirc.sourceforge.net/remotes/apple/A1156
+- http://www.elinux.org/RPi_Bluetooth_LE
+- https://github.com/IanHarvey/bluepy
 
 ### domotik
 - cd /home/pi
