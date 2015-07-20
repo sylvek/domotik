@@ -37,8 +37,15 @@
         if (response.data.length > 0) {
           var sensor = response.data[0];
           var sum = 0;
+          var count_this_date = false;
           sensor.values.forEach(function(e) {
-            sum += e[1];
+            if (count_this_date) {
+              sum += e[1];
+            }
+            var date = new Date(e[0] * 1000);
+            if (date.getHours() == 0 && !count_this_date) {
+              count_this_date = true;
+            }
           });
           $scope.sum_watt_now = sum/1000;
         }
