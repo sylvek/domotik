@@ -62,11 +62,14 @@ router.get('/last/:time(24h|30d)/:sensor(meanPerHour|sumPerDay)', function(req, 
 router.get('/last/year/:sensor(meanPerHour|sumPerDay)', function(req, res, next) {
   var db = req.db;
   var collection = db.get("measures");
-  var last_year = Math.floor((new Date().getTime() - 365*60*60*24*1000) / 1000);
-  var last_year_plus_one_day = Math.floor((new Date().getTime() - 364*60*60*24*1000) / 1000);
+  
+  var now = new Date();
+  var last_year_date = new Date();
+  last_year_date.setFullYear(now.getFullYear() - 1);
+  var last_year = Math.floor(last_year_date.getTime() / 1000);
 
   collection.ensureIndex({ sensors:1, type:1, timestamp:1 }, { background:true }, function(err, indexName) {
-    collection.find({ sensor:req.params.sensor, type:'watt', timestamp:{$gt: last_year}, timestamp:{$lt: last_year_plus_one_day} },
+    collection.find({ sensor:req.params.sensor, type:'watt', timestamp:{$gt: last_year} },
                     { fields: {timestamp:1, sensor:1, value:1, _id:0},
                       sort: {timestamp:1}, limit:1 }, function (err, elements) {
           res.send(elements);
