@@ -23,6 +23,7 @@
       $scope.sum_watt_yesterday = "nc";
       $scope.sum_watt_last_year = "nc";
       $scope.sum_watt_now = "nc";
+      $scope.mean_last_30_days = "nc";
 
       domotikSrv.last("24h", "temp").then(function(response) {
         $scope.twenty_four_hours_temp = response.data;
@@ -47,7 +48,7 @@
               count_this_date = true;
             }
           });
-          $scope.sum_watt_now = sum/1000;
+          $scope.sum_watt_now = (sum / 1000).toPrecision(4);
         }
       });
 
@@ -55,15 +56,22 @@
         $scope.thirty_days_sum_watt = response.data;
         if (response.data.length > 0) {
           var sensor = response.data[0];
-          if (sensor.values.length > 0) {
-            $scope.sum_watt_yesterday = sensor.values[sensor.values.length - 1][1]/1000 ;
+          var number_of_values = sensor.values.length;
+          if (number_of_values > 0) {
+            $scope.sum_watt_yesterday = (sensor.values[number_of_values - 1][1] / 1000).toPrecision(4);
+
+            var sum = 0;
+            sensor.values.forEach(function(element) {
+              sum += element[1];
+            });
+            $scope.mean_last_30_days = (sum / number_of_values / 1000).toPrecision(4);
           }
         }
       });
 
       domotikSrv.last("year", "sumPerDay").then(function(response) {
         if (response.data.length > 0) {
-          $scope.sum_watt_last_year = response.data[0].value/1000;
+          $scope.sum_watt_last_year = (response.data[0].value / 1000).toPrecision(4);
         }
       });
 

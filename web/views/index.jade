@@ -14,11 +14,15 @@ block content
         tr
           th now
           th yesterday
-          th last year
         tr
           td {{sum_watt_now}}
           td {{sum_watt_yesterday}}
+        tr
+          th last year
+          th mean 30 days
+        tr
           td {{sum_watt_last_year}}
+          td {{mean_last_30_days}}
 
     div
       nvd3-line-chart(

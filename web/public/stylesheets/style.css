@@ -16,3 +16,12 @@ a {
   text-align: center;
   font-size: 150%;
 }
+
+#history table {
+  border: 1px solid black;
+  padding: 5px;
+}
+
+#history th {
+  width: 30px;
+}
