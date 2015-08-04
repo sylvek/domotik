@@ -2,6 +2,7 @@
 echo "launching services..."
 $HOME/domotik/services/service-calculateMeanPerHour.py sensors/cc128/watt sensors/cc128mean/watt measures/meanPerHour/watt &
 $HOME/domotik/services/service-calculateSumPerDay.py measures/meanPerHour/watt measures/sumPerDay/watt &
+$HOME/domotik/services/service-alertValueUp.py measures/sumPerDay/watt 1.20 sylvain.maucourt@free.fr smaucourt@gmail.com smtp.free.fr &
 echo "launching mosquitto publishing..."
 $HOME/domotik/mosquitto_pub/cc128.sh &
 echo "launching mosquitto subscribing..."
