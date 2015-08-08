@@ -19,7 +19,7 @@ previous_value = 0
 def send_mail(current_value, percent):
     header = "From: %s\n" % args.from_mail
     header += "To: %s\n" % args.to_mail
-    header += "Subject: [domotik] consumption increased by %s percent.\n\n" % str(100 - percent * 100)
+    header += "Subject: [domotik] consumption increased by %s percent.\n\n" % str(percent)
     body = "current value %s should be abnormal. Please check your installation." % str(current_value)
     server = smtplib.SMTP(args.mail_server)
     server.sendmail(args.from_mail, args.to_mail, header + body)
