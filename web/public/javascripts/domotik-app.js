@@ -109,7 +109,7 @@
 
       $scope.xAxisTickFormat_Date_Format = function() {
         return function(d) {
-          return d3.time.format('%x')(new Date(d * 1000));
+          return d3.time.format('%e/%m')(new Date(d * 1000));
         }
       }
       $scope.xAxisTickFormat_Time_Format = function() {
