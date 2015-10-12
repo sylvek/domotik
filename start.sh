@@ -9,6 +9,7 @@ echo "launching mosquitto subscribing..."
 $HOME/domotik/mosquitto_sub/syslog.py &
 $HOME/domotik/mosquitto_sub/mongodb.py &
 $HOME/domotik/mosquitto_sub/freebox.sh &
+$HOME/domotik/mosquitto_sub/led.sh &
 echo "launching web interface..."
 cd $HOME/domotik/web
 npm install
