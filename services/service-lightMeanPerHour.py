@@ -20,12 +20,16 @@ def on_message(client, userdata, msg):
     global previous_value
     current_value = int(msg.payload)
     if (previous_value > 0):
-        percent = current_value / previous_value
+        percent = limit_percent(current_value / previous_value)
         red = int(255 - 125 * percent)
         green = int(125 * percent)
         color = struct.pack('BBB',*(red,green,255)).encode('hex')
         client.publish(args.trigger_out, color)
     previous_value = current_value
+
+def limit_percent(percent):
+    if (percent > 2.0):
+        return 2.0
 
 def signal_handler(signal, frame):
     print "Ending and cleaning up"
