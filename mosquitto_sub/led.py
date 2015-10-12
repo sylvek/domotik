@@ -4,6 +4,7 @@ import argparse
 import signal
 import struct
 import RPi.GPIO as GPIO
+import time
 
 parser = argparse.ArgumentParser(description='interact with led RGB by sending hex. rgb code')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
@@ -11,10 +12,25 @@ parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?
 args = parser.parse_args()
 
 def on_connect(client, userdata, flags, rc):
-    client.subscribe("triggers/led/update")
+    client.subscribe("triggers/led/+")
 
 def on_message(client, userdata, msg):
-    rgb = struct.unpack('BBB', msg.payload.decode('hex'))
+    topic = msg.topic
+    rgb = msg.payload
+    if topic == "triggers/led/update":
+        update_led_value(rgb)
+    if topic == "triggers/led/blink":
+        blink_led_value(rgb)
+
+def blink_led_value(value):
+    for x in xrange(0, 3):
+        update_led_value(value)
+        time.sleep(1000)
+        update_led_value("ffffff")
+        time.sleep(1000)
+
+def update_led_value(value):
+    rgb = struct.unpack('BBB', value.decode('hex'))
     rgb = [(x / 255.0) * 100 for x in rgb] # Convert 0-255 range to 0-100.
     RED.ChangeDutyCycle(rgb[0])
     GREEN.ChangeDutyCycle(rgb[1])
