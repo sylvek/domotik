@@ -11,7 +11,7 @@ parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?
 args = parser.parse_args()
 
 def on_connect(client, userdata, flags, rc):
-    client.subscribe("triggers/led/#")
+    client.subscribe("triggers/led/update")
 
 def on_message(client, userdata, msg):
     rgb = struct.unpack('BBB', msg.payload.decode('hex'))
