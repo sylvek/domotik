@@ -25,9 +25,9 @@ def on_message(client, userdata, msg):
 def blink_led_value(value):
     for x in xrange(0, 3):
         update_led_value(value)
-        time.sleep(1000)
+        time.sleep(1.000)
         update_led_value("ffffff")
-        time.sleep(1000)
+        time.sleep(1.000)
 
 def update_led_value(value):
     rgb = struct.unpack('BBB', value.decode('hex'))
