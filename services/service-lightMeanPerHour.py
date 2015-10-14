@@ -30,6 +30,7 @@ def on_message(client, userdata, msg):
 def limit_percent(percent):
     if (percent > 2.0):
         return 2.0
+    return percent
 
 def signal_handler(signal, frame):
     print "Ending and cleaning up"
