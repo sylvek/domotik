@@ -18,7 +18,8 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     current_value = int(msg.payload)
-    if (current_value < args.limit):
+    limit = int(args.limit)
+    if (current_value < limit):
         client.publish(args.trigger_out, args.trigger_value)
 
 def signal_handler(signal, frame):
