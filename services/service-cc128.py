@@ -8,12 +8,13 @@ import re
 import signal
 
 parser = argparse.ArgumentParser(description='fetch data from cc128 and push it to mqtt')
+parser.add_argument('usbport', metavar='usbport', help='usb port like /dev/ttyUSB0', nargs='?', default='/dev/ttyUSB0')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
 parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?', default="1883")
 args = parser.parse_args()
 
 system = 'envi' #'classic'
-usbport = '/dev/ttyUSB0'
+usbport = args.usbport
 run = True
 
 def sensor_data_check( sensor, watt, tmpr ):
