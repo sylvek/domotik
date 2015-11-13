@@ -32,7 +32,7 @@ def signal_handler(signal, frame):
 
 try:
 	signal.signal(signal.SIGINT, signal_handler)
-	ser = serial.Serial(port=usbport, baudrate=115200, timeout=3)
+	ser = serial.Serial(port=usbport, baudrate=9600, timeout=3)
 	client = mqtt.Client()
 	client.connect(args.hostname, int(args.port), 60)
 except:
