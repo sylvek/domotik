@@ -5,6 +5,7 @@ $HOME/domotik/services/service-lightMeanPerHour.py measures/meanPerHour/watt tri
 $HOME/domotik/services/service-calculateSumPerDay.py measures/meanPerHour/watt measures/sumPerDay/watt &
 $HOME/domotik/services/service-alertValueUp.py measures/sumPerDay/watt 1.20 sylvain.maucourt@free.fr smaucourt@gmail.com smtp.free.fr &
 $HOME/domotik/services/service-alertLowBattery.py sensors/thn132n/battery triggers/led/blink 30 ffff00 &
+$HOME/domotik/services/service-displayToLCD.py sensors/+/temp triggers/lcd/text &
 echo "launching mosquitto publishing..."
 $HOME/domotik/mosquitto_pub/cc128.sh &
 $HOME/domotik/mosquitto_pub/thn132n.sh &
