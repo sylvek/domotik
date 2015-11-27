@@ -7,7 +7,7 @@ import datetime
 parser = argparse.ArgumentParser(description='try to discover the hot water consumption by analysing when the hot water tank goes off. That should occur only one time per night.')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
 parser.add_argument('trigger_out', metavar='trigger_out', help='trigger message')
-parser.add_argument('percent', metavar='percent', help='trigger limit in percent between two values. 0.10 => 10percent means that the new measure looses 90p of value.', default="0.10")
+parser.add_argument('percent', metavar='percent', help='trigger limit in percent between two values. 0.10 => 10percent means that the new measure looses 90p of value.', nargs='?', default="0.10")
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
 parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?', default="1883")
 args = parser.parse_args()
