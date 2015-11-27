@@ -18,6 +18,7 @@
       $scope.twenty_four_hours_watt = [];
       $scope.twenty_four_hours_mean_watt = [];
       $scope.thirty_days_sum_watt = [];
+      $scope.thirty_days_hotwatertank_minutes = [];
       $scope.lastCapture = "api/last/capture";
 
       $scope.sum_watt_yesterday = "nc";
@@ -69,6 +70,10 @@
         }
       });
 
+      domotikSrv.last("30d", "tankHotWaterPerDay").then(function(response) {
+        $scope.thirty_days_hotwatertank_minutes = response.data;
+      });
+
       domotikSrv.last("year", "sumPerDay").then(function(response) {
         if (response.data.length > 0) {
           $scope.sum_watt_last_year = (response.data[0].value / 1000).toPrecision(4);
@@ -109,7 +114,7 @@
 
       $scope.xAxisTickFormat_Date_Format = function() {
         return function(d) {
-          return d3.time.format('%e/%m')(new Date(d * 1000));
+          return d3.time.format('%d/%m')(new Date(d * 1000));
         }
       }
       $scope.xAxisTickFormat_Time_Format = function() {
@@ -130,6 +135,11 @@
       $scope.yAxisTickFormat_Watt_Format = function() {
         return function(d) {
           return d + "W";
+        }
+      }
+      $scope.yAxisTickFormat_Min_Format = function() {
+        return function(d) {
+          return d + "min";
         }
       }
   });

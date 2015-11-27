@@ -91,3 +91,19 @@ block content
         xAxisLabel="last 30 days",
         margin="{left:100,top:20,bottom:100,right:10}"
         height="300")
+    div
+      nvd3-discrete-bar-chart(
+        data="thirty_days_hotwatertank_minutes",
+        showLegend="true",
+        showXAxis="true",
+        showYAxis="true",
+        showValues="true",
+        tooltips="true",
+        interactive="true",
+        useInteractiveGuideLine="true",
+        xAxisTickFormat="xAxisTickFormat_Date_Format()",
+        yAxisTickFormat="yAxisTickFormat_Min_Format()",
+        yAxisLabel="Minutes (min)",
+        xAxisLabel="last 30 days",
+        margin="{left:100,top:20,bottom:100,right:10}"
+        height="300")
