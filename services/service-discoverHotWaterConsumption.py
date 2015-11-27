@@ -26,13 +26,11 @@ def on_message(client, userdata, msg):
     global day
     now = datetime.datetime.now()
     current_value = int(msg.payload)
-    print current_value
     current_day = now.day
     p = float(args.percent)
     if (current_day is not day):
         trigger = True
     if (trigger and current_value < previous_value * p):
-        print "trigger!"
         current_time_in_minute = now.hour * 60 + now.minute
         client.publish(args.trigger_out, current_time_in_minute + minutes_previous_midnight)
         trigger = False
