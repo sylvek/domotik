@@ -30,6 +30,7 @@ def on_message(client, userdata, msg):
     p = float(args.percent)
     if (current_day is not day):
         trigger = True
+        day = current_day
     if (trigger and current_value < previous_value * p):
         current_time_in_minute = now.hour * 60 + now.minute
         client.publish(args.trigger_out, current_time_in_minute + minutes_previous_midnight)
