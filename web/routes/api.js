@@ -30,7 +30,7 @@ router.get('/last/:time(24h|20s)/:type(temp|watt)', function(req, res, next) {
   });
 });
 
-router.get('/last/:time(24h|30d)/:sensor(meanPerHour|sumPerDay)', function(req, res, next) {
+router.get('/last/:time(24h|30d)/:sensor(meanPerHour|sumPerDay|tankHotWaterPerDay)', function(req, res, next) {
   var db = req.db;
   var collection = db.get("measures");
   var twenty_four_hours = Math.floor((new Date().getTime() - 60*60*24*1000) / 1000);
