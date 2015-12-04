@@ -4,6 +4,7 @@ $HOME/domotik/services/service-calculateMeanPerHour.py sensors/cc128/watt sensor
 $HOME/domotik/services/service-lightMeanPerHour.py measures/meanPerHour/watt triggers/led/blink &
 $HOME/domotik/services/service-calculateSumPerDay.py measures/meanPerHour/watt measures/sumPerDay/watt &
 $HOME/domotik/services/service-alertValueUp.py measures/sumPerDay/watt 1.20 sylvain.maucourt@free.fr smaucourt@gmail.com smtp.free.fr &
+$HOME/domotik/services/service-alertValueUp.py measures/tankHotWaterPerDay/min 1.20 sylvain.maucourt@free.fr smaucourt@gmail.com smtp.free.fr &
 $HOME/domotik/services/service-alertLowBattery.py sensors/thn132n/battery triggers/led/blink 30 ffff00 &
 $HOME/domotik/services/service-displayToLCD.py sensors/+/temp triggers/lcd/text &
 $HOME/domotik/services/service-discoverHotWaterConsumption.py sensors/cc128/watt measures/tankHotWaterPerDay/min &
