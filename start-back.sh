@@ -16,10 +16,3 @@ $HOME/domotik/mosquitto_sub/syslog.py &
 $HOME/domotik/mosquitto_sub/mongodb.py &
 $HOME/domotik/mosquitto_sub/freebox.sh &
 sudo $HOME/domotik/mosquitto_sub/led.py &
-echo "launching web interface..."
-cd $HOME/domotik/web
-npm install
-node_modules/bower/bin/bower install
-nohup npm start > /dev/null &
-IP=$(ifconfig wlan0 | awk 'sub(/inet addr:/,""){print $1}')
-echo "go to http://$IP:3000"
