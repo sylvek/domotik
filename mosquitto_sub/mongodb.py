@@ -14,7 +14,6 @@ args = parser.parse_args()
 
 def on_connect(client, userdata, flags, rc):
     client_mqtt.subscribe("sensors/#")
-    client_mqtt.subscribe("triggers/#")
     client_mqtt.subscribe("measures/#")
 
 def on_message(client, userdata, msg):
