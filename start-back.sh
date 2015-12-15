@@ -8,6 +8,7 @@ $HOME/domotik/services/service-alertValueUp.py measures/tankHotWaterPerDay/min 1
 $HOME/domotik/services/service-alertLowBattery.py sensors/thn132n/battery triggers/led/blink 30 ffff00 &
 $HOME/domotik/services/service-displayToLCD.py sensors/+/temp triggers/lcd/text &
 $HOME/domotik/services/service-discoverHotWaterConsumption.py sensors/cc128/watt measures/tankHotWaterPerDay/min &
+$HOME/domotik/services/service-triggerFromHTTP.py triggers/web/receive &
 echo "launching mosquitto publishing..."
 $HOME/domotik/mosquitto_pub/cc128.sh &
 $HOME/domotik/mosquitto_pub/thn132n.sh &
