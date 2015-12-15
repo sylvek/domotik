@@ -25,6 +25,7 @@ def sensor_data_check( tmpr, moisture, battery ):
     client.publish("sensors/thn132n/temp", tmpr)
 
 def signal_handler(signal, frame):
+    global run
     print "Ending and cleaning up"
     ser.close()
     client.disconnect()

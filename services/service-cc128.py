@@ -25,6 +25,7 @@ def sensor_data_check( sensor, watt, tmpr ):
     client.publish("sensors/cc128/temp", tmpr)
 
 def signal_handler(signal, frame):
+    global run
     print "Ending and cleaning up"
     ser.close()
     client.disconnect()
