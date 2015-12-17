@@ -86,7 +86,6 @@ public class FullscreenActivity extends Activity {
                     break;
                 case MQTTservice.REGISTER:
                     subscribeTopic("sensors/+/temp");
-                    subscribeTopic("sensors/+/watt");
                     break;
                 default:
                     super.handleMessage(msg);
