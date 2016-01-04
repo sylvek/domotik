@@ -1,27 +1,24 @@
 body {
   padding: 20px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 20px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
 a {
   color: #00B7FF;
 }
 
-#capture {
-  display: inline;
-}
-
-#history {
-  float:right;
+#current, #history, #capture, #water {
+  float:left;
   text-align: center;
-  font-size: 150%;
+  font-size: 120%;
+  margin-right: 10px;
 }
 
-#history table {
+#history table, #current table, #water table {
   border: 1px solid black;
   padding: 5px;
 }
 
-#history th {
+#history th, #current th, @water th {
   width: 30px;
 }

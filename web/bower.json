@@ -17,6 +17,7 @@
     "angular": "~1.4.2",
     "d3": "~3.5.6",
     "nvd3": "~1.8.1",
-    "angularjs-nvd3-directives": "~0.0.7"
+    "angularjs-nvd3-directives": "~0.0.7",
+    "bower-mqttws": "~1.0.0"
   }
 }
