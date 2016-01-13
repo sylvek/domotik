@@ -1,14 +1,19 @@
-extends layout
+doctype html
+html
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel='stylesheet', href='stylesheets/style.css')
+  body
+    block content
+      h1 Welcome on #{title}
+      :markdown
+        This is my own home automation project. It is based on the concept of micro-services.
+        [You'll learn more on Wikipedia](https://en.wikipedia.org/wiki/Microservices).
 
-block content
-  h1 Welcome on #{title}
-  :markdown
-    This is my own home automation project. It is based on the concept of micro-services.
-    [You'll learn more on Wikipedia](https://en.wikipedia.org/wiki/Microservices).
+        [The project is hosted by GitHub](https://github.com/sylvek/domotik)
 
-    [The project is hosted by GitHub](https://github.com/sylvek/domotik)
+        Two links are availables:
 
-    Two links are availables:
-
-    - [current data](/current)
-    - [history](/history)
+        - [current data](current)
+        - [history](history)
