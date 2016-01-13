@@ -1,52 +1,14 @@
 extends layout
 
 block content
-  div(ng-controller="domotikIndexCtrl")
+  h1 Welcome on #{title}
+  :markdown
+    This is my own home automation project. It is based on the concept of micro-services.
+    [You'll learn more on Wikipedia](https://en.wikipedia.org/wiki/Microservices).
 
-    div#current
-      div Temp. (°c)
-      table
-        tr
-          th outside
-          td {{temp_outside}}
-        tr
-          th living
-          td {{temp_living_room}}
-        tr
-          th rooms
-          td {{temp_bathroom}}
+    [The project is hosted by GitHub](https://github.com/sylvek/domotik)
 
-    div#history
-      div Power (kWh)
-      table
-        tr
-          th current
-          td {{power_now}}
-        tr
-          th this hour
-          td {{power_hour}}
-        tr
-          th today
-          td {{sum_watt_now}}
-        tr
-          th yesterday
-          td {{sum_watt_yesterday}}
-        tr
-          th last year
-          td {{sum_watt_last_year}}
-        tr
-          th mean 30 days
-          td {{mean_watt_last_30_days}}
+    Two links are availables:
 
-    div#water
-      div Water (min.)
-        table
-          tr
-            th yesterday
-            td {{hot_water_comsuption_yesterday}}
-          tr
-            th mean 30 days
-            td {{hot_water_mean_last_30_days}}
-
-    div#capture
-      image(ng-src="{{last_view}}")
+    - [current data](/current)
+    - [history](/history)

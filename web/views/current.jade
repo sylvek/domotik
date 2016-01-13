@@ -1,0 +1,52 @@
+extends layout
+
+block content
+  div(ng-controller="domotikIndexCtrl")
+
+    div#current
+      div Temp. (°c)
+      table
+        tr
+          th outside
+          td {{temp_outside}}
+        tr
+          th living
+          td {{temp_living_room}}
+        tr
+          th rooms
+          td {{temp_bathroom}}
+
+    div#history
+      div Power (kWh)
+      table
+        tr
+          th current
+          td {{power_now}}
+        tr
+          th this hour
+          td {{power_hour}}
+        tr
+          th today
+          td {{sum_watt_now}}
+        tr
+          th yesterday
+          td {{sum_watt_yesterday}}
+        tr
+          th last year
+          td {{sum_watt_last_year}}
+        tr
+          th mean 30 days
+          td {{mean_watt_last_30_days}}
+
+    div#water
+      div Water (min.)
+        table
+          tr
+            th yesterday
+            td {{hot_water_comsuption_yesterday}}
+          tr
+            th mean 30 days
+            td {{hot_water_mean_last_30_days}}
+
+    div#capture
+      image(ng-src="{{last_view}}")

@@ -5,8 +5,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var sumup = require('./routes/sumup');
+var render = require('./routes/render');
 var api = require('./routes/api');
 
 var mongo = require('mongodb');
@@ -34,8 +33,7 @@ app.use(function(req,res,next){
     next();
 });
 
-app.use('/index', index);
-app.use('/sumup', sumup);
+app.use('/', render);
 app.use('/api', api);
 
 // catch 404 and forward to error handler
