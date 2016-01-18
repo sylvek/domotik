@@ -21,12 +21,6 @@ def on_message(client, userdata, msg):
         update_led_value(rgb)
     if topic == "triggers/led/blink":
         blink_led_value(rgb)
-    if topic == "triggers/led/ambiance":
-        ambiance_led_value(rgb)
-
-def ambiance_led_value(value):
-    for x in xrange(0, 255):
-
 
 def blink_led_value(value):
     for x in xrange(0, 3):
@@ -38,6 +32,9 @@ def blink_led_value(value):
 def update_led_value(value):
     rgb = struct.unpack('BBB', value.decode('hex'))
     rgb = [(x / 255.0) * 100 for x in rgb] # Convert 0-255 range to 0-100.
+    change_duty_cycle(rgb)
+
+def change_duty_cycle(rgb):
     RED.ChangeDutyCycle(rgb[0])
     GREEN.ChangeDutyCycle(rgb[1])
     BLUE.ChangeDutyCycle(rgb[2])
@@ -57,15 +54,15 @@ GPIO.setwarnings(False)
 
 GPIO.setup(7, GPIO.OUT)
 RED = GPIO.PWM(7, 100)
-RED.start(0)
+RED.start(100)
 
 GPIO.setup(8, GPIO.OUT)
 GREEN = GPIO.PWM(8, 100)
-GREEN.start(0)
+GREEN.start(100)
 
 GPIO.setup(25, GPIO.OUT)
 BLUE = GPIO.PWM(25, 100)
-BLUE.start(0)
+BLUE.start(100)
 
 client.connect(args.hostname, int(args.port), 60)
 client.loop_forever()
