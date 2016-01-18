@@ -21,6 +21,12 @@ def on_message(client, userdata, msg):
         update_led_value(rgb)
     if topic == "triggers/led/blink":
         blink_led_value(rgb)
+    if topic == "triggers/led/ambiance":
+        ambiance_led_value(rgb)
+
+def ambiance_led_value(value):
+    for x in xrange(0, 255):
+
 
 def blink_led_value(value):
     for x in xrange(0, 3):
