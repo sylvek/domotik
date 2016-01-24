@@ -1,4 +1,5 @@
 #!/usr/bin/python
+from __future__ import division
 import paho.mqtt.client as mqtt
 import argparse
 import signal
