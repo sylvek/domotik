@@ -14,6 +14,7 @@ args = parser.parse_args()
 run = True
 
 def signal_handler(signal, frame):
+    global run
     print "Ending and cleaning up"
     GPIO.remove_event_detect(14)
     GPIO.cleanup()
@@ -39,10 +40,10 @@ except:
 	sys.exit(errno.EIO)
 
 while run:
-	try:
-		client.loop()
+    try:
+        client.loop()
         value = GPIO.input(14)
         client.publish("sensors/hcsr505/motion", value)
         time.sleep(10)
-	except:
-		sys.exit(errno.EIO)
+    except:
+        sys.exit(errno.EIO)
