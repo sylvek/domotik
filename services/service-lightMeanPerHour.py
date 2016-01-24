@@ -18,7 +18,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     global previous_value
-    current_value = int(msg.payload)
+    current_value = float(msg.payload)
     if (previous_value > 0):
         percent = limit_percent(current_value / previous_value)
         red = int(255 - 125 * percent)

@@ -19,7 +19,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global sum
     global day
-    sum += int(msg.payload)
+    sum += float(msg.payload)
     currentDay = datetime.datetime.now().day
     if (currentDay is not day):
         client.publish(args.measure_out, sum)
