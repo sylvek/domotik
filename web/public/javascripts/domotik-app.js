@@ -17,6 +17,7 @@
       $scope.twenty_four_hours_temp = [];
       $scope.twenty_four_hours_watt = [];
       $scope.twenty_four_hours_mean_watt = [];
+      $scope.twenty_four_hours_presence_livingroom = [];
       $scope.thirty_days_sum_watt = [];
       $scope.thirty_days_hotwatertank_minutes = [];
 
@@ -141,6 +142,10 @@
         }
       });
 
+      domotikSrv.last("24h", "livingRoomPerHour").then(function(response) {
+        $scope.twenty_four_hours_presence_livingroom = response.data;
+      });
+
       domotikSrv.last("30d", "sumPerDay").then(function(response) {
         $scope.thirty_days_sum_watt = response.data;
         if (response.data.length > 0) {
@@ -209,6 +214,11 @@
       $scope.yAxisTickFormat_Min_Format = function() {
         return function(d) {
           return d + "min";
+        }
+      }
+      $scope.yAxisTickFormat_Percent_Format = function() {
+        return function(d) {
+          return (d * 100).toPrecision(4) + "%";
         }
       }
   });
