@@ -77,24 +77,4 @@ router.get('/last/year/:sensor(meanPerHour|sumPerDay)', function(req, res, next)
   });
 });
 
-router.get('/last/capture', function(req, res, next) {
-  var db = req.db;
-  var collection = db.get("sensors");
-
-  collection.ensureIndex({ sensor:1 }, { background:true }, function(err, indexName) {
-    collection.find({ sensor:'camera' },
-                    { fields: {timestamp:1, type:1, value:1, _id:0},
-                      sort: {timestamp:-1}, limit: 1 }, function (err, elements) {
-
-            if (elements.length == 0) {
-              res.status(404).send('Not found');
-            }
-
-            var element = elements[0];
-            res.writeHead(200, { 'Content-Type': element.type, 'Cache-Control': 'no-cache' });
-            res.end( new Buffer(element.value, 'base64'), 'binary');
-    });
-  });
-});
-
 module.exports = router;

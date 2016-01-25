@@ -10,6 +10,7 @@ $HOME/domotik/services/service-alertLowBattery.py sensors/thn132n/battery trigge
 $HOME/domotik/services/service-displayToLCD.py sensors/+/temp triggers/lcd/text &
 $HOME/domotik/services/service-discoverHotWaterConsumption.py sensors/cc128/watt measures/tankHotWaterPerDay/min &
 $HOME/domotik/services/service-triggerFromHTTP.py triggers/web/receive &
+$HOME/domotik/services/service-executeCommand.py sensors/hcsr505/event "$HOME/domotik/mosquitto_pub/jpg_webcam.sh sensors/camera/jpg" &
 echo "launching mosquitto publishing..."
 $HOME/domotik/mosquitto_pub/cc128.py /dev/cc128 &
 $HOME/domotik/mosquitto_pub/thn132n.py /dev/thn32n &
