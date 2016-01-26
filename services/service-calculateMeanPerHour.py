@@ -32,7 +32,7 @@ def on_message(client, userdata, msg):
         count = 1
         sum = mean
         hour = currentHour
-        client.publish(args.measure_out, mean)
+        client.publish(args.measure_out, round(mean, 2))
 
 def signal_handler(signal, frame):
     print "Ending and cleaning up"
