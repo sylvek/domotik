@@ -8,6 +8,7 @@ import json
 import os.path
 
 parser = argparse.ArgumentParser(description='calculate a mean and send a measure one time per hour')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('sensor_in', metavar='sensor_in', help='sensor path given')
 parser.add_argument('sensor_out', metavar='sensor_out', help='sensor path given a resulted mean')
 parser.add_argument('measure_out', metavar='measure_out', help='measure path given a resulted mean (one time per hour)')
@@ -37,15 +38,15 @@ def on_message(client, userdata, msg):
         client.publish(args.measure_out, round(mean, 2))
 
 def signal_handler(signal, frame):
-    with open(__file__ + ".previous", 'w') as outfile:
+    with open(__file__ + service_name + ".previous", 'w') as outfile:
         global count
         global sum
         json.dump({'count': count, 'sum': sum}, outfile)
     print "Ending and cleaning up"
     client.disconnect()
 
-if os.path.exists(__file__ + ".previous"):
-    with open(__file__ + ".previous", 'r') as infile:
+if os.path.exists(__file__ + service_name + ".previous"):
+    with open(__file__ + service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         count = previous['count']
         sum = previous['sum']

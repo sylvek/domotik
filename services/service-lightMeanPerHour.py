@@ -7,6 +7,7 @@ import json
 import os.path
 
 parser = argparse.ArgumentParser(description='blink the led with a certain color one time per hour')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
 parser.add_argument('trigger_out', metavar='trigger_out', help='trigger one time per hour')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
@@ -35,14 +36,14 @@ def limit_percent(percent):
     return percent
 
 def signal_handler(signal, frame):
-    with open(__file__ + ".previous", 'w') as outfile:
+    with open(__file__ + service_name + ".previous", 'w') as outfile:
         global previous_value
         json.dump({'previous_value':previous_value}, outfile)
     print "Ending and cleaning up"
     client.disconnect()
 
-if os.path.exists(__file__ + ".previous"):
-    with open(__file__ + ".previous", 'r') as infile:
+if os.path.exists(__file__ + service_name + ".previous"):
+    with open(__file__ + service_name + ".previous", 'r') as infile:
         previous_value = json.load(infile)['previous_value']
 
 signal.signal(signal.SIGINT, signal_handler)

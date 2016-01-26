@@ -5,6 +5,7 @@ import signal
 import struct
 
 parser = argparse.ArgumentParser(description='forwards message to trigger after formatting it')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
 parser.add_argument('trigger_out', metavar='trigger_out', help='trigger message')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")

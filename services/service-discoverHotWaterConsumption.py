@@ -7,6 +7,7 @@ import json
 import os.path
 
 parser = argparse.ArgumentParser(description='try to discover the hot water consumption by analysing when the hot water tank goes off. That should occur only one time per night.')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
 parser.add_argument('trigger_out', metavar='trigger_out', help='trigger message')
 parser.add_argument('percent', metavar='percent', help='trigger limit in percent between two values. 0.10 => 10percent means that the new measure looses 90p of value.', nargs='?', default="0.10")
@@ -40,7 +41,7 @@ def on_message(client, userdata, msg):
     previous_value = current_value
 
 def signal_handler(signal, frame):
-    with open(__file__ + ".previous", 'w') as outfile:
+    with open(__file__ + service_name + ".previous", 'w') as outfile:
         global previous_value
         global day
         global trigger
@@ -50,8 +51,8 @@ def signal_handler(signal, frame):
 
 day = datetime.datetime.now().day
 
-if os.path.exists(__file__ + ".previous"):
-    with open(__file__ + ".previous", 'r') as infile:
+if os.path.exists(__file__ + service_name + ".previous"):
+    with open(__file__ + service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         day = previous['day']
         previous_value = previous['previous_value']

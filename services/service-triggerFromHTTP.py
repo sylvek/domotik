@@ -5,6 +5,7 @@ import signal
 import argparse
 
 parser = argparse.ArgumentParser(description='trigg an event when web server receive a request')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('trigger_out', metavar='trigger_out', help='trigg out when something is received')
 parser.add_argument('http_port', metavar='http_port', help='web server port', nargs='?', default="8888")
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")

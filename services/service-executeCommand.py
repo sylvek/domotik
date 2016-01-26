@@ -5,6 +5,7 @@ import signal
 import subprocess
 
 parser = argparse.ArgumentParser(description='execute an external command')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
 parser.add_argument('command_out', metavar='command_out', help='external command executed')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")

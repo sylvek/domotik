@@ -5,6 +5,7 @@ import signal
 import struct
 
 parser = argparse.ArgumentParser(description='do something if measure of sensor is less than the limit')
+parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('sensor_in', metavar='sensor_in', help='sensor path given')
 parser.add_argument('trigger_out', metavar='trigger_out', help='trigger out, ex: blink a led')
 parser.add_argument('limit', metavar='limit', help='limit')
