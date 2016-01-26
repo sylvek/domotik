@@ -30,7 +30,7 @@ def on_message(client, userdata, msg):
         day = currentDay
 
 def signal_handler(signal, frame):
-    with open(__file__ + service_name + ".previous", 'w') as outfile:
+    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global day
         global sum
         json.dump({'day': day, 'sum': sum}, outfile)
@@ -39,8 +39,8 @@ def signal_handler(signal, frame):
 
 day = datetime.datetime.now().day
 
-if os.path.exists(__file__ + service_name + ".previous"):
-    with open(__file__ + service_name + ".previous", 'r') as infile:
+if os.path.exists(__file__ + "." + args.service_name + ".previous"):
+    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         day = previous['day']
         sum = previous['sum']

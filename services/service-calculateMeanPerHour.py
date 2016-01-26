@@ -38,15 +38,15 @@ def on_message(client, userdata, msg):
         client.publish(args.measure_out, round(mean, 2))
 
 def signal_handler(signal, frame):
-    with open(__file__ + service_name + ".previous", 'w') as outfile:
+    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global count
         global sum
         json.dump({'count': count, 'sum': sum}, outfile)
     print "Ending and cleaning up"
     client.disconnect()
 
-if os.path.exists(__file__ + service_name + ".previous"):
-    with open(__file__ + service_name + ".previous", 'r') as infile:
+if os.path.exists(__file__ + "." + args.service_name + ".previous"):
+    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         count = previous['count']
         sum = previous['sum']

@@ -41,7 +41,7 @@ def on_message(client, userdata, msg):
     previous_value = current_value
 
 def signal_handler(signal, frame):
-    with open(__file__ + service_name + ".previous", 'w') as outfile:
+    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global previous_value
         global day
         global trigger
@@ -51,8 +51,8 @@ def signal_handler(signal, frame):
 
 day = datetime.datetime.now().day
 
-if os.path.exists(__file__ + service_name + ".previous"):
-    with open(__file__ + service_name + ".previous", 'r') as infile:
+if os.path.exists(__file__ + "." + args.service_name + ".previous"):
+    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         day = previous['day']
         previous_value = previous['previous_value']
