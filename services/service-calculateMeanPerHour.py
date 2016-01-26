@@ -4,6 +4,8 @@ import paho.mqtt.client as mqtt
 import argparse
 import signal
 import datetime
+import json
+import os.path
 
 parser = argparse.ArgumentParser(description='calculate a mean and send a measure one time per hour')
 parser.add_argument('sensor_in', metavar='sensor_in', help='sensor path given')
@@ -35,12 +37,23 @@ def on_message(client, userdata, msg):
         client.publish(args.measure_out, round(mean, 2))
 
 def signal_handler(signal, frame):
+    with open(__file__ + ".previous", 'w') as outfile:
+        global count
+        global sum
+        json.dump({'count': count, 'sum': sum}, outfile)
     print "Ending and cleaning up"
     client.disconnect()
+
+if os.path.exists(__file__ + ".previous"):
+    with open(__file__ + ".previous", 'r') as infile:
+        previous = json.load(infile)
+        count = previous['count']
+        sum = previous['sum']
 
 hour = datetime.datetime.now().hour
 
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message

@@ -3,6 +3,8 @@ import paho.mqtt.client as mqtt
 import argparse
 import signal
 import datetime
+import json
+import os.path
 
 parser = argparse.ArgumentParser(description='calculate a sum of measures per day')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
@@ -27,12 +29,23 @@ def on_message(client, userdata, msg):
         day = currentDay
 
 def signal_handler(signal, frame):
+    with open(__file__ + ".previous", 'w') as outfile:
+        global day
+        global sum
+        json.dump({'day': day, 'sum': sum}, outfile)
     print "Ending and cleaning up"
     client.disconnect()
 
 day = datetime.datetime.now().day
 
+if os.path.exists(__file__ + ".previous"):
+    with open(__file__ + ".previous", 'r') as infile:
+        previous = json.load(infile)
+        day = previous['day']
+        sum = previous['sum']
+
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message

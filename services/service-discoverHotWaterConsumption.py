@@ -3,6 +3,8 @@ import paho.mqtt.client as mqtt
 import argparse
 import signal
 import datetime
+import json
+import os.path
 
 parser = argparse.ArgumentParser(description='try to discover the hot water consumption by analysing when the hot water tank goes off. That should occur only one time per night.')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
@@ -38,12 +40,25 @@ def on_message(client, userdata, msg):
     previous_value = current_value
 
 def signal_handler(signal, frame):
+    with open(__file__ + ".previous", 'w') as outfile:
+        global previous_value
+        global day
+        global trigger
+        json.dump({'day': day, 'previous_value': previous_value, 'trigger': trigger}, outfile)
     print "Ending and cleaning up"
     client.disconnect()
 
 day = datetime.datetime.now().day
 
+if os.path.exists(__file__ + ".previous"):
+    with open(__file__ + ".previous", 'r') as infile:
+        previous = json.load(infile)
+        day = previous['day']
+        previous_value = previous['previous_value']
+        trigger = previous['trigger']
+
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message

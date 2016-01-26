@@ -13,7 +13,7 @@ $HOME/domotik/services/service-triggerFromHTTP.py triggers/web/receive &
 $HOME/domotik/services/service-executeCommand.py sensors/hcsr505/event "$HOME/domotik/mosquitto_pub/jpg_webcam.sh sensors/camera/jpg" &
 echo "launching mosquitto publishing..."
 $HOME/domotik/mosquitto_pub/cc128.py /dev/cc128 &
-$HOME/domotik/mosquitto_pub/thn132n.py /dev/thn32n &
+$HOME/domotik/mosquitto_pub/thn132n.py /dev/thn132n &
 sudo $HOME/domotik/mosquitto_pub/hcsr505.py &
 echo "launching mosquitto subscribing..."
 $HOME/domotik/mosquitto_sub/syslog.py &
