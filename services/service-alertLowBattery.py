@@ -17,7 +17,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(args.sensor_in)
 
 def on_message(client, userdata, msg):
-    current_value = int(msg.payload)
+    current_value = float(msg.payload)
     limit = int(args.limit)
     if (current_value < limit):
         client.publish(args.trigger_out, args.trigger_value)

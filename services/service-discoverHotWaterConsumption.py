@@ -25,7 +25,7 @@ def on_message(client, userdata, msg):
     global trigger
     global day
     now = datetime.datetime.now()
-    current_value = int(msg.payload)
+    current_value = float(msg.payload)
     current_day = now.day
     p = float(args.percent)
     if (current_day is not day):

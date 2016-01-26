@@ -29,7 +29,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     global previous_value
-    current_value = int(msg.payload)
+    current_value = float(msg.payload)
     p = float(args.percent)
     if (previous_value != 0 and current_value > previous_value * p):
         send_mail(current_value, current_value * 100 / previous_value)

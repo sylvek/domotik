@@ -24,7 +24,7 @@ def on_message(client, userdata, msg):
     global sum
     global hour
     count += 1
-    sum += int(msg.payload)
+    sum += float(msg.payload)
     mean = sum/count
     client.publish(args.sensor_out, mean)
     currentHour = datetime.datetime.now().hour
