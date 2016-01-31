@@ -41,11 +41,11 @@
         notify: restart udev
 
       # domotik
-      - shell: nohup /home/pi/domotik/stop-back.sh &
+      - shell: nohup /home/pi/domotik/stop-back.sh
         tags:
           - refresh
           - stop
-      - shell: nohup /home/pi/domotik/start-back.sh &
+      - shell: nohup /home/pi/domotik/start-back.sh
         tags:
           - refresh
           - start

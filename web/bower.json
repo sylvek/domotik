@@ -15,14 +15,14 @@
   ],
   "dependencies": {
     "angular": "~1.4.9",
-    "d3": "~3.5.14",
+    "d3": "~3.4.13",
     "nvd3": "~1.8.2",
     "angularjs-nvd3-directives": "~0.0.7",
     "bower-mqttws": "~1.0.0"
   },
   "resolutions": {
     "angular": "~1.4.9",
-    "d3": "~3.5.14",
+    "d3": "~3.4.13",
     "nvd3": "~1.8.2"
   },
   "private": true
