@@ -5,7 +5,8 @@
       - apt: update_cache=yes cache_valid_time=3600
       - apt: upgrade=dist
       - apt: name=python-pip state=present
-      - git: repo=https://github.com/sylvek/domotik.git dest=/home/pi/domotik version=master
+      - git: repo=https://github.com/sylvek/domotik.git dest=/home/pi/domotik version=master force=yes
+        become_user: pi
         tags:
           - refresh
           - update
@@ -41,15 +42,12 @@
         notify: restart udev
 
       # domotik
-      - shell: nohup pkill mosquitto_sub || /bin/true
-        tags:
-          - refresh
-          - stop
-      - shell: killall /usr/bin/python || /bin/true
+      - shell: nohup /home/pi/domotik/stop-back.sh &
         tags:
           - refresh
           - stop
       - shell: nohup /home/pi/domotik/start-back.sh &
+        become_user: pi
         tags:
           - refresh
           - start
@@ -115,6 +113,7 @@
         tags:
           - refresh
       - shell: MONGO_DB='127.0.0.1:27017/domotik' forever start /home/pi/domotik/web/bin/www
+        become_user: pi
         tags:
           - node_start
           - refresh

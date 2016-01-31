@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "stopping mosquitto subscribing..."
-killall mosquitto_sub
+pkill mosquitto_sub
 echo "stopping services..."
-sudo killall /usr/bin/python
+pkill domotik
 echo "bye"
