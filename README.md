@@ -11,57 +11,40 @@ An another service (services folder) could calculate the mean or the max value, 
 ### raspberrypi
 assume that you have installed a fresh raspbian…
 
-### mosquitto
-- sudo apt-get install mosquitto mosquitto-clients python-mosquitto
+### from ansible
 
-- git clone http://git.eclipse.org/gitroot/paho/org.eclipse.paho.mqtt.python.git
-- cd org.eclipse.paho.mqtt.python
-- sudo python setup.py install
-
-### node.js
-- wget http://node-arm.herokuapp.com/node_latest_armhf.deb
-- sudo dpkg -i node_latest_armhf.deb
-
-### mongodb
-- wget https://github.com/tjanson/mongodb-armhf-deb/releases/download/v2.1.1-1/mongodb_2.1.1_armhf.deb
-- sudo dpkg -i mongodb_2.1.1_armhf.deb
-- sudo /etc/init.d/mongodb start
-- sudo update-rc.d mongodb defaults
-
-- git clone git://github.com/mongodb/mongo-python-driver.git pymongo
-- cd pymongo/
-- sudo python setup.py install
-
-### others
-- sudo apt-get install fswebcam lirc
-- http://ozzmaker.com/2013/10/24/how-to-control-the-gpio-on-a-raspberry-pi-with-an-ir-remote/
-- http://lirc.sourceforge.net/remotes/apple/A1156
-- http://www.elinux.org/RPi_Bluetooth_LE
-- https://github.com/IanHarvey/bluepy
-
-### domotik
-- cd /home/pi
-- git clone https://github.com/sylvek/domotik.git
-- cd /home/pi/domotik
-- --> create and run your own sensors (crontab.txt)
-- ./start.sh
-- go to http://[your raspberrypi]:3000
-- ...
-- ./stop.sh
+```
+domotik/extras/ansible $> ansible-playbook -b -i raspberrypi playbook.yml [--limit @host] [--tag "tags"]
+# where tags is:
+# refresh
+# update
+# stop
+# start
+# node_stop
+# node_start
+```
 
 ## sensors (mosquitto_pub)
-several sensors push data over MQTT (read crontab.txt)
-- pi temperature
+several sensors push data over MQTT
 - home int. temperature (via CurrentCost ENVI cc128)
+- home int. temperature (via esp8266 + DS18B20)
+- home ext. temperature (via thn132n + arduino bridge over usb)
 - power consumption (via CurrentCost ENVI cc128)
-- home ext. temperature (via yahoo weather webservice)
-- webcam usb
 
 ## triggers (mosquitto_pub)
-- lirc
+- remote IR control (via lirc)
+- motion sensor (via hc sr505)
 
 ## analyzers (mosquitto_sub)
 several analyzers are available
 - push data to syslog
 - push data to mongodb
 - control the freebox HD
+- RGB LED
+- LCD
+
+## services
+- mean by hour
+- sum per day
+- alert consumption
+- webcam picture

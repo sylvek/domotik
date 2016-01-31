@@ -1,0 +1,5 @@
+[front]
+192.168.0.5 ansible_user=pi ansible_ssh_pass=raspberry
+
+[back]
+192.168.0.4 ansible_user=pi ansible_ssh_pass=raspberry

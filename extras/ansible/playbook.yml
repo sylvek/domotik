@@ -1,0 +1,121 @@
+---
+  - hosts: all
+    tasks:
+      - locale_gen: name=fr_FR.UTF-8 state=present
+      - apt: update_cache=yes cache_valid_time=3600
+      - apt: upgrade=dist
+      - apt: name=python-pip state=present
+      - git: repo=https://github.com/sylvek/domotik.git dest=/home/pi/domotik version=master
+        tags:
+          - refresh
+          - update
+
+  - hosts: back
+    tasks:
+      - apt: name=mosquitto state=present
+      - apt: name=mosquitto-clients state=present
+      - apt: name=python-mosquitto state=present
+      - apt: name=fswebcam state=present
+      - pip: name=paho-mqtt
+
+      # check wifi connection
+      - copy: src=wifi/check-freebox.sh dest=/home/pi/check-freebox.sh mode="u+rx,g=r,o=r"
+      - cron: name="check freebox" minute="0/1" job="/home/pi/check-freebox.sh"
+
+      # configure lirc
+      - apt: name=lirc state=present
+      - apt: name=liblircclient-dev state=present
+      - lineinfile: dest=/etc/modules line="lirc_dev"
+        notify: reboot
+      - lineinfile: dest=/etc/modules line="lirc_rpi gpio_in_pin=18"
+        notify: reboot
+      - copy: src=lirc/A1156 dest=/etc/lirc/lircd.conf owner=root group=root
+        notify: restart lircd
+      - copy: src=lirc/lircrc dest=/etc/lirc/lircrc owner=root group=root
+        notify: restart lircd
+      - copy: src=lirc/hardware.conf dest=/etc/lirc/hardware.conf owner=root group=root
+        notify: restart lircd
+
+      # configure udev
+      - copy: src=usb/etc-udev-rules.d-99-usb-serial.rules dest=/etc/udev/rules.d/99-usb-serial.rules owner=root group=root
+        notify: restart udev
+
+      # domotik
+      - shell: nohup pkill mosquitto_sub || /bin/true
+        tags:
+          - refresh
+          - stop
+      - shell: killall /usr/bin/python || /bin/true
+        tags:
+          - refresh
+          - stop
+      - shell: nohup /home/pi/domotik/start-back.sh &
+        tags:
+          - refresh
+          - start
+
+    handlers:
+      - name: reboot
+        debug: msg="you should reboot after installation"
+      - name: restart lircd
+        service: name=lirc state=restarted
+      - name: restart udev
+        service: name=udev state=restarted
+
+  - hosts: front
+    tasks:
+      - command: dpkg-query -W node
+        register: node_check_deb
+        failed_when: node_check_deb.rc > 1
+        changed_when: node_check_deb.rc == 1
+      - get_url: url=http://node-arm.herokuapp.com/node_latest_armhf.deb dest=/tmp/node_latest_armhf.deb
+        when: node_check_deb.rc == 1
+      - apt: deb=/tmp/node_latest_armhf.deb
+        when: node_check_deb.rc == 1
+      - command: dpkg-query -W mongodb
+        register: mongodb_check_deb
+        failed_when: mongodb_check_deb.rc > 1
+        changed_when: mongodb_check_deb.rc == 1
+      - get_url: url=https://github.com/tjanson/mongodb-armhf-deb/releases/download/v2.1.1-1/mongodb_2.1.1_armhf.deb dest=/tmp/mongodb_2.1.1_armhf.deb
+        when: mongodb_check_deb.rc == 1
+      - apt: deb=/tmp/mongodb_2.1.1_armhf.deb
+        when: mongodb_check_deb.rc == 1
+      - service: name=mongodb state=started enabled=yes
+      - pip: name=paho-mqtt
+      - pip: name=pymongo
+      - npm: name=forever global=yes
+      - npm: name=bower global=yes
+
+      # domotik
+      - shell: pkill mongodb.py || /bin/true
+        tags:
+          - refresh
+          - stop
+      - shell: nohup /home/pi/domotik/mosquitto_sub/mongodb.py {{ hostvars[groups['back'][0]]['inventory_hostname'] }} &
+        tags:
+          - refresh
+          - start
+      - shell: pkill syslog.py || /bin/true
+        tags:
+          - refresh
+          - stop
+      - shell: nohup /home/pi/domotik/mosquitto_sub/syslog.py {{ hostvars[groups['back'][0]]['inventory_hostname'] }} &
+        tags:
+          - refresh
+          - start
+      - shell: forever stop /home/pi/domotik/web/bin/www || /bin/true
+        tags:
+          - node_stop
+          - refresh
+          - stop
+      - npm: path=/home/pi/domotik/web global=no
+        tags:
+          - refresh
+      - bower: path=/home/pi/domotik/web
+        tags:
+          - refresh
+      - shell: MONGO_DB='127.0.0.1:27017/domotik' forever start /home/pi/domotik/web/bin/www
+        tags:
+          - node_start
+          - refresh
+          - start
