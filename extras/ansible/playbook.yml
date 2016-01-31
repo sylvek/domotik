@@ -110,7 +110,7 @@
       - bower: path=/home/pi/domotik/web
         tags:
           - refresh
-      - shell: MONGO_DB='127.0.0.1:27017/domotik' forever start /home/pi/domotik/web/bin/www
+      - shell: MONGO_DB='127.0.0.1:27017/domotik' forever start -s /home/pi/domotik/web/bin/www
         tags:
           - node_start
           - refresh
