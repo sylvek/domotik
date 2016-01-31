@@ -14,7 +14,7 @@ echo "launching services..."
 echo "launching mosquitto publishing..."
 /home/pi/domotik/mosquitto_pub/cc128.py /dev/cc128 &
 /home/pi/domotik/mosquitto_pub/thn132n.py /dev/thn132n &
-sudo /home/pi/domotik/mosquitto_pub/hcsr505.py &
+/home/pi/domotik/mosquitto_pub/hcsr505.py &
 echo "launching mosquitto subscribing..."
 /home/pi/domotik/mosquitto_sub/syslog.py &
 /home/pi/domotik/mosquitto_sub/mongodb.py &
