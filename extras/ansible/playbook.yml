@@ -6,7 +6,6 @@
       - apt: upgrade=dist
       - apt: name=python-pip state=present
       - git: repo=https://github.com/sylvek/domotik.git dest=/home/pi/domotik version=master force=yes
-        become_user: pi
         tags:
           - refresh
           - update
@@ -47,7 +46,6 @@
           - refresh
           - stop
       - shell: nohup /home/pi/domotik/start-back.sh &
-        become_user: pi
         tags:
           - refresh
           - start
@@ -113,7 +111,6 @@
         tags:
           - refresh
       - shell: MONGO_DB='127.0.0.1:27017/domotik' forever start /home/pi/domotik/web/bin/www
-        become_user: pi
         tags:
           - node_start
           - refresh

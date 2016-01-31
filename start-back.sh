@@ -17,6 +17,6 @@ nohup $HOME/domotik/mosquitto_pub/thn132n.py /dev/thn132n &
 nohup sudo $HOME/domotik/mosquitto_pub/hcsr505.py &
 echo "launching mosquitto subscribing..."
 nohup $HOME/domotik/mosquitto_sub/syslog.py &
-#nohup $HOME/domotik/mosquitto_sub/mongodb.py &
+nohup $HOME/domotik/mosquitto_sub/mongodb.py &
 nohup $HOME/domotik/mosquitto_sub/freebox.sh &
 nohup sudo $HOME/domotik/mosquitto_sub/led.py &
