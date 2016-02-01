@@ -14,16 +14,15 @@
     "tests"
   ],
   "dependencies": {
-    "angular": "~1.4.9",
-    "d3": "~3.4.13",
-    "nvd3": "~1.8.2",
-    "angularjs-nvd3-directives": "~0.0.7",
-    "bower-mqttws": "~1.0.0"
+    "angular": "^1.4.x",
+    "d3": "3.5.6",
+    "nvd3": "1.8.1",
+    "angularjs-nvd3-directives": "0.0.7",
+    "bower-mqttws": "^1.0.x"
   },
   "resolutions": {
-    "angular": "~1.4.9",
-    "d3": "~3.4.13",
-    "nvd3": "~1.8.2"
-  },
-  "private": true
+    "nvd3": "1.8.1",
+    "d3": "3.5.6",
+    "angular": "^1.4.x"
+  }
 }
