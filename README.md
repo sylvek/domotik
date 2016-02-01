@@ -4,7 +4,7 @@
 
 Domotik is a very simple home-automation software based on micro-services principle.
 Each service (services folder) does only one thing. A script (mosquitto_pub) pushes the data on MQTT.
-A another process (mosquitto_pub) has the responsability to dispatch the data somewhere.
+A another process (mosquitto_sub) is in charge of dispatch the data somewhere.
 An another service (services folder) could calculate the mean or the max value, etc and push it on MQTT, etc, etc.
 
 ## installation
@@ -14,7 +14,7 @@ assume that you have installed a fresh raspbian…
 ### from ansible
 
 ```
-domotik/extras/ansible $> ansible-playbook -b -i raspberrypi playbook.yml [--limit @host] [--tag "tags"]
+domotik/ansible $> ansible-playbook -b -i raspberrypi playbook.yml [--limit @host] [--tag "tags"]
 # where tags is:
 # refresh
 # update
