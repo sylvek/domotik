@@ -28,6 +28,7 @@
       $scope.hot_water_comsuption_yesterday = "nc";
       $scope.hot_water_mean_last_30_days = "nc";
 
+      $scope.temp_room = "nc";
       $scope.temp_bathroom = "nc";
       $scope.temp_outside = "nc";
       $scope.temp_living_room = "nc";
@@ -52,6 +53,10 @@
         console.log("onMessageArrived => " + topic + " " + payload);
         var categories = topic.split("/");
         switch(categories[1]) {
+          // room
+          case "esp12e":
+            $scope.temp_room = payload;
+            break;
           // bathroom
           case "esp8266":
             $scope.temp_bathroom = payload;
