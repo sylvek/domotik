@@ -32,7 +32,6 @@ html(ng-app='domotikApp')
             th room
             td(class="stream") {{temp_room}}
 
-      div#history
         div Power (kWh)
         table
           tr
@@ -41,6 +40,10 @@ html(ng-app='domotikApp')
           tr
             th this hour
             td(class="stream") {{power_hour}}
+
+      div#history
+        div Power (kWh)
+        table
           tr
             th today
             td {{sum_watt_now}}
