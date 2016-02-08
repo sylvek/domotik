@@ -1,0 +1,23 @@
+body {
+  background-color: black;
+  color: white;
+}
+
+.stream {
+  background-color: chocolate;
+}
+
+#current, #history, #capture, #water {
+  float:left;
+  text-align: center;
+  font-size: 120%;
+  margin-right: 10px;
+}
+
+#history table, #current table, #water table {
+  padding: 5px;
+}
+
+#history th, #current th, #water th {
+  width: 30px;
+}

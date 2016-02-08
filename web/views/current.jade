@@ -1,55 +1,68 @@
-extends layout
+doctype html
+html(ng-app='domotikApp')
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel='stylesheet', href='stylesheets/style.css')
+    link(rel='stylesheet', href='stylesheets/style-current.css')
+    link(rel='stylesheet', href='bower_components/nvd3/build/nv.d3.css')
+    script(src='bower_components/angular/angular.min.js')
+    script(src='bower_components/bower-mqttws/mqttws31.js')
+    script(src='bower_components/d3/d3.js')
+    script(src='bower_components/nvd3/build/nv.d3.js')
+    script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
+    script(src='javascripts/domotik-app.js')
 
-block content
-  div(ng-controller="domotikIndexCtrl")
+  block content
+    div(ng-controller="domotikIndexCtrl")
 
-    div#current
-      div Temp. (°c)
-      table
-        tr
-          th outside
-          td {{temp_outside}}
-        tr
-          th living
-          td {{temp_living_room}}
-        tr
-          th bathroom
-          td {{temp_bathroom}}
-        tr
-          th room
-          td {{temp_room}}
-
-    div#history
-      div Power (kWh)
-      table
-        tr
-          th current
-          td {{power_now}}
-        tr
-          th this hour
-          td {{power_hour}}
-        tr
-          th today
-          td {{sum_watt_now}}
-        tr
-          th yesterday
-          td {{sum_watt_yesterday}}
-        tr
-          th last year
-          td {{sum_watt_last_year}}
-        tr
-          th mean 30 days
-          td {{mean_watt_last_30_days}}
-
-    div#water
-      div Water (min.)
+      div#current
+        div Temp. (°c)
         table
           tr
+            th outside
+            td(class="stream") {{temp_outside}}
+          tr
+            th living
+            td(class="stream") {{temp_living_room}}
+          tr
+            th bathroom
+            td(class="stream") {{temp_bathroom}}
+          tr
+            th room
+            td(class="stream") {{temp_room}}
+
+      div#history
+        div Power (kWh)
+        table
+          tr
+            th current
+            td(class="stream") {{power_now}}
+          tr
+            th this hour
+            td(class="stream") {{power_hour}}
+          tr
+            th today
+            td {{sum_watt_now}}
+          tr
             th yesterday
-            td {{hot_water_comsuption_yesterday}}
+            td {{sum_watt_yesterday}}
+          tr
+            th last year
+            td {{sum_watt_last_year}}
           tr
             th mean 30 days
-            td {{hot_water_mean_last_30_days}}
+            td {{mean_watt_last_30_days}}
 
-    div#capture
-      image(ng-src="{{last_view}}")
+      div#water
+        div Water (min.)
+          table
+            tr
+              th yesterday
+              td {{hot_water_comsuption_yesterday}}
+            tr
+              th mean 30 days
+              td {{hot_water_mean_last_30_days}}
+
+      div#capture
+        image(ng-src="{{last_view}}")

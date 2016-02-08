@@ -1,103 +1,116 @@
-extends layout
+doctype html
+html(ng-app='domotikApp')
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel='stylesheet', href='stylesheets/style.css')
+    link(rel='stylesheet', href='stylesheets/style-history.css')
+    link(rel='stylesheet', href='bower_components/nvd3/build/nv.d3.css')
+    script(src='bower_components/angular/angular.min.js')
+    script(src='bower_components/bower-mqttws/mqttws31.js')
+    script(src='bower_components/d3/d3.js')
+    script(src='bower_components/nvd3/build/nv.d3.js')
+    script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
+    script(src='javascripts/domotik-app.js')
 
-block content
-  div(ng-controller="domotikIndexCtrl")
+  block content
+    div(ng-controller="domotikIndexCtrl")
 
-    div
-      nvd3-line-chart(
-        data="twenty_four_hours_temp",
-        objectEquality="true",
-        isArea="false",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        interpolate="basis",
-        xAxisTickFormat="xAxisTickFormat_Time_Format()",
-        yAxisTickFormat="yAxisTickFormat_Temp_Format()",
-        yAxisLabel="Temperature (°c)",
-        xAxisLabel="last 24 hours of temperature",
-        margin="{left:100,top:20,bottom:100,right:10}",
-        height="300")
-      nvd3-line-chart(
-        data="twenty_four_hours_watt",
-        objectEquality="true",
-        isArea="false",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        interpolate="basis",
-        xAxisTickFormat="xAxisTickFormat_Time_Format()",
-        yAxisTickFormat="yAxisTickFormat_Watt_Format()",
-        yAxisLabel="Power (W)",
-        xAxisLabel="last 24 hours of general power consumption",
-        margin="{left:100,top:20,bottom:100,right:10}",
-        height="300")
+      div
+        nvd3-line-chart(
+          data="twenty_four_hours_temp",
+          objectEquality="true",
+          isArea="false",
+          showLegend="true",
+          showXAxis="true",
+          showYAxis="true",
+          tooltips="true",
+          interactive="true",
+          useInteractiveGuideLine="true",
+          interpolate="basis",
+          xAxisTickFormat="xAxisTickFormat_Time_Format()",
+          yAxisTickFormat="yAxisTickFormat_Temp_Format()",
+          yAxisLabel="Temperature (°c)",
+          xAxisLabel="last 24 hours of temperature",
+          margin="{left:100,top:20,bottom:100,right:10}",
+          height="300")
+        nvd3-line-chart(
+          data="twenty_four_hours_watt",
+          objectEquality="true",
+          isArea="false",
+          showLegend="true",
+          showXAxis="true",
+          showYAxis="true",
+          tooltips="true",
+          interactive="true",
+          useInteractiveGuideLine="true",
+          interpolate="basis",
+          xAxisTickFormat="xAxisTickFormat_Time_Format()",
+          yAxisTickFormat="yAxisTickFormat_Watt_Format()",
+          yAxisLabel="Power (W)",
+          xAxisLabel="last 24 hours of general power consumption",
+          margin="{left:100,top:20,bottom:100,right:10}",
+          height="300")
 
-    div
-      nvd3-discrete-bar-chart(
-        data="twenty_four_hours_mean_watt",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        showValues="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        xAxisTickFormat="xAxisTickFormat_Hour_Format()",
-        yAxisTickFormat="yAxisTickFormat_Watt_Format()",
-        yAxisLabel="Power (W)",
-        xAxisLabel="last 24 hours",
-        margin="{left:100,top:20,bottom:100,right:10}"
-        height="300")
-      nvd3-discrete-bar-chart(
-        data="twenty_four_hours_presence_livingroom",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        showValues="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        xAxisTickFormat="xAxisTickFormat_Hour_Format()",
-        yAxisTickFormat="yAxisTickFormat_Percent_Format()",
-        yAxisLabel="Percent (%)",
-        xAxisLabel="last 24 hours of presence in the living room",
-        margin="{left:100,top:20,bottom:100,right:10}"
-        height="300")
-    div
-      nvd3-discrete-bar-chart(
-        data="thirty_days_sum_watt",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        showValues="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        xAxisTickFormat="xAxisTickFormat_Date_Format()",
-        yAxisTickFormat="yAxisTickFormat_Watt_Format()",
-        yAxisLabel="Power (W)",
-        xAxisLabel="last 30 days of general power consumption",
-        margin="{left:100,top:20,bottom:100,right:10}"
-        height="300")
-      nvd3-discrete-bar-chart(
-        data="thirty_days_hotwatertank_minutes",
-        showLegend="true",
-        showXAxis="true",
-        showYAxis="true",
-        showValues="true",
-        tooltips="true",
-        interactive="true",
-        useInteractiveGuideLine="true",
-        xAxisTickFormat="xAxisTickFormat_Date_Format()",
-        yAxisTickFormat="yAxisTickFormat_Min_Format()",
-        yAxisLabel="Minutes (min)",
-        xAxisLabel="last 30 days of tank hot water power consumption",
-        margin="{left:100,top:20,bottom:100,right:10}"
-        height="300")
+      div
+        nvd3-discrete-bar-chart(
+          data="twenty_four_hours_mean_watt",
+          showLegend="true",
+          showXAxis="true",
+          showYAxis="true",
+          showValues="true",
+          tooltips="true",
+          interactive="true",
+          useInteractiveGuideLine="true",
+          xAxisTickFormat="xAxisTickFormat_Hour_Format()",
+          yAxisTickFormat="yAxisTickFormat_Watt_Format()",
+          yAxisLabel="Power (W)",
+          xAxisLabel="last 24 hours",
+          margin="{left:100,top:20,bottom:100,right:10}"
+          height="300")
+        nvd3-discrete-bar-chart(
+          data="twenty_four_hours_presence_livingroom",
+          showLegend="true",
+          showXAxis="true",
+          showYAxis="true",
+          showValues="true",
+          tooltips="true",
+          interactive="true",
+          useInteractiveGuideLine="true",
+          xAxisTickFormat="xAxisTickFormat_Hour_Format()",
+          yAxisTickFormat="yAxisTickFormat_Percent_Format()",
+          yAxisLabel="Percent (%)",
+          xAxisLabel="last 24 hours of presence in the living room",
+          margin="{left:100,top:20,bottom:100,right:10}"
+          height="300")
+      div
+        nvd3-discrete-bar-chart(
+          data="thirty_days_sum_watt",
+          showLegend="true",
+          showXAxis="true",
+          showYAxis="true",
+          showValues="true",
+          tooltips="true",
+          interactive="true",
+          useInteractiveGuideLine="true",
+          xAxisTickFormat="xAxisTickFormat_Date_Format()",
+          yAxisTickFormat="yAxisTickFormat_Watt_Format()",
+          yAxisLabel="Power (W)",
+          xAxisLabel="last 30 days of general power consumption",
+          margin="{left:100,top:20,bottom:100,right:10}"
+          height="300")
+        nvd3-discrete-bar-chart(
+          data="thirty_days_hotwatertank_minutes",
+          showLegend="true",
+          showXAxis="true",
+          showYAxis="true",
+          showValues="true",
+          tooltips="true",
+          interactive="true",
+          useInteractiveGuideLine="true",
+          xAxisTickFormat="xAxisTickFormat_Date_Format()",
+          yAxisTickFormat="yAxisTickFormat_Min_Format()",
+          yAxisLabel="Minutes (min)",
+          xAxisLabel="last 30 days of tank hot water power consumption",
+          margin="{left:100,top:20,bottom:100,right:10}"
+          height="300")
