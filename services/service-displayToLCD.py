@@ -19,7 +19,8 @@ def on_message(client, userdata, msg):
     topic = msg.topic.split('/')
     payload = msg.payload
     unit = "degree" if topic[2] == "temp" else topic[2]
-    client.publish(args.trigger_out, topic[1] + ";" + payload + ";" + unit)
+    sensor = "salon" if topic[1] == "cc128" else "chambre" if topic[1] == "esp12e" else "dehors" if topic[1] == "thn132n" else "salle de bain" if topic[1] == "esp8266" else topic[1]
+    client.publish(args.trigger_out, sensor + ";" + payload + ";" + unit)
 
 
 def signal_handler(signal, frame):
