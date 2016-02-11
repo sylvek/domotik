@@ -25,7 +25,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     global count
     global sum
-    global hour
+    global day
     count += 1
     sum += float(msg.payload)
     mean = sum/count
