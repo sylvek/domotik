@@ -4,7 +4,7 @@ echo "launching services..."
 /home/pi/domotik/services/service-calculateMeanPerHour.py domotik_motion_per_hour sensors/hcsr505/motion sensors/hcsr505mean/motion measures/livingRoomPerHour/motion &
 /home/pi/domotik/services/service-lightMeanPerHour.py domotik_light_per_hour measures/meanPerHour/watt triggers/led/blink &
 /home/pi/domotik/services/service-calculateSumPerDay.py domotik_watt_per_day measures/meanPerHour/watt measures/sumPerDay/watt &
-/home/pi/domotik/services/service-calculateMeanPerDay.py domotik_mean_outside_temp_per_day sensors/thn132n/temp sensors/thn132nmean/temp measures/outside/temp &
+/home/pi/domotik/services/service-calculateMeanPerDay.py domotik_mean_outside_temp_per_day sensors/thn132n/temp sensors/thn132n/mean measures/outside/temp &
 /home/pi/domotik/services/service-alertValueUp.py domotik_alert_watt_consumption measures/sumPerDay/watt 1.20 sylvain.maucourt@free.fr smaucourt@gmail.com smtp.free.fr &
 /home/pi/domotik/services/service-alertValueUp.py domotik_alert_water_consumption measures/tankHotWaterPerDay/min 1.20 sylvain.maucourt@free.fr smaucourt@gmail.com smtp.free.fr &
 /home/pi/domotik/services/service-alertLowBattery.py domotik_thn132n_low_battery sensors/thn132n/battery triggers/led/blink 30 ffff00 &
