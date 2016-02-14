@@ -11,61 +11,69 @@ html(ng-app='domotikApp')
     script(src='bower_components/d3/d3.js')
     script(src='bower_components/nvd3/build/nv.d3.js')
     script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
-    script(src='javascripts/domotik-app.js')
+    script(src='javascripts/domotik-app-current.js')
 
   block content
     div(ng-controller="domotikIndexCtrl")
 
-      div#current
-        div Temp. (°c)
+      div#weather
+        h2 {{weather.city}}
+        image(ng-src="{{weather.img}}")
         table
           tr
-            th outside
-            td(class="stream") {{temp_outside}}
+            th actuellement
+            td {{weather.temp.current}} °c
           tr
-            th living
-            td(class="stream") {{temp_living_room}}
+            th min
+            td {{weather.temp.min}} °c
           tr
-            th bathroom
-            td(class="stream") {{temp_bathroom}}
-          tr
-            th room
-            td(class="stream") {{temp_room}}
+            th max
+            td {{weather.temp.max}} °c
 
-        div Power (kWh)
+      div#current
+        h2 Maison
         table
           tr
-            th current
-            td(class="stream") {{power_now}}
+            th dehors
+            td(class="stream") {{temp_outside}} °c
           tr
-            th this hour
-            td(class="stream") {{power_hour}}
+            th salon
+            td(class="stream") {{temp_living_room}} °c
+          tr
+            th salle de bain
+            td(class="stream") {{temp_bathroom}} °c
+          tr
+            th chambre
+            td(class="stream") {{temp_room}} °c
+          tr
+            th actuellement
+            td(class="stream") {{power_now}} kWh
+          tr
+            th cette heure
+            td(class="stream") {{power_hour}} kWh
 
       div#history
-        div Power (kWh)
+        h2 Electrique
         table
           tr
-            th today
-            td {{sum_watt_now}}
+            th hier
+            td {{sum_watt_yesterday}} kWh
           tr
-            th yesterday
-            td {{sum_watt_yesterday}}
+            th l'année dernière
+            td {{sum_watt_last_year}} kWh
           tr
-            th last year
-            td {{sum_watt_last_year}}
-          tr
-            th mean 30 days
-            td {{mean_watt_last_30_days}}
+            th sur 30 jours
+            td {{mean_watt_last_30_days}} kWh
 
       div#water
-        div Water (min.)
-          table
-            tr
-              th yesterday
-              td {{hot_water_comsuption_yesterday}}
-            tr
-              th mean 30 days
-              td {{hot_water_mean_last_30_days}}
+        h2 Eau chaude
+        table
+          tr
+            th hier
+            td {{hot_water_comsuption_yesterday}} min.
+          tr
+            th sur 30 jours
+            td {{hot_water_mean_last_30_days}} min.
 
       div#capture
         image(ng-src="{{last_view}}")

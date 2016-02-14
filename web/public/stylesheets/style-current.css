@@ -5,19 +5,26 @@ body {
 
 .stream {
   background-color: chocolate;
+  padding-right: 1em;
+  padding-left: 1em;
 }
 
-#current, #history, #capture, #water {
+#weather, #current, #history, #capture, #water {
   float:left;
   text-align: center;
   font-size: 120%;
   margin-right: 10px;
+  margin-top: 10px;
+}
+
+#capture {
+  width: 300px;
 }
 
 #history table, #current table, #water table {
   padding: 5px;
 }
 
-#history th, #current th, #water th {
-  width: 30px;
+th {
+  width: 200px;
 }
