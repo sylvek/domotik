@@ -10,7 +10,7 @@
 
     function getWeather(query) {
       var weather = { temp: {}, clouds: null };
-      $http.jsonp('http://api.openweathermap.org/data/2.5/weather?q=' + query + '&units=metric&appid=5de8e795c11a94258c9e69cc8f2d87bf&callback=JSON_CALLBACK').success(function(data) {
+      $http.jsonp('//api.openweathermap.org/data/2.5/weather?q=' + query + '&units=metric&appid=5de8e795c11a94258c9e69cc8f2d87bf&callback=JSON_CALLBACK').success(function(data) {
           if (data) {
               if (data.main) {
                   weather.city = query;
