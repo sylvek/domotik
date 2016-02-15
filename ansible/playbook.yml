@@ -58,6 +58,42 @@
       - name: restart udev
         service: name=udev state=restarted
 
+  - hosts: kiosk
+    tasks:
+      - apt: name=xwit state=present
+      - apt: name=x11-xserver-utils state=present
+      - apt: name=libwebkit-dev state=present
+      - apt: name=matchbox state=present
+      - apt: name=xserver-xorg state=present
+      - apt: name=xinit state=present
+      - apt: name=lightdm state=present
+        notify: raspi-config
+      - lineinfile: dest=/etc/lightdm/lightdm.conf line="xserver-command=X -s 0 dpms"
+        notify: restart lightdm
+      - git: repo=https://github.com/sylvek/kiosk-browser.git dest=/home/pi/kiosk-browser version=master force=yes
+      - shell: make
+        args:
+            chdir: /home/pi/kiosk-browser
+
+      # domotik
+      - shell: pkill browser || /bin/true
+        tags:
+          - kiosk_stop
+          - refresh
+      - shell: nohup /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal &
+        become: no
+        environment:
+          DISPLAY: :0
+        tags:
+          - kiosk_start
+          - refresh
+
+    handlers:
+      - name: raspi-config
+        debug: msg="you should call sudo raspi-config and verify that X11 is launched at startup"
+      - name: restart lightdm
+        service: name=lightdm state=restarted
+
   - hosts: front
     tasks:
       - command: dpkg-query -W node
