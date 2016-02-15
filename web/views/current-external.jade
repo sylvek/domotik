@@ -11,40 +11,26 @@ html(ng-app='domotikApp')
     script(src='bower_components/d3/d3.js')
     script(src='bower_components/nvd3/build/nv.d3.js')
     script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
-    script(src='javascripts/domotik-app-current.js')
+    script(src='javascripts/domotik-app-current-external.js')
 
   block content
     div(ng-controller="domotikIndexCtrl")
-
-      div#weather
-        h2 {{weather.city}}
-        image(ng-src="{{weather.img}}")
-        table
-          tr
-            th actuellement
-            td {{weather.temp.current}} °c
-          tr
-            th min
-            td {{weather.temp.min}} °c
-          tr
-            th max
-            td {{weather.temp.max}} °c
 
       div#current
         h2 Maison
         table
           tr
-            th dehors
-            td(class="stream") {{temp_outside}} °c
+            th dehors balcon
+            td(class="stream") {{temp_outside1}} °c
+          tr
+            th dehors cuisine
+            td(class="stream") {{temp_outside2}} °c
           tr
             th salon
             td(class="stream") {{temp_living_room}} °c
           tr
             th salle de bain
             td(class="stream") {{temp_bathroom}} °c
-          tr
-            th chambre
-            td(class="stream") {{temp_room}} °c
           tr
             th actuellement
             td(class="stream") {{power_now}} kWh

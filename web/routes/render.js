@@ -5,8 +5,11 @@ var router = express.Router();
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'domotik' });
 });
-router.get('/current', function(req, res, next) {
-  res.render('current', { title: 'domotik' });
+router.get('/internal', function(req, res, next) {
+  res.render('current-internal', { title: 'domotik' });
+});
+router.get('/external', function(req, res, next) {
+  res.render('current-external', { title: 'domotik' });
 });
 router.get('/history', function(req, res, next) {
   res.render('history', { title: 'domotik' });

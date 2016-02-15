@@ -1,0 +1,94 @@
+doctype html
+html(ng-app='domotikApp')
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel='stylesheet', href='stylesheets/style.css')
+    link(rel='stylesheet', href='stylesheets/style-current.css')
+    link(rel='stylesheet', href='bower_components/nvd3/build/nv.d3.css')
+    script(src='bower_components/angular/angular.min.js')
+    script(src='bower_components/bower-mqttws/mqttws31.js')
+    script(src='bower_components/d3/d3.js')
+    script(src='bower_components/nvd3/build/nv.d3.js')
+    script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
+    script(src='javascripts/domotik-app-current-internal.js')
+
+  block content
+    div(ng-controller="domotikIndexCtrl")
+
+      div#weather
+        h2 {{weather1.city}}
+        image(ng-src="{{weather1.img}}")
+        table
+          tr
+            th temperature
+            td {{weather1.temp.current}} °c
+          tr
+            th humidité
+            td {{weather1.humidity}} %
+          tr
+            th vent
+            td {{weather1.wind}} km/h
+          tr
+            th pression
+            td {{weather1.pressure}} hPa
+        h2 {{weather2.city}}
+        image(ng-src="{{weather2.img}}")
+        table
+          tr
+            th temperature
+            td {{weather2.temp.current}} °c
+          tr
+            th humidité
+            td {{weather2.humidity}} %
+          tr
+            th vent
+            td {{weather2.wind}} km/h
+          tr
+            th pression
+            td {{weather2.pressure}} hPa
+
+      div#current
+        h2 Maison
+        table
+          tr
+            th dehors balcon
+            td(class="stream") {{temp_outside1}} °c
+          tr
+            th dehors cuisine
+            td(class="stream") {{temp_outside2}} °c
+          tr
+            th salon
+            td(class="stream") {{temp_living_room}} °c
+          tr
+            th salle de bain
+            td(class="stream") {{temp_bathroom}} °c
+          tr
+            th actuellement
+            td(class="stream") {{power_now}} kWh
+          tr
+            th cette heure
+            td(class="stream") {{power_hour}} kWh
+
+      div#history
+        h2 Electrique
+        table
+          tr
+            th hier
+            td {{sum_watt_yesterday}} kWh
+          tr
+            th l'année dernière
+            td {{sum_watt_last_year}} kWh
+          tr
+            th sur 30 jours
+            td {{mean_watt_last_30_days}} kWh
+
+      div#water
+        h2 Eau chaude
+        table
+          tr
+            th hier
+            td {{hot_water_comsuption_yesterday}} min.
+          tr
+            th sur 30 jours
+            td {{hot_water_mean_last_30_days}} min.

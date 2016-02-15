@@ -9,14 +9,17 @@
     });
 
     function getWeather(query) {
-      var weather = { temp: {}, clouds: null };
-      $http.jsonp('//api.openweathermap.org/data/2.5/weather?q=' + query + '&units=metric&appid=5de8e795c11a94258c9e69cc8f2d87bf&callback=JSON_CALLBACK').success(function(data) {
+      var weather = { temp: {}, clouds: null, humidity: null, pressure: null, wind: null };
+      $http.jsonp('http://api.openweathermap.org/data/2.5/weather?q=' + query + '&units=metric&appid=5de8e795c11a94258c9e69cc8f2d87bf&callback=JSON_CALLBACK').success(function(data) {
           if (data) {
               if (data.main) {
                   weather.city = query;
                   weather.temp.current = data.main.temp;
                   weather.temp.min = data.main.temp_min;
                   weather.temp.max = data.main.temp_max;
+                  weather.humidity = data.main.humidity;
+                  weather.pressure = data.main.pressure;
+                  weather.wind = data.wind.speed;
               }
               weather.clouds = data.clouds ? data.clouds.all : undefined;
 
@@ -48,21 +51,22 @@
       $scope.hot_water_comsuption_yesterday = "--";
       $scope.hot_water_mean_last_30_days = "--";
 
-      $scope.temp_room = "--";
+      $scope.temp_outside1 = "--";
+      $scope.temp_outside2 = "--";
       $scope.temp_bathroom = "--";
-      $scope.temp_outside = "--";
       $scope.temp_living_room = "--";
       $scope.power_hour = "--";
       $scope.power_now = "--";
 
-      var client = new Paho.MQTT.Client("wss://sylvek.hd.free.fr/mosquitto", "gh-" + new Date().getTime());
+      var client = new Paho.MQTT.Client("ws://192.168.0.2/mosquitto", "gh-" + new Date().getTime());
       client.onConnectionLost = function(responseObject) {
           if (responseObject.errorCode !== 0) {
               console.log("onConnectionLost:" + responseObject.errorMessage);
               console.log("Reconnecting... [" + new Date() + "]");
               client.connect({
                   onSuccess: function() {
-                      client.subscribe("sensors/#");
+                      client.subscribe("sensors/+/temp");
+                      client.subscribe("sensors/+/watt");
                   }
               });
           }
@@ -75,13 +79,7 @@
         switch(categories[1]) {
           // room
           case "esp12e":
-            switch (caterogies[2]) {
-              case "temp":
-                $scope.temp_room = payload;
-                break;
-              default:
-                break;
-            }
+            $scope.temp_outside2 = payload;
             break;
           // bathroom
           case "esp8266":
@@ -89,7 +87,13 @@
             break;
           // outside
           case "thn132n":
-            $scope.temp_outside = payload;
+            switch (categories[2]) {
+              case "temp":
+                $scope.temp_outside1 = payload;
+                break;
+              default:
+                break;
+            }
             break;
           // living room
           case "cc128":
@@ -107,9 +111,6 @@
           case "cc128mean":
             $scope.power_hour = (payload / 1000).toPrecision(4);
             break;
-          case "camera":
-            $scope.last_view = "data:image/jpg;base64," + payload;
-            break;
           default:
             break;
         }
@@ -118,12 +119,14 @@
       };
       client.connect({
         onSuccess: function() {
-          console.log("onSuccess => subscribe to sensors/#");
-          client.subscribe("sensors/#");
+          console.log("onSuccess => subscribe to sensors/+/temp & sensors/+/watt");
+          client.subscribe("sensors/+/temp");
+          client.subscribe("sensors/+/watt");
         }
       });
 
-      $scope.weather = domotikSrv.getWeather("Paris,FR");
+      $scope.weather1 = domotikSrv.getWeather("Paris,FR");
+      $scope.weather2 = domotikSrv.getWeather("Los-Angeles,USA");
 
       domotikSrv.last("30d", "sumPerDay").then(function(response) {
         if (response.data.length > 0) {
