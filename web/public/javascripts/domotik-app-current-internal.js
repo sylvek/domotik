@@ -170,6 +170,6 @@
 
       // repeat it
       refresh();
-      $interval(refresh, 900000 /* 15min */);
+      // $interval(refresh, 900000 /* 15min */);
   });
 }(angular));

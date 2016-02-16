@@ -76,6 +76,7 @@
             chdir: /home/pi/kiosk-browser
 
       # domotik
+      - cron: name="reload webpage" minute="0" job="pidof browser | xargs kill -SIGHUP"
       - shell: pkill browser || /bin/true
         tags:
           - kiosk_stop
