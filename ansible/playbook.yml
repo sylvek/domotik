@@ -18,6 +18,7 @@
       - apt: name=python-mosquitto state=present
       - apt: name=fswebcam state=present
       - pip: name=paho-mqtt
+      - pip: name=pyserial
 
       # check wifi connection
       - copy: src=wifi/check-freebox.sh dest=/home/pi/check-freebox.sh mode="u+rx,g=r,o=r"
@@ -63,16 +64,14 @@
 
   - hosts: kiosk
     tasks:
-      - apt: name=xwit state=present
-      - apt: name=x11-xserver-utils state=present
       - apt: name=libwebkit-dev state=present
-      - apt: name=matchbox state=present
       - apt: name=xserver-xorg state=present
       - apt: name=xinit state=present
-      - apt: name=lightdm state=present
-        notify: raspi-config
-      - lineinfile: dest=/etc/lightdm/lightdm.conf line="xserver-command=X -s 0 dpms"
-        notify: restart lightdm
+      - apt: name=matchbox-window-manager state=present
+      - lineinfile: dest=/etc/X11/Xwrapper.config regexp=^allowed_users= line=allowed_users=anybody
+      - lineinfile: dest=/etc/rc.local line="sudo -u pi startx &" insertbefore="^exit 0"
+        tags:
+          - test
       - git: repo=https://github.com/sylvek/kiosk-browser.git dest=/home/pi/kiosk-browser version=master force=yes
       - shell: make
         args:
@@ -91,12 +90,6 @@
         tags:
           - kiosk_start
           - refresh
-
-    handlers:
-      - name: raspi-config
-        debug: msg="you should call sudo raspi-config and verify that X11 is launched at startup"
-      - name: restart lightdm
-        service: name=lightdm state=restarted
 
   - hosts: front
     tasks:
