@@ -5,6 +5,7 @@
       - apt: update_cache=yes cache_valid_time=3600
       - apt: upgrade=dist
       - apt: name=python-pip state=present
+      - apt: name=git state=present
       - git: repo=https://github.com/sylvek/domotik.git dest=/home/pi/domotik version=master force=yes
         tags:
           - refresh
