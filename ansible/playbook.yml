@@ -30,6 +30,8 @@
         notify: reboot
       - lineinfile: dest=/etc/modules line="lirc_rpi gpio_in_pin=18"
         notify: reboot
+      - lineinfile: dest=/boot/config.txt line="dtoverlay=lirc-rpi"
+        notify: reboot
       - copy: src=lirc/A1156 dest=/etc/lirc/lircd.conf owner=root group=root
         notify: restart lircd
       - copy: src=lirc/lircrc dest=/etc/lirc/lircrc owner=root group=root
