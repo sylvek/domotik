@@ -64,14 +64,13 @@
 
   - hosts: kiosk
     tasks:
+      - apt: name=x11-xserver-utils state=present
       - apt: name=libwebkit-dev state=present
       - apt: name=xserver-xorg state=present
       - apt: name=xinit state=present
       - apt: name=matchbox-window-manager state=present
       - lineinfile: dest=/etc/X11/Xwrapper.config regexp=^allowed_users= line=allowed_users=anybody
-      - lineinfile: dest=/etc/rc.local line="sudo -u pi startx &" insertbefore="^exit 0"
-        tags:
-          - test
+      - lineinfile: dest=/etc/rc.local line="sudo -u pi startx -- -nocursor &" insertbefore="^exit 0"
       - git: repo=https://github.com/sylvek/kiosk-browser.git dest=/home/pi/kiosk-browser version=master force=yes
       - shell: make
         args:
@@ -82,6 +81,13 @@
       - shell: pkill browser || /bin/true
         tags:
           - kiosk_stop
+          - refresh
+      - shell: xset -dpms
+        become: no
+        environment:
+          DISPLAY: :0
+        tags:
+          - kiosk_start
           - refresh
       - shell: nohup /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal &
         become: no
