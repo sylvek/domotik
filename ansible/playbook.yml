@@ -82,7 +82,7 @@
         tags:
           - kiosk_stop
           - refresh
-      - shell: xset -dpms
+      - shell: xset dpms 0 0 0
         become: no
         environment:
           DISPLAY: :0
