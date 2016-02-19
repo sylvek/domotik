@@ -20,10 +20,6 @@
       - pip: name=paho-mqtt
       - pip: name=pyserial
 
-      # check wifi connection
-      - copy: src=wifi/check-freebox.sh dest=/home/pi/check-freebox.sh mode="u+rx,g=r,o=r"
-      - cron: name="check freebox" minute="0/1" job="/home/pi/check-freebox.sh"
-
       # configure lirc
       - apt: name=lirc state=present
       - apt: name=liblircclient-dev state=present
