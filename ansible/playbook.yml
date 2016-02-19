@@ -11,6 +11,35 @@
           - refresh
           - update
 
+  - hosts: websocket
+    tasks:
+      - apt: name=apache2 state=present
+      - apt: name=scons state=present
+      - apt: name=apache2-prefork-dev state=present
+      - service: name=apache2 state=started
+      - git: repo=https://github.com/sylvek/apache-websocket.git dest=/home/pi/apache-websocket
+      - git: repo=https://github.com/sylvek/mod_websocket_mosquitto.git dest=/home/pi/mod_websocket_mosquitto
+      - shell: scons
+        args:
+            chdir: /home/pi/apache-websocket
+      - shell: scons install
+        args:
+            chdir: /home/pi/apache-websocket
+      - shell: scons
+        args:
+            chdir: /home/pi/mod_websocket_mosquitto
+      - shell: scons install
+        args:
+            chdir: /home/pi/mod_websocket_mosquitto
+      - template: src=websocket/websocket.conf dest=/etc/apache2/mods-available/websocket.conf
+      - apache2_module: name=websocket state=present
+        notify:
+          - restart apache2
+
+    handlers:
+      - name: restart apache2
+        service: name=apache2 state=restarted
+
   - hosts: back
     tasks:
       - apt: name=mosquitto state=present

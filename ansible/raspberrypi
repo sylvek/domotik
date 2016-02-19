@@ -6,3 +6,6 @@
 
 [kiosk]
 192.168.0.4 ansible_user=pi ansible_ssh_pass=raspberry
+
+[websocket]
+192.168.0.2 ansible_user=pi ansible_ssh_pass=raspberry
