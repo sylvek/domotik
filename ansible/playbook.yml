@@ -19,10 +19,10 @@
       - service: name=apache2 state=started
       - git: repo=https://github.com/sylvek/apache-websocket.git dest=/home/pi/apache-websocket
       - git: repo=https://github.com/sylvek/mod_websocket_mosquitto.git dest=/home/pi/mod_websocket_mosquitto
-      - shell: scons
+      - shell: apxs2 -i -a -c mod_websocket.c
         args:
             chdir: /home/pi/apache-websocket
-      - shell: scons install
+      - shell: apxs2 -i -a -c mod_websocket_draft76.c
         args:
             chdir: /home/pi/apache-websocket
       - shell: scons
