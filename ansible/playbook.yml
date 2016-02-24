@@ -103,6 +103,10 @@
 
       # domotik
       - cron: name="reload webpage" minute="0" job="pidof browser | xargs kill -SIGHUP"
+      - cron: name="restart webpage" minute="0/10" job="pidof browser || DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://192.168.0.5:3000/internal &"
+        become: no
+        tags:
+          - test
       - shell: pkill browser || /bin/true
         tags:
           - kiosk_stop
