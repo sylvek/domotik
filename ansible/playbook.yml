@@ -104,30 +104,21 @@
       - cron: name="reload webpage" minute="0" job="pidof browser | xargs kill -SIGHUP"
       - cron: name="restart webpage" minute="*/10" job="pidof browser || DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://192.168.0.5:3000/internal &"
         become: no
-      - shell: pkill xinit || /bin/true
-        tags:
-          - kiosk_stop
-          - refresh
       - shell: nohup startx -- -nocursor &
         become: no
         environment:
           DISPLAY: :0
-        tags:
-          - kiosk_start
-          - refresh
       - shell: xset -dpms
         become: no
         environment:
           DISPLAY: :0
-        tags:
-          - kiosk_start
-          - refresh
       - shell: xset dpms 0 0 0
         become: no
         environment:
           DISPLAY: :0
+      - shell: pkill browser || /bin/true
         tags:
-          - kiosk_start
+          - kiosk_stop
           - refresh
       - shell: nohup /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal &
         become: no
