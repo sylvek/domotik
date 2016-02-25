@@ -109,6 +109,13 @@
         tags:
           - kiosk_stop
           - refresh
+      - shell: xset -dpms
+        become: no
+        environment:
+          DISPLAY: :0
+        tags:
+          - kiosk_start
+          - refresh
       - shell: xset dpms 0 0 0
         become: no
         environment:
