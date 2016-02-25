@@ -112,7 +112,7 @@
         become: no
         environment:
           DISPLAY: :0
-      - shell: xset dpms 0 0 0
+      - shell: xset s noblank
         become: no
         environment:
           DISPLAY: :0
