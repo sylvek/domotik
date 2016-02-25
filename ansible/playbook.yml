@@ -95,7 +95,6 @@
       - apt: name=xinit state=present
       - apt: name=matchbox-window-manager state=present
       - lineinfile: dest=/etc/X11/Xwrapper.config regexp=^allowed_users= line=allowed_users=anybody
-      - lineinfile: dest=/etc/rc.local line="sudo -u pi startx -- -nocursor &" insertbefore="^exit 0"
       - git: repo=https://github.com/sylvek/kiosk-browser.git dest=/home/pi/kiosk-browser version=master force=yes
       - shell: make
         args:
@@ -105,9 +104,16 @@
       - cron: name="reload webpage" minute="0" job="pidof browser | xargs kill -SIGHUP"
       - cron: name="restart webpage" minute="*/10" job="pidof browser || DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://192.168.0.5:3000/internal &"
         become: no
-      - shell: pkill browser || /bin/true
+      - shell: pkill xinit || /bin/true
         tags:
           - kiosk_stop
+          - refresh
+      - shell: nohup startx -- -nocursor &
+        become: no
+        environment:
+          DISPLAY: :0
+        tags:
+          - kiosk_start
           - refresh
       - shell: xset -dpms
         become: no
