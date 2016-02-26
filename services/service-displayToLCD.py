@@ -19,7 +19,7 @@ def on_message(client, userdata, msg):
     topic = msg.topic.split('/')
     payload = msg.payload
     unit = "degree" if topic[2] == "temp" else topic[2]
-    sensor = "salon" if topic[1] == "cc128" else "chambre" if topic[1] == "esp12e" else "dehors" if topic[1] == "thn132n" else "salle de bain" if topic[1] == "esp8266" else topic[1]
+    sensor = "salon" if topic[1] == "cc128" else "dehors c." if topic[1] == "esp12e" else "dehors b." if topic[1] == "thn132n" else "salle de bain" if topic[1] == "esp8266" else topic[1]
     client.publish(args.trigger_out, sensor + ";" + payload + ";" + unit)
 
 
