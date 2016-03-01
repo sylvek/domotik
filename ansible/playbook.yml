@@ -108,14 +108,20 @@
         become: no
         environment:
           DISPLAY: :0
+        tags:
+          - x_start
       - shell: xset -dpms
         become: no
         environment:
           DISPLAY: :0
+        tags:
+          - x_start
       - shell: xset s noblank
         become: no
         environment:
           DISPLAY: :0
+        tags:
+          - x_start
       - shell: pkill browser || /bin/true
         tags:
           - kiosk_stop
