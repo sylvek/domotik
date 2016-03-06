@@ -6,3 +6,4 @@ sleep 10
 xset -dpms
 xset dpms 0 0 0
 xset s noblank
+xset s off
