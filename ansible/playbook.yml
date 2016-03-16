@@ -70,6 +70,7 @@
         notify: restart udev
 
       # domotik
+      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-back.sh" insertbefore="^exit 0"
       - shell: nohup /home/pi/domotik/stop-back.sh
         tags:
           - refresh
