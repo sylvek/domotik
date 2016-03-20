@@ -26,12 +26,12 @@ def blink_led_value(value):
     for x in xrange(0, 3):
         update_led_value(value)
         time.sleep(1.000)
-        update_led_value("ffffff")
+        update_led_value("000000")
         time.sleep(1.000)
 
 def update_led_value(value):
     rgb = struct.unpack('BBB', value.decode('hex'))
-    rgb = [(x / 255.0) * 100 for x in rgb] # Convert 0-255 range to 0-100.
+    rgb = [100 - (x / 255.0) * 100 for x in rgb] # Convert 0-255 range to 0-100.
     change_duty_cycle(rgb)
 
 def change_duty_cycle(rgb):
