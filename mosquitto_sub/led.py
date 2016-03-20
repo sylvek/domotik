@@ -16,7 +16,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     topic = msg.topic
-    rgb = msg.payload
+    rgb = msg.payload.replace("#", "")
     if topic == "triggers/led/update":
         update_led_value(rgb)
     if topic == "triggers/led/blink":
