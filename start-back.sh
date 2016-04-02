@@ -12,6 +12,7 @@ echo "launching services..."
 /home/pi/domotik/services/service-discoverHotWaterConsumption.py domotik_water_per_day sensors/cc128/watt measures/tankHotWaterPerDay/min &
 /home/pi/domotik/services/service-triggerFromHTTP.py domotik_trigger_from_http triggers/web/receive &
 /home/pi/domotik/services/service-executeCommand.py domotik_trigger_from_event sensors/hcsr505/event "/home/pi/domotik/mosquitto_pub/jpg_webcam.sh sensors/camera/jpg" &
+/home/pi/domotik/services/service-lightAmbiant.py domotik_light_ambiant triggers/led2/update &
 echo "launching mosquitto publishing..."
 /home/pi/domotik/mosquitto_pub/cc128.py /dev/cc128 &
 /home/pi/domotik/mosquitto_pub/thn132n.py /dev/thn132n &

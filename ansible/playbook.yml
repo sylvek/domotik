@@ -48,6 +48,7 @@
       - apt: name=fswebcam state=present
       - pip: name=paho-mqtt
       - pip: name=pyserial
+      - pip: name=schedule
 
       # configure lirc
       - apt: name=lirc state=present
