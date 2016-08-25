@@ -28,6 +28,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(args.measure_in)
 
 def on_message(client, userdata, msg):
+    global locked_datetime
     current_datetime = datetime.datetime.now()
     trigger_datetime = locked_datetime + datetime.timedelta(hours=int(args.nb_hours))
     if msg.payload and trigger_datetime < current_datetime:
