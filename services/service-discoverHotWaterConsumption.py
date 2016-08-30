@@ -31,8 +31,11 @@ def on_message(client, userdata, msg):
     p = float(args.percent)
     if (not trigger and current_time_in_minute > 1350): # 1350 minutes means 22h30
         trigger = True
+        day = now.day
+        previous_value = 0
+    if (trigger and previous_value < current_value): # we keep the most important value during the triggered delay
         previous_value = current_value
-    if (trigger and current_value < previous_value * p):
+    if (trigger and current_value < previous_value * p): # if the current value is x percent lower than the higher value, the trigger is ended
         trigger = False
         elapsed_time_in_minute = (1350 - current_time_in_minute) if now.day == day else (90 + current_time_in_minute) # 90 means minutes between 22h30 and midnight
         client.publish(args.trigger_out, elapsed_time_in_minute)
