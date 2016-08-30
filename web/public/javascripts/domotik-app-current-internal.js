@@ -65,6 +65,7 @@
               console.log("Reconnecting... [" + new Date() + "]");
               client.connect({
                   onSuccess: function() {
+                      client.subscribe("triggers/+/temp");
                       client.subscribe("sensors/+/temp");
                       client.subscribe("sensors/+/watt");
                   }
@@ -120,6 +121,7 @@
       client.connect({
         onSuccess: function() {
           console.log("onSuccess => subscribe to sensors/+/temp & sensors/+/watt");
+          client.subscribe("triggers/+/temp");
           client.subscribe("sensors/+/temp");
           client.subscribe("sensors/+/watt");
         }

@@ -35,6 +35,7 @@
               console.log("Reconnecting... [" + new Date() + "]");
               client.connect({
                   onSuccess: function() {
+                      client.subscribe("triggers/+/temp");
                       client.subscribe("sensors/#");
                   }
               });
@@ -92,6 +93,7 @@
       client.connect({
         onSuccess: function() {
           console.log("onSuccess => subscribe to sensors/#");
+          client.subscribe("triggers/+/temp");
           client.subscribe("sensors/#");
         }
       });

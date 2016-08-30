@@ -14,6 +14,9 @@ echo "launching services..."
 /home/pi/domotik/services/service-triggerFromHTTP.py domotik_trigger_from_http triggers/web/receive &
 /home/pi/domotik/services/service-executeCommand.py domotik_trigger_from_event sensors/hcsr505/event "/home/pi/domotik/mosquitto_pub/jpg_webcam.sh sensors/camera/jpg" &
 /home/pi/domotik/services/service-lightAmbiant.py domotik_light_ambiant triggers/led2/update &
+/home/pi/domotik/services/service-persistCurrentValue.py domotik_persist_thn132n sensors/thn132n/temp triggers/thn132n/temp &
+/home/pi/domotik/services/service-persistCurrentValue.py domotik_persist_esp12e sensors/esp12e/temp triggers/esp12e/temp &
+/home/pi/domotik/services/service-persistCurrentValue.py domotik_persist_esp8266 sensors/esp8266/temp triggers/esp8266/temp &
 echo "launching mosquitto publishing..."
 /home/pi/domotik/mosquitto_pub/cc128.py /dev/cc128 &
 /home/pi/domotik/mosquitto_pub/thn132n.py /dev/thn132n &
