@@ -21,55 +21,6 @@
       $scope.thirty_days_sum_watt = [];
       $scope.thirty_days_hotwatertank_minutes = [];
 
-      var client = new Paho.MQTT.Client("wss://sylvek.hd.free.fr/mosquitto", "gh-" + new Date().getTime());
-      client.onConnectionLost = function(responseObject) {
-          if (responseObject.errorCode !== 0) {
-              console.log("onConnectionLost:" + responseObject.errorMessage);
-              console.log("Reconnecting... [" + new Date() + "]");
-              client.connect({
-                  onSuccess: function() {
-                      client.subscribe("sensors/#");
-                  }
-              });
-          }
-      };
-      client.onMessageArrived = function(message) {
-        var topic = message.destinationName;
-        var payload = message.payloadString;
-        console.log("onMessageArrived => " + topic + " " + payload);
-        var categories = topic.split("/");
-        switch (categories[2]) {
-          case "temp":
-            var d = $scope.twenty_four_hours_temp;
-            d.forEach(function(e2) {
-              if (e2.key == categories[1]) {
-                e2.values.push([new Date().getTime()/1000,payload]);
-              }
-            });
-            $scope.twenty_four_hours_temp = d;
-            break;
-          case "watt":
-            var d = $scope.twenty_four_hours_watt;
-            d.forEach(function(e2) {
-              if (e2.key == categories[1]) {
-                e2.values.push([new Date().getTime()/1000,payload]);
-              }
-            });
-            $scope.twenty_four_hours_watt = d;
-            break;
-          default:
-            break;
-        }
-
-        $scope.$apply();
-      };
-      client.connect({
-        onSuccess: function() {
-          console.log("onSuccess => subscribe to sensors/#");
-          client.subscribe("sensors/#");
-        }
-      });
-
       domotikSrv.last("24h", "temp").then(function(response) {
         $scope.twenty_four_hours_temp = response.data;
       });
