@@ -103,7 +103,8 @@
             chdir: /home/pi/kiosk-browser
 
       # domotik
-      - cron: name="restart webpage" minute="*/20" job="pidof browser | xargs kill && DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://192.168.0.5:3000/internal &"
+      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-x.sh" insertbefore="^exit 0"
+      - cron: name="restart webpage" minute="*/20" job="pidof browser | xargs kill & DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal &"
         become: no
       - shell: pkill xinit || /bin/true
         tags:
@@ -116,10 +117,8 @@
         tags:
           - kiosk_stop
           - refresh
-      - shell: nohup /home/pi/kiosk-browser/browser http://192.168.0.5:3000/internal &
+      - shell: DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal &
         become: no
-        environment:
-          DISPLAY: :0
         tags:
           - kiosk_start
           - refresh
@@ -149,25 +148,9 @@
       - npm: name=bower global=yes
 
       # domotik
-      - shell: pkill mongodb.py || /bin/true
+      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-front.sh {{ hostvars[groups['back'][0]]['inventory_hostname'] }}" insertbefore="^exit 0"
+      - shell: nohup /home/pi/domotik/stop-front.sh
         tags:
-          - refresh
-          - stop
-      - shell: nohup /home/pi/domotik/mosquitto_sub/mongodb.py {{ hostvars[groups['back'][0]]['inventory_hostname'] }} &
-        tags:
-          - refresh
-          - start
-      - shell: pkill syslog.py || /bin/true
-        tags:
-          - refresh
-          - stop
-      - shell: nohup /home/pi/domotik/mosquitto_sub/syslog.py {{ hostvars[groups['back'][0]]['inventory_hostname'] }} &
-        tags:
-          - refresh
-          - start
-      - shell: forever stop /home/pi/domotik/web/bin/www || /bin/true
-        tags:
-          - node_stop
           - refresh
           - stop
       - npm: path=/home/pi/domotik/web global=no
@@ -176,8 +159,7 @@
       - bower: path=/home/pi/domotik/web
         tags:
           - refresh
-      - shell: MONGO_DB='127.0.0.1:27017/domotik' forever start -s /home/pi/domotik/web/bin/www
+      - shell: nohup /home/pi/domotik/start-front.sh {{ hostvars[groups['back'][0]]['inventory_hostname'] }}
         tags:
-          - node_start
           - refresh
           - start

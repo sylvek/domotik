@@ -20,8 +20,6 @@ domotik/ansible $> ansible-playbook -b -i raspberrypi playbook.yml [--limit @hos
 # update
 # stop
 # start
-# node_stop
-# node_start
 ```
 
 ## sensors (mosquitto_pub)
