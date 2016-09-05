@@ -35,11 +35,14 @@ def on_message(client, userdata, msg):
         send_mail()
     locked_datetime = current_datetime
 
-def signal_handler(signal, frame):
-    print "Ending and cleaning up"
-    client.disconnect()
+def signal_handler(sig, frame):
+    if sig is not signal.SIGUSR1:
+        print "Ending and cleaning up"
+        client.disconnect()
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message

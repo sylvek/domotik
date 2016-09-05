@@ -18,12 +18,14 @@ run = True
 def publish(m=''):
     client.publish(args.trigger_out, m)
 
-def signal_handler(signal, frame):
-    print "Ending and cleaning up"
-    global run
-    run = False
-    client.disconnect()
+def signal_handler(sig, frame):
+    if sig is not signal.SIGUSR1:
+        print "Ending and cleaning up"
+        global run
+        run = False
+        client.disconnect()
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()

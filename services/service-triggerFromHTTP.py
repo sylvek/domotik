@@ -22,13 +22,16 @@ class myHandler(BaseHTTPRequestHandler):
         self.end_headers()
         return
 
-def signal_handler(signal, frame):
-    global run
-    print "Ending and cleaning up"
-    run = False
-    client.disconnect()
+def signal_handler(sig, frame):
+    if sig is not signal.SIGUSR1:
+        global run
+        print "Ending and cleaning up"
+        run = False
+        client.disconnect()
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
+signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()
 client.connect(args.hostname, int(args.port), 60)
 

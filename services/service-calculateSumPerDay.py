@@ -29,13 +29,14 @@ def on_message(client, userdata, msg):
         sum = 0
         day = currentDay
 
-def signal_handler(signal, frame):
+def signal_handler(sig, frame):
     with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global day
         global sum
         json.dump({'day': day, 'sum': sum}, outfile)
-    print "Ending and cleaning up"
-    client.disconnect()
+    if sig is not signal.SIGUSR1:
+        print "Ending and cleaning up"
+        client.disconnect()
 
 day = datetime.datetime.now().day
 
@@ -45,6 +46,7 @@ if os.path.exists(__file__ + "." + args.service_name + ".previous"):
         day = previous['day']
         sum = previous['sum']
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()

@@ -40,14 +40,15 @@ def on_message(client, userdata, msg):
         elapsed_time_in_minute = (1350 - current_time_in_minute) if now.day == day else (90 + current_time_in_minute) # 90 means minutes between 22h30 and midnight
         client.publish(args.trigger_out, elapsed_time_in_minute)
 
-def signal_handler(signal, frame):
+def signal_handler(sig, frame):
     with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global previous_value
         global day
         global trigger
         json.dump({'day': day, 'previous_value': previous_value, 'trigger': trigger}, outfile)
-    print "Ending and cleaning up"
-    client.disconnect()
+    if sig is not signal.SIGUSR1:
+        print "Ending and cleaning up"
+        client.disconnect()
 
 day = datetime.datetime.now().day
 
@@ -58,6 +59,7 @@ if os.path.exists(__file__ + "." + args.service_name + ".previous"):
         previous_value = previous['previous_value']
         trigger = previous['trigger']
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()

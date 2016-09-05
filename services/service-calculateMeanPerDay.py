@@ -37,13 +37,14 @@ def on_message(client, userdata, msg):
         day = currentDay
         client.publish(args.measure_out, round(mean, 2))
 
-def signal_handler(signal, frame):
+def signal_handler(sig, frame):
     with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global count
         global sum
         json.dump({'count': count, 'sum': sum}, outfile)
-    print "Ending and cleaning up"
-    client.disconnect()
+    if sig is not signal.SIGUSR1:
+        print "Ending and cleaning up"
+        client.disconnect()
 
 if os.path.exists(__file__ + "." + args.service_name + ".previous"):
     with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
@@ -53,6 +54,7 @@ if os.path.exists(__file__ + "." + args.service_name + ".previous"):
 
 day = datetime.datetime.now().day
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()

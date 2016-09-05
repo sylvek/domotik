@@ -35,17 +35,19 @@ def limit_percent(percent):
         return 2.0
     return percent
 
-def signal_handler(signal, frame):
+def signal_handler(sig, frame):
     with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global previous_value
         json.dump({'previous_value':previous_value}, outfile)
-    print "Ending and cleaning up"
-    client.disconnect()
+    if sig is not signal.SIGUSR1:
+        print "Ending and cleaning up"
+        client.disconnect()
 
 if os.path.exists(__file__ + "." + args.service_name + ".previous"):
     with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous_value = json.load(infile)['previous_value']
 
+signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 client = mqtt.Client()
