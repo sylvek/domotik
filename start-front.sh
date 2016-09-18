@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "launching mosquitto subscribing..."
-/home/pi/domotik/mosquitto_sub/syslog.py $1 &
+#/home/pi/domotik/mosquitto_sub/syslog.py $1 &
 /home/pi/domotik/mosquitto_sub/mongodb.py $1 &
 
 echo "launching webserver..."
