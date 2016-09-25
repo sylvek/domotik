@@ -48,3 +48,24 @@ max.to_csv('sumPerDay.max')
 retrieve this files from jupyter and store it into the folder 'services/data'
 
 at this point, we could use min and max to check if a new value is "correct"
+
+# image analysis
+
+first of all, we need to extract images data. Images are stored on mongodb but
+every 24h this database is erased (obviously data are backuped on an hard drive disk)
+
+to retrieve data, the simpliest way is to "zgrep" backup files.
+
+```
+$ zgrep -h camera sensors* > ~/Downloads/camera.json
+```
+
+data is a list of json object containing a value field. This field is a base64
+jpg encoded.
+
+To extract data to jpg files, we can use :
+
+```
+# camera.json should be in the same folder of extract_images.py
+$ python extract_images.py
+```
