@@ -37,7 +37,7 @@ def on_message(client, userdata, msg):
         previous_value = current_value
     if (trigger and current_value < previous_value * p): # if the current value is x percent lower than the higher value, the trigger is ended
         trigger = False
-        elapsed_time_in_minute = (1350 - current_time_in_minute) if now.day == day else (90 + current_time_in_minute) # 90 means minutes between 22h30 and midnight
+        elapsed_time_in_minute = (current_time_in_minute - 1350) if now.day == day else (90 + current_time_in_minute) # 90 means minutes between 22h30 and midnight
         client.publish(args.trigger_out, elapsed_time_in_minute)
 
 def signal_handler(sig, frame):
