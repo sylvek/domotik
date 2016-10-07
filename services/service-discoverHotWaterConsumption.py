@@ -29,7 +29,7 @@ def on_message(client, userdata, msg):
     current_value = float(msg.payload)
     current_time_in_minute = now.hour * 60 + now.minute # minutes since the begining of current day
     p = float(args.percent)
-    if (not trigger and current_time_in_minute > 1350): # 1350 minutes means 22h30
+    if (not trigger and current_time_in_minute > 1360 and day is not now.day): # 1360 minutes means 22h40 - to prevent mistakes with heating
         trigger = True
         day = now.day
         previous_value = 0
