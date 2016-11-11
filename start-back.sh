@@ -18,6 +18,8 @@ echo "launching services..."
 /home/pi/domotik/services/service-persistCurrentValue.py domotik_persist_esp8266 sensors/esp8266/temp triggers/esp8266/temp &
 /home/pi/domotik/services/service-persistCurrentValue.py domotik_persist_camera sensors/camera/jpg triggers/camera/jpg &
 /home/pi/domotik/services/service-rebootIfNecessary.py domotik_raspberry_reboot sensors/cc128/watt 15 &
+/home/pi/domotik/services/service-checkSensorsAvailability.py domotik_check_esp12e sensors/esp12e/temp 30 triggers/led/blink e06fb9 &
+/home/pi/domotik/services/service-checkSensorsAvailability.py domotik_check_thn132n sensors/thn132n/temp 30 triggers/led/blink e06fb9 &
 echo "launching mosquitto publishing..."
 /home/pi/domotik/mosquitto_pub/cc128.py /dev/cc128 &
 /home/pi/domotik/mosquitto_pub/thn132n.py /dev/thn132n &
