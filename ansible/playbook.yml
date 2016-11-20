@@ -151,6 +151,8 @@
 
       # domotik
       - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-front.sh {{ hostvars[groups['back'][0]]['inventory_hostname'] }}" insertbefore="^exit 0"
+      - cron: name="check mongodb.py" minute="*/5" job="pid=$(pidof python); if [[ -z $pid ]]; then sudo /usr/bin/python /home/pi/domotik/mosquitto_sub/mongodb.py {{ hostvars[groups['back'][0]]['inventory_hostname'] }}; fi &"
+        become: no
       - shell: nohup /home/pi/domotik/stop-front.sh
         tags:
           - refresh
