@@ -9,7 +9,7 @@ body {
   padding-left: 1em;
 }
 
-#weather, #current, #history, #capture, #water {
+#weather, #current, #history, #capture, #water, #geolocation {
   float:left;
   text-align: center;
   font-size: 120%;
@@ -19,6 +19,10 @@ body {
 
 #capture {
   width: 300px;
+}
+
+#geolocation {
+  width: 400px;
 }
 
 #history table, #current table, #water table {

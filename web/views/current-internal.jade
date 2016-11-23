@@ -83,7 +83,6 @@ html(ng-app='domotikApp')
             th sur 30 jours
             td {{mean_watt_last_30_days}} kWh
 
-      div#water
         h2 Eau chaude
         table
           tr
@@ -92,3 +91,8 @@ html(ng-app='domotikApp')
           tr
             th sur 30 jours
             td {{hot_water_mean_last_30_days}} min.
+
+      div#geolocation
+        h2 dernière position
+        {{last_date}}
+        image(ng-src="{{last_position}}")

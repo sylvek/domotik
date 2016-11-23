@@ -66,8 +66,8 @@
               client.connect({
                   onSuccess: function() {
                       client.subscribe("triggers/+/temp");
-                      client.subscribe("sensors/+/temp");
-                      client.subscribe("sensors/+/watt");
+                      client.subscribe("sharemyposition/+/position", {"qos": 1});
+                      client.subscribe("sensors/#");
                   }
               });
           }
@@ -113,6 +113,18 @@
             $scope.power_hour = (payload / 1000).toPrecision(4);
             break;
           default:
+            switch (categories[2]) {
+              case "position":
+                var p = JSON.parse(payload);
+                var position = p.lat + "," + p.lng;
+                var newDate = new Date();
+                newDate.setTime(p.timestamp);
+                $scope.last_date = newDate.toUTCString();
+                $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=352x288&maptype=mapnik&markers=" + position + ",ol-marker-gold"
+                break;
+              default:
+                break;
+            }
             break;
         }
 
@@ -120,10 +132,10 @@
       };
       client.connect({
         onSuccess: function() {
-          console.log("onSuccess => subscribe to sensors/+/temp & sensors/+/watt");
+          console.log("onSuccess => subscribe to sensors, triggers (temp) & positions");
           client.subscribe("triggers/+/temp");
-          client.subscribe("sensors/+/temp");
-          client.subscribe("sensors/+/watt");
+          client.subscribe("sharemyposition/+/position", {"qos": 1});
+          client.subscribe("sensors/#");
         }
       });
 
