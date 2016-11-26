@@ -163,7 +163,7 @@
       - bower: path=/home/pi/domotik/web
         tags:
           - refresh
-      - shell: nohup /home/pi/domotik/start-front.sh {{ hostvars[groups['back'][0]]['inventory_hostname'] }}
+      - shell: nohup /home/pi/domotik/start-front.sh
         tags:
           - refresh
           - start
