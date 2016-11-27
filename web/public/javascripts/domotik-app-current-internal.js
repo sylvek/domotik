@@ -52,6 +52,8 @@
       $scope.hot_water_mean_last_30_days = "--";
 
       $scope.temp_outside1 = "--";
+      $scope.moisture_outside1 = "--";
+      $scope.battery_outside1 = "--";
       $scope.temp_outside2 = "--";
       $scope.temp_bathroom = "--";
       $scope.temp_living_room = "--";
@@ -91,6 +93,12 @@
             switch (categories[2]) {
               case "temp":
                 $scope.temp_outside1 = payload;
+                break;
+              case "moisture":
+                $scope.moisture_outside1 = payload;
+                break;
+              case "battery":
+                $scope.battery_outside1 = payload;
                 break;
               default:
                 break;
