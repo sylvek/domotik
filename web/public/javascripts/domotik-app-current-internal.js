@@ -60,6 +60,8 @@
       $scope.power_hour = "--";
       $scope.power_now = "--";
 
+      $scope.last_position_timestamp = 0;
+
       var client = new Paho.MQTT.Client("ws://192.168.0.2/mosquitto", "gh-" + new Date().getTime());
       client.onConnectionLost = function(responseObject) {
           if (responseObject.errorCode !== 0) {
@@ -124,11 +126,14 @@
             switch (categories[2]) {
               case "position":
                 var p = JSON.parse(payload);
-                var position = p.lat + "," + p.lng;
-                var newDate = new Date();
-                newDate.setTime(p.timestamp);
-                $scope.last_date = newDate.toUTCString();
-                $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=352x288&maptype=mapnik&markers=" + position + ",ol-marker-gold"
+                if ($scope.last_position_timestamp < p.timestamp) {
+                  var position = p.lat + "," + p.lng;
+                  var newDate = new Date();
+                  newDate.setTime(p.timestamp);
+                  $scope.last_date = newDate.toUTCString();
+                  $scope.last_position_timestamp = p.timestamp;
+                  $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=352x288&maptype=mapnik&markers=" + position + ",ol-marker-gold"
+                }
                 break;
               default:
                 break;
