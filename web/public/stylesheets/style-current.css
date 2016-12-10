@@ -9,7 +9,7 @@ body {
   padding-left: 1em;
 }
 
-#weather, #current, #history, #capture, #water, #geolocation {
+#weather, #current, #history, #capture, #water, #geolocation, #twitter {
   float:left;
   text-align: center;
   font-size: 120%;
@@ -21,7 +21,7 @@ body {
   width: 300px;
 }
 
-#geolocation {
+#geolocation, #twitter {
   width: 400px;
 }
 

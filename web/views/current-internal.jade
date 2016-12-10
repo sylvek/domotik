@@ -11,6 +11,7 @@ html(ng-app='domotikApp')
     script(src='bower_components/d3/d3.js')
     script(src='bower_components/nvd3/build/nv.d3.js')
     script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
+    script(src='bower_components/ngtweet/dist/ngtweet.min.js')
     script(src='javascripts/domotik-app-current-internal.js')
 
   block content
@@ -103,3 +104,6 @@ html(ng-app='domotikApp')
         h2 dernière position
         {{last_date}}
         image(ng-src="{{last_position}}")
+
+      div#twitter
+        twitter-timeline(twitter-timeline-type='list' twitter-timeline-owner-screen-name='"sylv3k"' twitter-timeline-slug='"transilien"')

@@ -1,5 +1,5 @@
 (function (angular) {
-  var app = angular.module("domotikApp", ['nvd3ChartDirectives']);
+  var app = angular.module("domotikApp", ['nvd3ChartDirectives', 'ngtweet']);
 
   app.service('domotikSrv', function ($http) {
 
