@@ -130,7 +130,7 @@
                   var position = p.lat + "," + p.lng;
                   var newDate = new Date();
                   newDate.setTime(p.timestamp);
-                  $scope.last_date = newDate.toUTCString();
+                  $scope.last_date = newDate.toLocaleString();
                   $scope.last_position_timestamp = p.timestamp;
                   $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=352x288&maptype=mapnik&markers=" + position + ",ol-marker-gold"
                 }
