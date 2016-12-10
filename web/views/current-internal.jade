@@ -76,7 +76,6 @@ html(ng-app='domotikApp')
             th cette heure
             td(class="stream") {{power_hour}} kWh
 
-      div#history
         h2 Electrique
         table
           tr
@@ -99,6 +98,8 @@ html(ng-app='domotikApp')
             td {{hot_water_mean_last_30_days}} min.
 
       div#geolocation
+        h2 {{ current_time | date:'dd MMM yyyy'}}
+        h2 {{ current_time | date:'HH:mm:ss'}}
         h2 dernière position
         {{last_date}}
         image(ng-src="{{last_position}}")

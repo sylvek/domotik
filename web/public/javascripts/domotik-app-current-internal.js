@@ -152,7 +152,7 @@
         }
       });
 
-      var refresh = function() {
+      var weather = function() {
         $scope.weather1 = domotikSrv.getWeather("Paris,FR");
         $scope.weather2 = domotikSrv.getWeather("Los-Angeles,USA");
 
@@ -195,8 +195,11 @@
         });
       };
 
-      // repeat it
-      refresh();
-      // $interval(refresh, 900000 /* 15min */);
+      weather();
+
+      // clock
+      var timeController = this;
+      timeController.clock = { time: "", interval: 1000 };
+      $interval( function () {$scope.current_time = Date.now();}, timeController.clock.interval);
   });
 }(angular));
