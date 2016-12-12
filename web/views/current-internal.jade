@@ -118,3 +118,9 @@ html(ng-app='domotikApp')
               twitter-timeline-owner-screen-name='"sylv3k"'
               twitter-timeline-slug='"transilien"'
               twitter-timeline-options='{"theme": "dark", "chrome": "noheader nofooter noborders transparent"}')
+        twitter-timeline(
+              ng-if="slug == 'news'"
+              twitter-timeline-type='list'
+              twitter-timeline-owner-screen-name='"sylv3k"'
+              twitter-timeline-slug='"news"'
+              twitter-timeline-options='{"theme": "dark", "chrome": "noheader nofooter noborders transparent"}')
