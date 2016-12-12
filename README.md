@@ -1,6 +1,7 @@
 # domotik
 
 ![screenshot](extras/screenshot.png)
+![tv](extras/tv.jpg)
 
 Domotik is a very simple home-automation software based on micro-services principle.
 Each service (services folder) does only one thing. A script (mosquitto_pub) pushes the data on MQTT.
