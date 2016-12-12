@@ -106,4 +106,15 @@ html(ng-app='domotikApp')
         image(ng-src="{{last_position}}")
 
       div#twitter
-        twitter-timeline(twitter-timeline-type='list' twitter-timeline-owner-screen-name='"sylv3k"' twitter-timeline-slug='"transilien"')
+        twitter-timeline(
+              ng-if="slug == 'beauty'"
+              twitter-timeline-type='list'
+              twitter-timeline-owner-screen-name='"sylv3k"'
+              twitter-timeline-slug='"beauty"'
+              twitter-timeline-options='{"theme": "dark", "chrome": "noheader nofooter noborders transparent"}')
+        twitter-timeline(
+              ng-if="slug == 'transilien'"
+              twitter-timeline-type='list'
+              twitter-timeline-owner-screen-name='"sylv3k"'
+              twitter-timeline-slug='"transilien"'
+              twitter-timeline-options='{"theme": "dark", "chrome": "noheader nofooter noborders transparent"}')

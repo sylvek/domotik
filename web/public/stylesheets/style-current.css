@@ -21,8 +21,12 @@ body {
   width: 300px;
 }
 
-#geolocation, #twitter {
+#geolocation {
   width: 450px;
+}
+
+#twitter {
+  width: 500px;
 }
 
 #history table, #current table, #water table {

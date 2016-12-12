@@ -197,6 +197,15 @@
 
       weather();
 
+      // twitter
+      $scope.slug = "beauty";
+      var now = new Date();
+      if (now.getDay() > 0 && now.getDay() < 6 && /* week days */
+          now.getHours() > 5 && now.getHours() < 8 /* during departure */)
+      {
+        $scope.slug = "transilien";
+      }
+
       // clock
       var timeController = this;
       timeController.clock = { time: "", interval: 1000 };
