@@ -1,4 +1,6 @@
 body {
+  margin: 0px;
+  padding: 0px;
   background-color: black;
   color: white;
 }
@@ -35,4 +37,8 @@ body {
 
 th {
   width: 200px;
+}
+
+@media screen and (min-width: 0px) and (max-width: 1800px) {
+  #twitter { display: none; }   /* hide it elsewhere */
 }
