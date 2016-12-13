@@ -132,7 +132,7 @@
                   newDate.setTime(p.timestamp);
                   $scope.last_date = newDate.toLocaleString();
                   $scope.last_position_timestamp = p.timestamp;
-                  $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=352x288&maptype=mapnik&markers=" + position + ",ol-marker-gold"
+                  $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=420x600&maptype=mapnik&markers=" + position + ",ol-marker-gold"
                 }
                 break;
               default:
@@ -153,8 +153,9 @@
       });
 
       var weather = function() {
-        $scope.weather1 = domotikSrv.getWeather("Paris,FR");
-        $scope.weather2 = domotikSrv.getWeather("Los-Angeles,USA");
+        $scope.weather1 = domotikSrv.getWeather("Juvisy,FR");
+        $scope.weather2 = domotikSrv.getWeather("Santa Monica,CA");
+        $scope.weather3 = domotikSrv.getWeather("New York,NY");
 
         domotikSrv.last("30d", "sumPerDay").then(function(response) {
           if (response.data.length > 0) {
@@ -194,14 +195,13 @@
           }
         });
       };
-
       weather();
 
       // twitter
-      $scope.slug = "beauty";
+      $scope.slug = "";
       var now = new Date();
       if (now.getDay() > 0 && now.getDay() < 6 && /* week days */
-          now.getHours() > 5 && now.getHours() < 8 /* during departure */)
+          now.getHours() > 5 && now.getHours() < 9 /* during departure */)
       {
         $scope.slug = "transilien";
       }
@@ -211,9 +211,41 @@
         $scope.slug = "news";
       }
 
+      // wallpaper
+      switch (now.getMonth()) {
+        default:
+        case 0:
+          $scope.background = "images/newyear.jpg";
+          break;
+        case 1:
+        case 2:
+          $scope.background = "images/winter.jpg";
+          break;
+        case 3:
+        case 4:
+          $scope.background = "images/motherday.jpg";
+          break;
+        case 5:
+          $scope.background = "images/spring.jpg";
+          break;
+        case 6:
+        case 7:
+        case 8:
+          $scope.background = "images/summer.jpg";
+          break;
+        case 9:
+        case 10:
+          $scope.background = "images/autumn.jpg";
+          break;
+        case 11:
+          $scope.background = "images/christmas.jpg";
+          break;
+      }
+
       // clock
       var timeController = this;
       timeController.clock = { time: "", interval: 1000 };
       $interval( function () {$scope.current_time = Date.now();}, timeController.clock.interval);
+
   });
 }(angular));

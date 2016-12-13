@@ -17,110 +17,113 @@ html(ng-app='domotikApp')
   block content
     div(ng-controller="domotikIndexCtrl")
 
-      div#weather
-        h2 {{weather1.city}}
-        image(ng-src="{{weather1.img}}")
-        table
-          tr
-            th temperature
-            td {{weather1.temp.current}} °c
-          tr
-            th humidité
-            td {{weather1.humidity}} %
-          tr
-            th vent
-            td {{weather1.wind}} km/h
-          tr
-            th pression
-            td {{weather1.pressure}} hPa
-        h2 {{weather2.city}}
-        image(ng-src="{{weather2.img}}")
-        table
-          tr
-            th temperature
-            td {{weather2.temp.current}} °c
-          tr
-            th humidité
-            td {{weather2.humidity}} %
-          tr
-            th vent
-            td {{weather2.wind}} km/h
-          tr
-            th pression
-            td {{weather2.pressure}} hPa
+      div#wallpaper(ng-style="{'background-image':'url({{background}})'}")
 
-      div#current
-        h2 Maison
-        table
-          tr
-            th dehors balcon
-            td(class="stream") {{temp_outside1}} °c
-          tr
-            th dehors cuisine
-            td(class="stream") {{temp_outside2}} °c
-          tr
-            th humidité
-            td(class="stream") {{moisture_outside1}} %
-          tr
-            th batterie
-            td(class="stream") {{battery_outside1}} %
-          tr
-            th salon
-            td(class="stream") {{temp_living_room}} °c
-          tr
-            th salle de bain
-            td(class="stream") {{temp_bathroom}} °c
-          tr
-            th actuellement
-            td(class="stream") {{power_now}} kWh
-          tr
-            th cette heure
-            td(class="stream") {{power_hour}} kWh
+        div#left
+          {{last_date}}
+          image(ng-src="{{last_position}}")
+          div#clock
+            div {{ current_time | date:'dd MMM yyyy' }}
+            div
+              span#hours {{ current_time | date:'HH' }}
+              span#minutes {{ current_time | date:'mm' }}
+              span#seconds {{ current_time | date:'ss' }}
 
-        h2 Electrique
-        table
-          tr
-            th hier
-            td {{sum_watt_yesterday}} kWh
-          tr
-            th l'année dernière
-            td {{sum_watt_last_year}} kWh
-          tr
-            th sur 30 jours
-            td {{mean_watt_last_30_days}} kWh
+        div#weather
+          table
+            tr
+              th
+                div(class="city") {{weather1.city}}
+                image(ng-src="{{weather1.img}}")
+              td
+                div {{weather1.temp.current}} °c
+                div {{weather1.humidity}} %
+                div {{weather1.wind}} km/h
+                div {{weather1.pressure}} hPa
+            tr
+              th
+                div(class="city") {{weather2.city}}
+                image(ng-src="{{weather2.img}}")
+              td
+                div {{weather2.temp.current}} °c
+                div {{weather2.humidity}} %
+                div {{weather2.wind}} km/h
+                div {{weather2.pressure}} hPa
+            tr
+              th
+                div(class="city") {{weather3.city}}
+                image(ng-src="{{weather3.img}}")
+              td
+                div {{weather3.temp.current}} °c
+                div {{weather3.humidity}} %
+                div {{weather3.wind}} km/h
+                div {{weather3.pressure}} hPa
 
-        h2 Eau chaude
-        table
-          tr
-            th hier
-            td {{hot_water_comsuption_yesterday}} min.
-          tr
-            th sur 30 jours
-            td {{hot_water_mean_last_30_days}} min.
+        div#current-to-right
+          h2 Maison
+          table
+            tr
+              th dehors balcon
+              td(class="stream") {{temp_outside1}} °c
+            tr
+              th dehors cuisine
+              td(class="stream") {{temp_outside2}} °c
+            tr
+              th humidité
+              td(class="stream") {{moisture_outside1}} %
+            tr
+              th batterie
+              td(class="stream") {{battery_outside1}} %
+            tr
+              th salon
+              td(class="stream") {{temp_living_room}} °c
+            tr
+              th salle de bain
+              td(class="stream") {{temp_bathroom}} °c
+            tr
+              th actuellement
+              td(class="stream") {{power_now}} kWh
+            tr
+              th cette heure
+              td(class="stream") {{power_hour}} kWh
 
-      div#geolocation
-        h2 {{ current_time | date:'dd MMM yyyy'}}
-        h2 {{ current_time | date:'HH:mm:ss'}}
-        h2 dernière position
-        {{last_date}}
-        image(ng-src="{{last_position}}")
+          h2 Electrique
+          table
+            tr
+              th hier
+              td {{sum_watt_yesterday}} kWh
+            tr
+              th l'année dernière
+              td {{sum_watt_last_year}} kWh
+            tr
+              th sur 30 jours
+              td {{mean_watt_last_30_days}} kWh
 
-      div#twitter
-        twitter-timeline(
-              ng-if="slug == 'beauty'"
-              twitter-timeline-type='list'
-              twitter-timeline-owner-screen-name='"sylv3k"'
-              twitter-timeline-slug='"beauty"'
-              twitter-timeline-options='{"tweet-limit": "2", "theme": "dark", "chrome": "noheader nofooter noborders transparent"}')
-        twitter-timeline(
-              ng-if="slug == 'transilien'"
-              twitter-timeline-type='list'
-              twitter-timeline-owner-screen-name='"sylv3k"'
-              twitter-timeline-slug='"transilien"'
-              twitter-timeline-options='{"tweet-limit": "6", "theme": "dark", "chrome": "noheader nofooter noborders transparent"}')
-        twitter-timeline(
-              ng-if="slug == 'news'"
-              twitter-timeline-type='list'
-              twitter-timeline-owner-screen-name='"sylv3k"'
-              twitter-timeline-slug='"news"'
-              twitter-timeline-options='{"tweet-limit": "6", "theme": "dark", "chrome": "noheader nofooter noborders transparent"}')
+          h2 Eau chaude
+          table
+            tr
+              th hier
+              td {{hot_water_comsuption_yesterday}} min.
+            tr
+              th sur 30 jours
+              td {{hot_water_mean_last_30_days}} min.
+
+        div#right
+          twitter-timeline(
+                ng-if="slug == 'beauty'"
+                twitter-timeline-type='list'
+                twitter-timeline-owner-screen-name='"sylv3k"'
+                twitter-timeline-slug='"beauty"'
+                twitter-timeline-options='{"tweet-limit": 2, "theme": "light", "chrome": "noheader nofooter noborders transparent"}')
+          twitter-timeline(
+                ng-if="slug == 'transilien'"
+                twitter-timeline-type='list'
+                twitter-timeline-owner-screen-name='"sylv3k"'
+                twitter-timeline-slug='"transilien"'
+                twitter-timeline-options='{"tweet-limit": 6, "theme": "light", "chrome": "noheader nofooter noborders transparent"}')
+          twitter-timeline(
+                ng-if="slug == 'news'"
+                twitter-timeline-type='list'
+                twitter-timeline-owner-screen-name='"sylv3k"'
+                twitter-timeline-slug='"news"'
+                twitter-timeline-options='{"tweet-limit": 6, "theme": "light", "chrome": "noheader nofooter noborders transparent"}')

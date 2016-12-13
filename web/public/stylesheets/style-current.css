@@ -1,17 +1,33 @@
 body {
   margin: 0px;
   padding: 0px;
-  background-color: black;
-  color: white;
+  background-color: white;
+  color: black;
 }
 
 .stream {
-  background-color: chocolate;
-  padding-right: 1em;
-  padding-left: 1em;
 }
 
-#weather, #current, #history, #capture, #water, #geolocation, #twitter {
+#wallpaper {
+  height: 1200px;
+  width: 1920;
+}
+
+#clock {
+  font-size: 230%;
+}
+#hours {
+  font-size: 200%;
+}
+
+#minutes {
+  font-size: 300%;
+}
+#weather div.city {
+  font-size: 120%;
+}
+
+#left, #current, #history, #capture, #water, #weather {
   float:left;
   text-align: center;
   font-size: 120%;
@@ -19,16 +35,25 @@ body {
   margin-top: 10px;
 }
 
+img {
+  border-radius: 5px;
+}
+
 #capture {
   width: 300px;
 }
 
-#geolocation {
+#left {
   width: 450px;
 }
 
-#twitter {
+#right {
+  float: right;
   width: 500px;
+}
+
+#current-to-right {
+  float: right;
 }
 
 #history table, #current table, #water table {
@@ -37,8 +62,4 @@ body {
 
 th {
   width: 200px;
-}
-
-@media screen and (min-width: 0px) and (max-width: 1800px) {
-  #twitter { display: none; }   /* hide it elsewhere */
 }
