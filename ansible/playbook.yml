@@ -106,7 +106,7 @@
 
       # domotik
       - lineinfile: dest=/etc/rc.local line="sudo -u pi nohup /home/pi/domotik/start-x.sh" insertbefore="^exit 0"
-      - cron: name="restart webpage" minute="*/20" job="pidof browser | xargs kill > /dev/null 2>&1 || /bin/true && DISPLAY=:0 nohup /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal &"
+      - cron: name="restart webpage" minute="*/10" job="pidof browser | xargs kill > /dev/null 2>&1 || /bin/true && DISPLAY=:0 nohup nice -n 19 /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal > /dev/null &"
         become: no
       - shell: pkill xinit || /bin/true
         tags:
