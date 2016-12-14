@@ -205,12 +205,12 @@
       if (now.getDay() > 0 && now.getDay() < 6 && /* week days */
           now.getHours() > 5 && now.getHours() < 9 /* during departure */)
       {
-        //$scope.slug = "transilien";
+        $scope.slug = "transilien";
       }
       if (now.getDay() > 0 && now.getDay() < 6 && /* week days */
           now.getHours() > 19 && now.getHours() < 23 /* during sunrise */)
       {
-        //$scope.slug = "news";
+        $scope.slug = "news";
       }
 
       // wallpaper
