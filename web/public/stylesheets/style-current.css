@@ -48,6 +48,7 @@ img {
 }
 
 #right {
+  padding: 10px;
   float: right;
   width: 500px;
 }
