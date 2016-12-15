@@ -213,7 +213,7 @@
         $scope.slug = "transilien";
       }
       if (now.getDay() > 0 && now.getDay() < 6 && /* week days */
-          now.getHours() > 19 && now.getHours() < 23 /* during sunrise */)
+          now.getHours() > 17 && now.getHours() < 23 /* during sunrise */)
       {
         $scope.slug = "news";
       }
