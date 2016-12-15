@@ -70,8 +70,11 @@
               client.connect({
                   onSuccess: function() {
                       client.subscribe("triggers/+/temp");
-                      client.subscribe("sharemyposition/+/position", {"qos": 1});
-                      client.subscribe("sensors/#");
+                      client.subscribe("sharemyposition/+/position");
+                      client.subscribe("sensors/+/temp");
+                      client.subscribe("sensors/+/watt");
+                      client.subscribe("sensors/+/battery");
+                      client.subscribe("sensors/+/moisture");
                   }
               });
           }
@@ -79,7 +82,6 @@
       client.onMessageArrived = function(message) {
         var topic = message.destinationName;
         var payload = message.payloadString;
-        console.log("onMessageArrived => " + topic + " " + payload);
         var categories = topic.split("/");
         switch(categories[1]) {
           // room
@@ -147,8 +149,11 @@
         onSuccess: function() {
           console.log("onSuccess => subscribe to sensors, triggers (temp) & positions");
           client.subscribe("triggers/+/temp");
-          client.subscribe("sharemyposition/+/position", {"qos": 1});
-          client.subscribe("sensors/#");
+          client.subscribe("sharemyposition/+/position");
+          client.subscribe("sensors/+/temp");
+          client.subscribe("sensors/+/watt");
+          client.subscribe("sensors/+/battery");
+          client.subscribe("sensors/+/moisture");
         }
       });
 
