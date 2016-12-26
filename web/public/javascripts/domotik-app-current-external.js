@@ -137,5 +137,11 @@
           $scope.sum_watt_last_year = (response.data[0].value / 1000).toPrecision(4);
         }
       });
+
+      $scope.captureCamera = function() {
+        var message = new Paho.MQTT.Message("1");
+        message.destinationName = "sensors/hcsr505/event";
+        client.send(message);
+      }
   });
 }(angular));
