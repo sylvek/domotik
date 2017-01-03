@@ -45,6 +45,7 @@
 
   app.controller('domotikIndexCtrl', function($scope, $interval, domotikSrv){
 
+      $scope.sum_watt_today = "--";
       $scope.sum_watt_yesterday = "--";
       $scope.sum_watt_last_year = "--";
       $scope.mean_watt_last_30_days = "--";
@@ -69,7 +70,7 @@
               console.log("Reconnecting... [" + new Date() + "]");
               client.connect({
                   onSuccess: function() {
-                      client.subscribe("triggers/+/temp");
+                      client.subscribe("current/+/+");
                       client.subscribe("sharemyposition/+/position");
                       client.subscribe("sensors/+/temp");
                       client.subscribe("sensors/+/watt");
@@ -124,6 +125,9 @@
           case "cc128mean":
             $scope.power_hour = (payload / 1000).toPrecision(4);
             break;
+          case "sumPerDay":
+            $scope.sum_watt_today = (payload / 1000).toPrecision(4);
+            break;
           default:
             switch (categories[2]) {
               case "position":
@@ -148,7 +152,7 @@
       client.connect({
         onSuccess: function() {
           console.log("onSuccess => subscribe to sensors, triggers (temp) & positions");
-          client.subscribe("triggers/+/temp");
+          client.subscribe("current/+/+");
           client.subscribe("sharemyposition/+/position");
           client.subscribe("sensors/+/temp");
           client.subscribe("sensors/+/watt");

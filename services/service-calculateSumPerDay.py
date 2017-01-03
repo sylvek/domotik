@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description='calculate a sum of measures per da
 parser.add_argument('service_name', metavar='service_name', help='name of the current service')
 parser.add_argument('measure_in', metavar='measure_in', help='measure path given')
 parser.add_argument('measure_out', metavar='measure_out', help='measure path given a resulted sum (one time per day)')
+parser.add_argument('current_out', metavar='current_out', help='measure path given a resulted sum (each time a measure_in is received)')
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
 parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?', default="1883")
 args = parser.parse_args()
@@ -24,6 +25,7 @@ def on_message(client, userdata, msg):
     global day
     sum += float(msg.payload)
     currentDay = datetime.datetime.now().day
+    client.publish(args.current_out, sum, 0, True)
     if (currentDay is not day):
         client.publish(args.measure_out, sum)
         sum = 0

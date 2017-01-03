@@ -80,15 +80,18 @@ html(ng-app='domotikApp')
             tr
               th salle de bain
               td(class="stream") {{temp_bathroom}} °c
+
+          h2 Electrique
+          table
             tr
               th actuellement
               td(class="stream") {{power_now}} kWh
             tr
               th cette heure
               td(class="stream") {{power_hour}} kWh
-
-          h2 Electrique
-          table
+            tr
+              th aujourd'hui
+              td {{sum_watt_today}} kWh
             tr
               th hier
               td {{sum_watt_yesterday}} kWh
