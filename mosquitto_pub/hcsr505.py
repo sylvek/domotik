@@ -8,7 +8,7 @@ import time
 import datetime
 
 parser = argparse.ArgumentParser(description='interact with the hcsr505 by reading the motion value')
-parser.add_argument('delay', metavar='delay', help='delay in seconds between 2 event', nargs='?', default="15")
+parser.add_argument('delay', metavar='delay', help='delay in seconds between 2 event', nargs='?', default="30")
 parser.add_argument('hostname', metavar='hostname', help='hostname of mqtt server', nargs='?', default="0.0.0.0")
 parser.add_argument('port', metavar='port', help='port of mqtt server', nargs='?', default="1883")
 args = parser.parse_args()
