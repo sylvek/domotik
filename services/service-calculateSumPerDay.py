@@ -25,11 +25,11 @@ def on_message(client, userdata, msg):
     global day
     sum += float(msg.payload)
     currentDay = datetime.datetime.now().day
-    client.publish(args.current_out, sum, 0, True)
     if (currentDay is not day):
         client.publish(args.measure_out, sum)
         sum = 0
         day = currentDay
+    client.publish(args.current_out, sum, 0, True)
 
 def signal_handler(sig, frame):
     with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
