@@ -27,6 +27,10 @@ body {
   font-size: 120%;
 }
 
+#ephemeris div {
+  font-size: 140%;
+}
+
 #left, #current, #history, #capture, #water, #weather {
   float:left;
   text-align: center;

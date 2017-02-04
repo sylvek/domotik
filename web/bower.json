@@ -19,7 +19,8 @@
     "nvd3": "1.8.1",
     "angularjs-nvd3-directives": "0.0.7",
     "bower-mqttws": "^1.0.x",
-    "ngtweet": "0.6.1"
+    "ngtweet": "0.6.1",
+    "ephemeris": "v.1.0.1"
   },
   "resolutions": {
     "nvd3": "1.8.1",

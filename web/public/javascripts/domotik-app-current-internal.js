@@ -163,6 +163,10 @@
         }
       });
 
+      var ephemeride = function() {
+        $scope.ephemeride = ephemeris.getTodayEphemeris();
+      }
+
       var weather = function() {
         $scope.weather1 = domotikSrv.getWeather("Juvisy,FR");
         $scope.weather2 = domotikSrv.getWeather("Santa Monica,CA");
@@ -207,6 +211,7 @@
         });
       };
       weather();
+      ephemeride();
 
       // twitter
       // https://github.com/arusahni/ngtweet/issues/30
