@@ -74,7 +74,7 @@
         notify: restart udev
 
       # domotik
-      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-back.sh" insertbefore="^exit 0"
+      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-back.sh &" insertbefore="^exit 0"
       - cron: name="persist current data to prevent to lost it (kernel panic)" minute="*/10" job="sudo pkill -SIGUSR1 service"
         become: no
       - shell: nohup /home/pi/domotik/stop-back.sh
@@ -108,7 +108,7 @@
             chdir: /home/pi/kiosk-browser
 
       # domotik
-      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-x.sh" insertbefore="^exit 0"
+      - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-x.sh &" insertbefore="^exit 0"
       - cron: name="restart webpage" minute="*/20" job="pidof browser | xargs sudo kill > /dev/null 2>&1 || /bin/true && DISPLAY=:0 nohup nice -n 19 sudo /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal > /dev/null &"
         become: no
       - shell: pkill xinit || /bin/true
