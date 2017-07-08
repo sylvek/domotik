@@ -10,6 +10,9 @@
         tags:
           - refresh
           - update
+      - apt: name=mosquitto-clients state=present
+      - cron: name="send cpu temperature" minute="*/10" job="/home/pi/domotik/mosquitto_pub/raspberry_cpu_temp.sh sensors/$(hostname)/temp"
+        become: no
 
   - hosts: websocket
     tasks:
