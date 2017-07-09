@@ -171,20 +171,38 @@
 - name: Kiosk
 - hosts: kiosk
   tasks:
-    - apt: name=x11-xserver-utils state=present
-    - apt: name=libwebkit-dev state=present
-    - apt: name=xserver-xorg state=present
-    - apt: name=xinit state=present
-    - apt: name=matchbox-window-manager state=present
-    - lineinfile: dest=/etc/X11/Xwrapper.config regexp=^allowed_users= line=allowed_users=anybody
-    - git: repo=https://github.com/sylvek/kiosk-browser.git dest=/home/pi/kiosk-browser version=master force=yes
+    - name: Ensure packages are installed.
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - 'x11-xserver-utils'
+      - 'libwebkit-dev'
+      - 'xserver-xorg'
+      - 'xinit'
+      - 'matchbox-window-manager'
+    - name: Ensure kiosk is configured.
+      lineinfile:
+        dest: '/etc/X11/Xwrapper.config'
+        regexp: '^allowed_users='
+        line: 'allowed_users=anybody'
+    - name: Ensure Github repo kiosk-browser is up-to-date.
+      git:
+        repo: 'https://github.com/sylvek/kiosk-browser.git'
+        dest: '/home/pi/kiosk-browser'
+        version: 'master'
+        force yes
     - shell: make
       args:
           chdir: /home/pi/kiosk-browser
 
     # domotik
     - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-x.sh &" insertbefore="^exit 0"
-    - cron: name="restart webpage" minute="*/20" job="pidof browser | xargs sudo kill > /dev/null 2>&1 || /bin/true && DISPLAY=:0 nohup nice -n 19 sudo /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal > /dev/null &"
+    - name: Ensure kiosk cron is defined.
+      cron:
+        name: "restart webpage"
+        minute: "*/20"
+        job: "pidof browser | xargs sudo kill > /dev/null 2>&1 || /bin/true && DISPLAY=:0 nohup nice -n 19 sudo /home/pi/kiosk-browser/browser http://{{ hostvars[groups['front'][0]]['inventory_hostname'] }}:3000/internal > /dev/null &"
       become: no
     - shell: pkill xinit || /bin/true
       tags:
