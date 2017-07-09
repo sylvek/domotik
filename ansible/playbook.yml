@@ -85,38 +85,79 @@
 
 - name: Backend
   hosts: back
+  handlers:
+    - name: reboot
+      debug: msg="you should reboot after installation"
+    - name: restart lircd
+      service:
+        name: lirc
+        state: restarted
+    - name: restart udev
+      service:
+        name: udev
+        state: restarted
   tasks:
-    - apt: name=mosquitto state=present
-    - apt: name=mosquitto-clients state=present
-    - apt: name=python-mosquitto state=present
-    - apt: name=fswebcam state=present
-    - pip: name=paho-mqtt
-    - pip: name=pyserial
-    - pip: name=schedule
+    - name: Ensure packages are installed.
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - 'mosquitto'
+      - 'mosquitto-clients'
+      - 'python-mosquitto'
+      - 'fswebcam'
+      - 'lirc'
+      - 'liblircclient-dev'
+    - name: Ensure pip packages are installed.
+      pip:
+        name: "{{ item }}"
+      with_items:
+      - 'paho-mqtt'
+      - 'pyserial'
+      - 'schedule'
 
     # configure lirc
-    - apt: name=lirc state=present
-    - apt: name=liblircclient-dev state=present
-    - lineinfile: dest=/etc/modules line="lirc_dev"
+    - name: Ensure lirc configuration is OK.
+      lineinfile:
+        dest: "{{ item.dest }}"
+        line: "{{ item.line }}"
+      with_items:
+      - {dest: '/etc/modules', line: 'lirc_dev'}
+      - {dest: '/etc/modules', line: 'lirc_rpi gpio_in_pin=18'}
+      - {dest: '/boot/config.txt', line: 'dtoverlay=lirc-rpi'}
       notify: reboot
-    - lineinfile: dest=/etc/modules line="lirc_rpi gpio_in_pin=18"
-      notify: reboot
-    - lineinfile: dest=/boot/config.txt line="dtoverlay=lirc-rpi"
-      notify: reboot
-    - copy: src=lirc/A1156 dest=/etc/lirc/lircd.conf owner=root group=root
-      notify: restart lircd
-    - copy: src=lirc/lircrc dest=/etc/lirc/lircrc owner=root group=root
-      notify: restart lircd
-    - copy: src=lirc/hardware.conf dest=/etc/lirc/hardware.conf owner=root group=root
+    - name: Ensure lirc configuration files are OK.
+      copy:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        owner: 'root'
+        group: 'root'
+      with_items:
+      - {src: 'lirc/A1156',  dest: '/etc/lirc/lircd.conf'}
+      - {src: 'lirc/lircrc', dest: '/etc/lirc/lircrc'}
+      - {src: 'lirc/hardware.conf', dest: '/etc/lirc/hardware.conf'}
       notify: restart lircd
 
     # configure udev
-    - copy: src=usb/etc-udev-rules.d-99-usb-serial.rules dest=/etc/udev/rules.d/99-usb-serial.rules owner=root group=root
+    - name: Ensure udev is configured.
+      copy:
+        src: 'usb/etc-udev-rules.d-99-usb-serial.rules'
+        dest: '/etc/udev/rules.d/99-usb-serial.rules'
+        owner: 'root'
+        group: 'root'
       notify: restart udev
 
     # domotik
-    - lineinfile: dest=/etc/rc.local line="nohup /home/pi/domotik/start-back.sh &" insertbefore="^exit 0"
-    - cron: name="persist current data to prevent to lost it (kernel panic)" minute="*/10" job="sudo pkill -SIGUSR1 service"
+    - name: Ensure domotik is configured.
+      lineinfile:
+        dest: '/etc/rc.local'
+        line: "nohup /home/pi/domotik/start-back.sh &"
+        insertbefore: "^exit 0"
+    - name: Ensure domotik cron is defined.
+      cron:
+        name: "persist current data to prevent to lost it (kernel panic)"
+        minute: "*/10"
+        job: "sudo pkill -SIGUSR1 service"
       become: no
     - shell: nohup /home/pi/domotik/stop-back.sh
       tags:
@@ -126,13 +167,6 @@
       tags:
         - refresh
         - start
-  handlers:
-    - name: reboot
-      debug: msg="you should reboot after installation"
-    - name: restart lircd
-      service: name=lirc state=restarted
-    - name: restart udev
-      service: name=udev state=restarted
 
 - name: Kiosk
 - hosts: kiosk
