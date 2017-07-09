@@ -34,13 +34,32 @@
 
 - name: Websocket
   hosts: websocket
+  handlers:
+    - name: restart apache2
+      service:
+        name: 'apache2'
+        state: restarted
   tasks:
-    - apt: name=apache2 state=present
-    - apt: name=scons state=present
-    - apt: name=apache2-prefork-dev state=present
-    - service: name=apache2 state=started
-    - git: repo=https://github.com/sylvek/apache-websocket.git dest=/home/pi/apache-websocket
-    - git: repo=https://github.com/sylvek/mod_websocket_mosquitto.git dest=/home/pi/mod_websocket_mosquitto
+    - name: Ensure packages are installed.
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - 'apache2'
+      - 'scons'
+      - 'apache2-prefork-dev'
+    - name: Ensure apache2 is started.
+      service:
+        name: apache2
+        state: started
+    - name: Ensure Github repo apache-websocket is up-to-date.
+      git:
+        repo: 'https://github.com/sylvek/apache-websocket.git'
+        dest: '/home/pi/apache-websocket'
+    - name: Ensure Github repo mod_websocket_mosquito is up-to-date.
+      git:
+        repo: 'https://github.com/sylvek/mod_websocket_mosquitto.git'
+        dest: '/home/pi/mod_websocket_mosquitto'
     - shell: apxs2 -i -a -c mod_websocket.c
       args:
           chdir: /home/pi/apache-websocket
@@ -53,13 +72,16 @@
     - shell: scons install
       args:
           chdir: /home/pi/mod_websocket_mosquitto
-    - template: src=websocket/websocket.conf dest=/etc/apache2/mods-available/websocket.conf
-    - apache2_module: name=websocket state=present
+    - name: Ensure websocket mod is configured.
+      template:
+        src: 'websocket/websocket.conf'
+        dest: '/etc/apache2/mods-available/websocket.conf'
+    - name: Ensure apache module are started.
+      apache2_module:
+        name: 'websocket'
+        state: present
       notify:
         - restart apache2
-  handlers:
-    - name: restart apache2
-      service: name=apache2 state=restarted
 
 - name: Backend
   hosts: back
