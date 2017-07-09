@@ -2,17 +2,34 @@
 - name: All
   hosts: all
   tasks:
-    - locale_gen: name=fr_FR.UTF-8 state=present
+    - name: Ensure locale are defined.
+      locale_gen:
+        name: 'fr_FR.UTF-8'
+        state: present
     - apt: update_cache=yes cache_valid_time=3600
     - apt: upgrade=dist
-    - apt: name=python-pip state=present
-    - apt: name=git state=present
-    - git: repo=https://github.com/sylvek/domotik.git dest=/home/pi/domotik version=master force=yes
+    - name: Ensure packages are installed.
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+      - 'python-pip'
+      - 'git'
+      - 'mosquitto-clients'
+    - name: Ensure github repo is up-to-date.
+      git:
+        repo: 'https://github.com/sylvek/domotik.git'
+        dest: '/home/pi/domotik'
+        version: 'master'
+        force: yes
       tags:
         - refresh
         - update
-    - apt: name=mosquitto-clients state=present
-    - cron: name="send cpu temperature" minute="*/10" job="/home/pi/domotik/mosquitto_pub/raspberry_cpu_temp.sh sensors/$(hostname)/temp"
+    - name: Ensure cron is defined.
+      cron:
+        name: "send cpu temperature"
+        job: "/home/pi/domotik/mosquitto_pub/raspberry_cpu_temp.sh sensors/$(hostname)/temp"
+        minute: "*/10"
       become: no
 
 - name: Websocket
