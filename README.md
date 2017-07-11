@@ -15,7 +15,7 @@ assume that you have installed a fresh raspbian…
 ### from ansible
 
 ```
-domotik/ansible $> ansible-playbook -b -i raspberrypi --ask-pass playbook.yml [--limit @host] [--tag "tags"]
+domotik/ansible $> ansible-playbook playbook.yml -b -i raspberrypi --ask-pass [--limit @host] [--tag "tags"]
 # where tags is:
 # refresh
 # update
