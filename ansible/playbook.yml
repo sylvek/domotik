@@ -209,7 +209,6 @@
     tags:
       - x_stop
   - shell: nohup /home/pi/domotik/start-x.sh
-    become: no
     tags:
       - x_start
   - shell: pkill browser || /bin/true
