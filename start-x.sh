@@ -1,11 +1,4 @@
 #!/bin/bash
 echo "launching X..."
-export DISPLAY=:0
 startx -- -nocursor &
-sleep 10
-xset -dpms
-xset dpms 0 0 0
-xset s noblank
-xset s off
-xset s reset
-xset s noexpose
+sleep 10 && xset -display :0 -dpms && xset -display :0 dpms 0 0 0 && xset -display :0 s noblank && xset -display :0 s off && xset -display :0 s reset && xset -display :0 s noexpose
