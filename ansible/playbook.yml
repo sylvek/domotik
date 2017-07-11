@@ -169,7 +169,7 @@
       - start
 
 - name: Kiosk
-- hosts: kiosk
+  hosts: kiosk
   tasks:
   - name: Ensure packages are installed.
     apt:
@@ -191,8 +191,9 @@
       repo: 'https://github.com/sylvek/kiosk-browser.git'
       dest: '/home/pi/kiosk-browser'
       version: 'master'
-      force yes
-  - shell: make
+      force: yes
+  - name: make browser
+    shell: make
     args:
         chdir: /home/pi/kiosk-browser
 
