@@ -21,8 +21,6 @@ echo "launching services..."
 /home/pi/domotik/services/service-checkSensorsAvailability.py domotik_check_esp12e sensors/esp12e/temp 30 triggers/led/blink e06fb9 &
 /home/pi/domotik/services/service-checkSensorsAvailability.py domotik_check_thn132n sensors/thn132n/temp 30 triggers/led/blink e06fb9 &
 echo "launching mosquitto publishing..."
-/home/pi/domotik/mosquitto_pub/cc128.py /dev/cc128 &
-/home/pi/domotik/mosquitto_pub/thn132n.py /dev/thn132n &
 /home/pi/domotik/mosquitto_pub/hcsr505.py &
 echo "launching mosquitto subscribing..."
 #/home/pi/domotik/mosquitto_sub/syslog.py &

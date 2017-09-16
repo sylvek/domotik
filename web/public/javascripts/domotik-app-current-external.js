@@ -28,7 +28,7 @@
       $scope.power_hour = "--";
       $scope.power_now = "--";
 
-      var client = new Paho.MQTT.Client("wss://sylvek.hd.free.fr/mosquitto", "gh-" + new Date().getTime());
+      var client = new Paho.MQTT.Client("wss://sylv3k.hd.free.fr/mosquitto", "gh-" + new Date().getTime());
       client.onConnectionLost = function(responseObject) {
           if (responseObject.errorCode !== 0) {
               console.log("onConnectionLost:" + responseObject.errorMessage);

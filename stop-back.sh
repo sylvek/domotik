@@ -8,7 +8,5 @@ pkill led.py
 echo "stopping services..."
 pkill service
 echo "stopping publishers..."
-pkill cc128.py
-pkill thn132n.py
 pkill hcsr505.py
 echo "bye"
