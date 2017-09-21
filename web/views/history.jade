@@ -68,21 +68,23 @@ html(ng-app='domotikApp')
           xAxisLabel="last 24 hours",
           margin="{left:100,top:20,bottom:100,right:10}"
           height="300")
-        nvd3-discrete-bar-chart(
-          data="twenty_four_hours_presence_livingroom",
-          showLegend="true",
-          showXAxis="true",
-          showYAxis="true",
-          showValues="true",
-          tooltips="true",
-          interactive="true",
-          useInteractiveGuideLine="true",
-          xAxisTickFormat="xAxisTickFormat_Hour_Format()",
-          yAxisTickFormat="yAxisTickFormat_Percent_Format()",
-          yAxisLabel="Percent (%)",
-          xAxisLabel="last 24 hours of presence in the living room",
-          margin="{left:100,top:20,bottom:100,right:10}"
-          height="300")
+        //-
+            nvd3-discrete-bar-chart(
+              data="twenty_four_hours_presence_livingroom",
+              showLegend="true",
+              showXAxis="true",
+              showYAxis="true",
+              showValues="true",
+              tooltips="true",
+              interactive="true",
+              useInteractiveGuideLine="true",
+              xAxisTickFormat="xAxisTickFormat_Hour_Format()",
+              yAxisTickFormat="yAxisTickFormat_Percent_Format()",
+              yAxisLabel="Percent (%)",
+              xAxisLabel="last 24 hours of presence in the living room",
+              margin="{left:100,top:20,bottom:100,right:10}"
+              height="300")
+        //
       div
         nvd3-discrete-bar-chart(
           data="thirty_days_sum_watt",

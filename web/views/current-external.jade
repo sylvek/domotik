@@ -61,6 +61,8 @@ html(ng-app='domotikApp')
             th sur 30 jours
             td {{hot_water_mean_last_30_days}} min.
 
-      div#capture
-        button(ng-click="captureCamera()") capture
-        image(ng-src="{{last_view}}")
+      //-
+          div#capture
+            button(ng-click="captureCamera()") capture
+            image(ng-src="{{last_view}}")
+      //
