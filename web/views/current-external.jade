@@ -19,11 +19,13 @@ html(ng-app='domotikApp')
       div#current
         h2 Maison
         table
+          //-
+            tr
+              th dehors 1
+              td(class="stream") {{temp_outside1}} °c
+          //
           tr
-            th dehors 1
-            td(class="stream") {{temp_outside1}} °c
-          tr
-            th dehors 2
+            th dehors
             td(class="stream") {{temp_outside2}} °c
           tr
             th garage
