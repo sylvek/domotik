@@ -33,36 +33,6 @@ html(ng-app='domotikApp')
             div
               {{ ephemeride }}
 
-        div#weather
-          table
-            tr
-              th
-                div(class="city") {{weather1.city}}
-                image(ng-src="{{weather1.img}}")
-              td
-                div {{weather1.temp.current}} °c
-                div {{weather1.humidity}} %
-                div {{weather1.wind}} km/h
-                div {{weather1.pressure}} hPa
-            tr
-              th
-                div(class="city") {{weather2.city}}
-                image(ng-src="{{weather2.img}}")
-              td
-                div {{weather2.temp.current}} °c
-                div {{weather2.humidity}} %
-                div {{weather2.wind}} km/h
-                div {{weather2.pressure}} hPa
-            tr
-              th
-                div(class="city") {{weather3.city}}
-                image(ng-src="{{weather3.img}}")
-              td
-                div {{weather3.temp.current}} °c
-                div {{weather3.humidity}} %
-                div {{weather3.wind}} km/h
-                div {{weather3.pressure}} hPa
-
         div#current-to-right
           h2 Maison
           table

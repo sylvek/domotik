@@ -168,9 +168,9 @@
       }
 
       var weather = function() {
-        $scope.weather1 = domotikSrv.getWeather("Juvisy,FR");
-        $scope.weather2 = domotikSrv.getWeather("Santa Monica,CA");
-        $scope.weather3 = domotikSrv.getWeather("New York,NY");
+        //$scope.weather1 = domotikSrv.getWeather("Juvisy,FR");
+        //$scope.weather2 = domotikSrv.getWeather("Santa Monica,CA");
+        //$scope.weather3 = domotikSrv.getWeather("New York,NY");
 
         domotikSrv.last("30d", "sumPerDay").then(function(response) {
           if (response.data.length > 0) {
