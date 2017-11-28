@@ -139,7 +139,7 @@
                   newDate.setTime(p.timestamp);
                   $scope.last_date = newDate.toLocaleString();
                   $scope.last_position_timestamp = p.timestamp;
-                  $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=12&size=420x600&maptype=mapnik&markers=" + position + ",ol-marker-gold"
+                  $scope.last_position = "http://staticmap.openstreetmap.de/staticmap.php?center=" + position + "&zoom=13&size=400x500&maptype=mapnik&markers=" + position + ",ol-marker-gold"
                 }
                 break;
               default:
