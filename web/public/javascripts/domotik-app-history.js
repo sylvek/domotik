@@ -20,6 +20,7 @@
       $scope.twenty_four_hours_presence_livingroom = [];
       $scope.thirty_days_sum_watt = [];
       $scope.thirty_days_hotwatertank_minutes = [];
+      $scope.thirty_days_water_liters = [];
 
       domotikSrv.last("24h", "temp").then(function(response) {
         $scope.twenty_four_hours_temp = response.data;
@@ -43,6 +44,10 @@
 
       domotikSrv.last("30d", "tankHotWaterPerDay").then(function(response) {
         $scope.thirty_days_hotwatertank_minutes = response.data;
+      });
+
+      domotikSrv.last("30d", "waterPerDay").then(function(response) {
+        $scope.thirty_days_water_liters = response.data;
       });
 
       $scope.xAxisTickFormat_Date_Format = function() {
@@ -78,6 +83,11 @@
       $scope.yAxisTickFormat_Percent_Format = function() {
         return function(d) {
           return (d * 100).toPrecision(4) + "%";
+        }
+      }
+      $scope.yAxisTickFormat_Liter_Format = function() {
+        return function(d) {
+          return d + "L";
         }
       }
   });

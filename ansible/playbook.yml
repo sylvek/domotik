@@ -115,6 +115,7 @@
     - 'paho-mqtt'
     - 'pyserial'
     - 'schedule'
+    - 'xlrd'
 
   # configure lirc
   - name: Ensure lirc configuration is OK.
