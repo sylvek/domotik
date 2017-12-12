@@ -8,44 +8,20 @@ Each service (services folder) does only one thing. A script (mosquitto_pub) pus
 A another process (mosquitto_sub) is in charge of dispatch the data somewhere.
 An another service (services folder) could calculate the mean or the max value, etc and push it on MQTT, etc, etc.
 
-## installation
-### raspberrypi
-assume that you have installed a fresh raspbian…
-
-### from ansible
+## Build it
 
 ```
-domotik/ansible $> ansible-playbook playbook.yml -b -i raspberrypi --ask-pass [--limit @host] [--tag "tags"]
-# where tags is:
-# refresh
-# update
-# stop
-# start
+back> docker build -t domotik-back .
+front> docker build -t domotik-front .
+bridge-to-mongodb> docker build -t domotik-bridge-to-mongodb .
+bridge-to-elasticsearch> docker build -t domotik-bridge-to-elasticsearch .
 ```
 
-## sensors (mosquitto_pub)
-several sensors push data over MQTT
-- home int. temperature (via CurrentCost ENVI cc128)
-- home int. temperature (via esp8266/esp1 + DS18B20)
-- home ext. temperature (via thn132n + arduino bridge over usb)
-- home ext. temperature (via esp8266/esp12e + DS18B20)
-- home power consumption (via CurrentCost ENVI cc128)
+## Run it
 
-## triggers (mosquitto_pub)
-- remote IR control (via lirc)
-- motion sensor (via hc sr505)
-
-## analyzers (mosquitto_sub)
-several analyzers are available
-- push data to syslog
-- push data to mongodb
-- control the freebox HD
-- RGB LED (replaced by an hacked Philips LED + esp8266/esp12e)
-- LCD (replaced by an arduino + esp8266/esp1)
-
-## services
-- mean by hour
-- sum per day
-- alert consumption
-- webcam picture
-- alert detection
+```
+$> docker run -d --name elasticsearch -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" docker.elastic.co/elasticsearch/elasticsearch:6.0.1
+$> docker run -d --name kibana p 5601:5601 docker.elastic.co/kibana/kibana:6.0.1
+$> docker run -d --name mongodb mongo:2
+$> docker run -d --name mosquitto -p 1883:1883 -p 9883:9883 jllopis/mosquitto:v1.4.14 mosquitto
+```
