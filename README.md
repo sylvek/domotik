@@ -1,4 +1,4 @@
-# domotik
+# Domotik
 
 ![screenshot](extras/screenshot.png)
 ![tv](extras/tv.jpg)
@@ -24,4 +24,27 @@ $> docker run -d --name elasticsearch -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" docker
 $> docker run -d --name kibana p 5601:5601 docker.elastic.co/kibana/kibana:6.0.1
 $> docker run -d --name mongodb mongo:2
 $> docker run -d --name mosquitto -p 1883:1883 -p 9883:9883 jllopis/mosquitto:v1.4.14 mosquitto
+
+$> docker run -d --name domotik-back --link mosquitto:mosquitto domotik-back
+$> docker run -d --name domotik-front --link mongodb:mongodb -p 3000:3000 domotik-front
+
+$> docker run -d --name domotik-bridge-to-mongodb --link mosquitto:mosquitto --link mongodb:mongodb domotik-bridge-to-mongodb
+$> docker run -d --name domotik-bridge-to-elasticsearch --link mosquitto:mosquitto --link elasticsearch:elasticsearch domotik-bridge-to-elasticsearch
 ```
+
+## Use it
+
+| service | link |
+|---------|------|
+| kibana dasboard | http://ip:5601 |
+| tv dashboard | http://ip:3000/internal |
+| history dashboard | http://ip:3000/history |
+| MQTT broker | tcp://ip:1883 |
+
+
+## TODO
+
+- (re)create thin client for TV
+- backup and cleanup (mongodb)
+- migrate IoT sensors
+- remove old raspberries

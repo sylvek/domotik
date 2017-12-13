@@ -41,7 +41,9 @@ def on_message(client, userdata, msg):
         client.publish(args.trigger_out, elapsed_time_in_minute)
 
 def signal_handler(sig, frame):
-    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
+    if not os.path.exists("/var/cache/domotik/services"):
+        os.makedirs("/var/cache/domotik/services")
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global previous_value
         global day
         global trigger
@@ -52,8 +54,8 @@ def signal_handler(sig, frame):
 
 day = datetime.datetime.now().day
 
-if os.path.exists(__file__ + "." + args.service_name + ".previous"):
-    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
+if os.path.exists("/var/cache/" + __file__ + "." + args.service_name + ".previous"):
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         day = previous['day']
         previous_value = previous['previous_value']

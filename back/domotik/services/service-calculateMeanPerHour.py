@@ -38,7 +38,9 @@ def on_message(client, userdata, msg):
         client.publish(args.measure_out, round(mean, 2))
 
 def signal_handler(sig, frame):
-    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
+    if not os.path.exists("/var/cache/domotik/services"):
+        os.makedirs("/var/cache/domotik/services")
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global count
         global sum
         json.dump({'count': count, 'sum': sum}, outfile)
@@ -46,8 +48,8 @@ def signal_handler(sig, frame):
         print "Ending and cleaning up"
         client.disconnect()
 
-if os.path.exists(__file__ + "." + args.service_name + ".previous"):
-    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
+if os.path.exists("/var/cache/" + __file__ + "." + args.service_name + ".previous"):
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         count = previous['count']
         sum = previous['sum']

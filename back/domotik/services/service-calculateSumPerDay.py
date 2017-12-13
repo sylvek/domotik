@@ -32,7 +32,9 @@ def on_message(client, userdata, msg):
     client.publish(args.current_out, sum, 0, True)
 
 def signal_handler(sig, frame):
-    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
+    if not os.path.exists("/var/cache/domotik/services"):
+        os.makedirs("/var/cache/domotik/services")
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global day
         global sum
         json.dump({'day': day, 'sum': sum}, outfile)
@@ -42,8 +44,8 @@ def signal_handler(sig, frame):
 
 day = datetime.datetime.now().day
 
-if os.path.exists(__file__ + "." + args.service_name + ".previous"):
-    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
+if os.path.exists("/var/cache/" + __file__ + "." + args.service_name + ".previous"):
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous = json.load(infile)
         day = previous['day']
         sum = previous['sum']

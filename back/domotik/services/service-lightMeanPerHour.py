@@ -36,15 +36,17 @@ def limit_percent(percent):
     return percent
 
 def signal_handler(sig, frame):
-    with open(__file__ + "." + args.service_name + ".previous", 'w') as outfile:
+    if not os.path.exists("/var/cache/domotik/services"):
+        os.makedirs("/var/cache/domotik/services")
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'w') as outfile:
         global previous_value
         json.dump({'previous_value':previous_value}, outfile)
     if sig is not signal.SIGUSR1:
         print "Ending and cleaning up"
         client.disconnect()
 
-if os.path.exists(__file__ + "." + args.service_name + ".previous"):
-    with open(__file__ + "." + args.service_name + ".previous", 'r') as infile:
+if os.path.exists("/var/cache/" + __file__ + "." + args.service_name + ".previous"):
+    with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'r') as infile:
         previous_value = json.load(infile)['previous_value']
 
 signal.signal(signal.SIGUSR1, signal_handler)
