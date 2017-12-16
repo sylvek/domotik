@@ -41,10 +41,15 @@ $> docker run -d --name domotik-bridge-to-elasticsearch --link mosquitto:mosquit
 | history dashboard | http://ip:3000/history |
 | MQTT broker | tcp://ip:1883 |
 
+## Tips
+
+to restore data
+
+```
+$> for file in *.gz; do zcat $file | mongoimport --host mongodb --db domotik --collection measures; done
+```
 
 ## TODO
 
 - (re)create thin client for TV
-- backup and cleanup (mongodb)
 - migrate IoT sensors
-- remove old raspberries
