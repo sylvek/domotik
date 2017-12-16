@@ -3,6 +3,6 @@ COPY domotik /domotik
 
 WORKDIR /domotik
 
-RUN ["pip", "install", "paho-mqtt", "serial"]
+RUN ["pip", "install", "paho-mqtt", "pyserial"]
 
-ENTRYPOINT ["python", "/domotik/mosquitto_sub/cc128.py", "/dev/cc128", "mosquitto"]
+ENTRYPOINT ["python", "/domotik/mosquitto_pub/cc128.py", "/dev/cc128", "mosquitto"]

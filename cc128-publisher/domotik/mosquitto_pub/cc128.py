@@ -6,6 +6,7 @@ import sys
 import errno
 import re
 import signal
+import os
 
 parser = argparse.ArgumentParser(description='fetch data from cc128 and push it to mqtt')
 parser.add_argument('usbport', metavar='usbport', help='usb port like /dev/ttyUSB0', nargs='?', default='/dev/ttyUSB0')
@@ -33,10 +34,16 @@ def signal_handler(signal, frame):
 
 try:
 	signal.signal(signal.SIGINT, signal_handler)
+
+	while not os.path.exists(usbport):
+		print "waiting for", usbport
+		time.sleep(2)
+
 	ser = serial.Serial(port=usbport, baudrate=57600, bytesize=serial.EIGHTBITS, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, timeout=3)
 	client = mqtt.Client()
 	client.connect(args.hostname, int(args.port), 60)
-except:
+except Exception as e:
+	print e
 	sys.exit(errno.EIO)
 
 while run:
