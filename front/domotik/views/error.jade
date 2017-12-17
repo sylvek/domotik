@@ -1,0 +1,11 @@
+doctype html
+html
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel='stylesheet', href='stylesheets/style.css')
+
+  block content
+    h1= message
+    h2= error.status
+    pre #{error.stack}

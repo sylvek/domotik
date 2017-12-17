@@ -1,0 +1,97 @@
+doctype html
+html(ng-app='domotikApp')
+  head
+    title= title
+    meta(name="viewport", content="width=device-width, initial-scale=1")
+    link(rel='stylesheet', href='stylesheets/style.css')
+    link(rel='stylesheet', href='stylesheets/style-current.css')
+    link(rel='stylesheet', href='bower_components/nvd3/build/nv.d3.css')
+    script(src='bower_components/angular/angular.min.js')
+    script(src='bower_components/bower-mqttws/mqttws31.js')
+    script(src='bower_components/d3/d3.js')
+    script(src='bower_components/nvd3/build/nv.d3.js')
+    script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
+    script(src='bower_components/ngtweet/dist/ngtweet.min.js')
+    script(src='bower_components/ephemeris/src/ephemeris.min.js')
+    script(src='javascripts/domotik-app-current-internal.js')
+
+  block content
+    div(ng-controller="domotikIndexCtrl")
+
+      div#wallpaper(ng-style="{'background-image':'url({{background}})'}")
+
+        div#left
+          {{last_date}}
+          image(ng-src="{{last_position}}")
+          div#clock
+            div {{ current_time | date:'dd MMM yyyy' }}
+            div
+              span#hours {{ current_time | date:'HH' }}
+              span#minutes {{ current_time | date:'mm' }}
+              span#seconds {{ current_time | date:'ss' }}
+          div#ephemeris
+            div
+              {{ ephemeride }}
+
+        div#current-to-right
+          h2 Maison
+          table
+            tr
+              th dehors
+              td(class="stream") {{temp_outside2}} °c
+            tr
+              th garage
+              td(class="stream") {{temp_living_room}} °c
+            tr
+              th maison
+              td(class="stream") {{temp_bathroom}} °c
+
+          h2 Electrique
+          table
+            tr
+              th actuellement
+              td(class="stream") {{power_now}} kWh
+            tr
+              th cette heure
+              td(class="stream") {{power_hour}} kWh
+            tr
+              th aujourd'hui
+              td {{sum_watt_today}} kWh
+            tr
+              th hier
+              td {{sum_watt_yesterday}} kWh
+            tr
+              th l'année dernière
+              td {{sum_watt_last_year}} kWh
+            tr
+              th sur 30 jours
+              td {{mean_watt_last_30_days}} kWh
+
+          h2 Eau chaude
+          table
+            tr
+              th hier
+              td {{hot_water_comsuption_yesterday}} min.
+            tr
+              th sur 30 jours
+              td {{hot_water_mean_last_30_days}} min.
+
+        div#right
+          twitter-timeline(
+                ng-if="slug == 'beauty'"
+                twitter-timeline-type='list'
+                twitter-timeline-owner-screen-name='"sylv3k"'
+                twitter-timeline-slug='"beauty"'
+                twitter-timeline-options='{"tweetLimit": 2, "theme": "light", "chrome": "noheader nofooter noborders"}')
+          twitter-timeline(
+                ng-if="slug == 'transilien'"
+                twitter-timeline-type='list'
+                twitter-timeline-owner-screen-name='"sylv3k"'
+                twitter-timeline-slug='"transilien"'
+                twitter-timeline-options='{"tweetLimit": 6, "theme": "light", "chrome": "noheader nofooter noborders"}')
+          twitter-timeline(
+                ng-if="slug == 'news'"
+                twitter-timeline-type='list'
+                twitter-timeline-owner-screen-name='"sylv3k"'
+                twitter-timeline-slug='"news"'
+                twitter-timeline-options='{"tweetLimit": 2, "theme": "light", "chrome": "noheader nofooter noborders"}')
