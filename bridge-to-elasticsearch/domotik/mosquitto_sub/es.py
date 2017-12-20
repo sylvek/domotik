@@ -28,8 +28,8 @@ def on_message(client, userdata, msg):
     except (ValueError, TypeError):
     	value = msg.payload
 
-    message = {"sensor":sensor,"type":type,"value":value,"timestamp":timestamp}
-    client_elasticsearch.index(index="domotik", doc_type=collection, body=message)
+    message = {"collection":collection,"sensor":sensor,"type":type,"value":value,"timestamp":timestamp}
+    client_elasticsearch.index(index="domotik", doc_type="data", body=message)
 
 def signal_handler(signal, frame):
     print "Ending and cleaning up"
