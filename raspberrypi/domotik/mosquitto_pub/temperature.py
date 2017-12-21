@@ -27,10 +27,15 @@ def signal_handler(signal, frame):
     client.disconnect()
     run = False
 
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        client.reconnect()
+
 try:
     signal.signal(signal.SIGINT, signal_handler)
 
     client = mqtt.Client()
+    client.on_disconnect = on_disconnect
     client.connect(args.hostname, int(args.port), 120)
 except Exception as e:
     print e
