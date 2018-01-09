@@ -1,0 +1,34 @@
+<html>
+  <head>
+    <style>
+    body {
+      font: 16px Arial, sans-serif;
+    }
+    table {
+        border-collapse: collapse;
+    }
+
+    table, th, td {
+        border: 1px solid black;
+        padding: 1em;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>Récapitulatif de la semaine</h1>
+    <table>
+      <tr>
+        <th>Electricité</th>
+        <th>Eau</th>
+      </tr>
+      <tr>
+        <td>%(power)s €</td>
+        <td>%(water)s €</td>
+      </tr>
+      <tr>
+        <td>%(power_consumption)s W</td>
+        <td>%(water_consumption)s L</td>
+      </tr>
+    </table>
+  </body>
+</html>
