@@ -16,7 +16,7 @@ args = parser.parse_args()
 run = True
 
 def publish(m=''):
-    client.publish(args.trigger_out, m)
+    client.publish(args.trigger_out, m, 1, True)
 
 def signal_handler(sig, frame):
     if sig is not signal.SIGUSR1:
