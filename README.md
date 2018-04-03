@@ -48,3 +48,10 @@ to restore data
 ```
 $> for file in *.gz; do zcat $file | mongoimport --host mongodb --db domotik --collection measures; done
 ```
+
+to export in Elasticsearch
+
+```
+$> for file in *.gz; do zcat $file | jq -c 'del(._id) | .timestamp=.timestamp*1000'; done >> export
+$> for data in `cat export`; do echo $data | docker run --link elasticsearch:elasticsearch -v export.elasticsearch:/export.elasticsearch --rm -i byrnedo/alpine-curl -X POST --data-binary @- http://elasticsearch:9200/test/data -H "Content-Type: application/json" -v; done
+```
