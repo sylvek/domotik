@@ -1,4 +1,4 @@
-# Back side
+# graphql side
 
 ## Build it
 
