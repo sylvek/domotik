@@ -14,13 +14,6 @@ args = parser.parse_args()
 temp_sensor = args.temp_sensor
 run = True
 
-def sensor_data_check( sensor, watt, tmpr ):
-    sensor = int(sensor)
-    watt = int(watt)
-    tmpr = float(tmpr)
-    client.publish("sensors/cc128/watt", watt)
-    client.publish("sensors/cc128/temp", tmpr)
-
 def signal_handler(signal, frame):
     global run
     print "Ending and cleaning up"

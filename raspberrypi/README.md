@@ -53,3 +53,24 @@ $> sudo apt-get install python-pip
 $> sudo pip install paho-mqtt RPi.GPIO
 /home/pi/domotik/raspberrypi/domotik/mosquitto_sub> python led.py 192.168.0.4
 ```
+
+## Install linky sensor
+
+```
+$> git clone https://github.com/sylvek/domotik.git
+$> sudo apt-get install python-pip
+$> sudo pip install paho-mqtt pyserial
+/home/pi/domotik/raspberrypi/domotik/mosquitto_pub> python linky.py /dev/serial0 192.168.0.4
+```
+
+For R-Zero W and R-3 you should
+
+```
+$> sudo systemctl disable hciuart
+$> sudo systemctl disable serial-getty@ttyAMA0.service
+-- on /boot/config.txt
+enable_uart=1
+dtoverlay=pi3-disable-bt
+-- on /boot/cmdline.txt
+wc_otg.lpm_enable=0 console=tty1 root=PARTUUID=319d213b-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
+```
