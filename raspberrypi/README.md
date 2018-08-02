@@ -73,4 +73,6 @@ enable_uart=1
 dtoverlay=pi3-disable-bt
 -- on /boot/cmdline.txt
 wc_otg.lpm_enable=0 console=tty1 root=PARTUUID=319d213b-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
+-- on terminal
+$> stty -F /dev/ttyAMA0 1200 sane evenp parenb cs7 clocal -crtscts
 ```
