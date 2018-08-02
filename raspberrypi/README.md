@@ -69,7 +69,6 @@ For R-Zero W and R-3 you should
 $> sudo systemctl disable hciuart
 $> sudo systemctl disable serial-getty@ttyAMA0.service
 -- on /boot/config.txt
-enable_uart=1
 dtoverlay=pi3-disable-bt
 -- on /boot/cmdline.txt
 wc_otg.lpm_enable=0 console=tty1 root=PARTUUID=319d213b-02 rootfstype=ext4 elevator=deadline fsck.repair=yes rootwait
