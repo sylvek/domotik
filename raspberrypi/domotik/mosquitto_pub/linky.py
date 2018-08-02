@@ -32,7 +32,7 @@ try:
         print "waiting for", usbport
         time.sleep(2)
 
-    ser = serial.Serial(port=usbport, baudrate=1200, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=None)
+    ser = serial.Serial(port=usbport, baudrate=1200, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1)
     client = mqtt.Client()
     client.connect(args.hostname, int(args.port), 60)
 except Exception as e:
