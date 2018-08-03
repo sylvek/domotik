@@ -17,6 +17,49 @@ args = parser.parse_args()
 usbport = args.usbport
 run = True
 
+def lectureTrame(ser):
+    """Lecture d'une trame sur le port serie specifie en entree.
+    La trame debute par le caractere STX (002 h) et fini par ETX (003 h)"""
+    # Lecture d'eventuel caractere avant le debut de trame
+    # Jusqu'au caractere \x02 + \n (= \x0a)
+    trame = list()
+    while trame[-2:]!=['\x02','\n']:
+        trame.append(ser.read(1))
+    # Lecture de la trame jusqu'au caractere \x03
+    trame=list()
+    while trame[-1:]!=['\x03']:
+        trame.append(ser.read(1))
+    # Suppression des caracteres de fin '\x03' et '\r' de la liste
+    trame.pop()
+    trame.pop()
+    return trame
+
+def decodeTrame(trame):
+    """Decode une trame complete et renvoie un dictionnaire des elements"""
+    lignes = trame.split('\r\n')
+    result = {}
+    for ligne in lignes:
+        tuple = valideLigne(ligne)
+        result[tuple[0]]=tuple[1]
+    return result
+
+def valideLigne(ligne):
+    """Retourne les elements d'une ligne sous forme de tuple si le checksum est ok"""
+    chk = checksumLigne(ligne)
+    items = ligne.split(' ')
+    if ligne[-1]==chk:
+        return (items[0], items[1])
+    else:
+        raise Exception("Checksum error")
+
+def checksumLigne(ligne):
+    """Verifie le checksum d'une ligne et retourne un tuple"""
+    sum = 0
+    for ch in ligne[:-2]:
+            sum += ord(ch)
+    sum = (sum & 63) + 32
+    return chr(sum)
+
 def signal_handler(signal, frame):
     global run
     print "Ending and cleaning up"
@@ -42,8 +85,8 @@ except Exception as e:
 while run:
     try:
         client.loop()
-        line = ser.readline()
-        if line.startswith( 'PAPP' ):
-                client.publish("sensors/linky/watt", line[5 : 10])
+        trame = lectureTrame(ser)
+        lignes = decodeTrame("".join(trame))
+        client.publish("sensors/linky/watt", lignes["PAPP"])
     except:
         sys.exit(errno.EIO)
