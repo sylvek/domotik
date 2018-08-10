@@ -17,19 +17,15 @@ run = True
 def signal_handler(signal, frame):
     global run
     print "Ending and cleaning up"
-    client.disconnect()
     run = False
-
-def on_disconnect(client, userdata, rc):
-    if rc != 0:
-        client.reconnect()
 
 try:
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
 
     client = mqtt.Client()
-    client.on_disconnect = on_disconnect
     client.connect(args.hostname, int(args.port), 120)
+    client.loop_start()
 except Exception as e:
     print e
     sys.exit(errno.EIO)
@@ -52,6 +48,10 @@ def read_temp():
         return round(temp_c, 2)
 
 while run:
-    client.loop()
-    client.publish("sensors/esp8266/temp", read_temp())
-    time.sleep(60)
+    try:
+        client.publish("sensors/esp8266/temp", read_temp())
+        time.sleep(60)
+    except:
+        pass
+
+client.disconnect()
