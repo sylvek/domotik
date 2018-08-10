@@ -7,6 +7,9 @@ import errno
 import re
 import signal
 import os
+import logging
+
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename='linky.log', filemode='w', level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='fetch data from linky and push it to mqtt')
 parser.add_argument('usbport', metavar='usbport', help='usb port like /dev/serial0', nargs='?', default='/dev/serial0')
@@ -62,31 +65,36 @@ def checksumLigne(ligne):
 
 def signal_handler(signal, frame):
     global run
-    print "Ending and cleaning up"
-    ser.close()
-    client.disconnect()
+    logging.info("Ending and cleaning up")
     run = False
 
 try:
-    print("Starting listening Linky")
+    logging.info("Starting listening Linky")
     signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
 
     while not os.path.exists(usbport):
-        print "waiting for", usbport
+        logging.debug("waiting for ", usbport)
         time.sleep(2)
 
     ser = serial.Serial(port=usbport, baudrate=1200, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1)
+
     client = mqtt.Client()
     client.connect(args.hostname, int(args.port), 60)
+    logging.info("connected to MQTT broker")
+    client.loop_start()
+    logging.info("running...")
 except Exception as e:
-    print e
+    logging.exception("Fatal error in main loop")
     sys.exit(errno.EIO)
 
 while run:
     try:
-        client.loop()
         trame = lectureTrame(ser)
         lignes = decodeTrame("".join(trame))
         client.publish("sensors/linky/watt", lignes["PAPP"])
     except:
-        sys.exit(errno.EIO)
+        logging.exception("error in main loop")
+
+ser.close()
+client.disconnect()
