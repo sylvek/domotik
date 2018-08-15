@@ -8,8 +8,10 @@ import re
 import signal
 import os
 import logging
+import time
 
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename='linky.log', filemode='w', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', filename='linky.log', filemode='w', level=logging.INFO)
+logger = logging.getLogger("linky")
 
 parser = argparse.ArgumentParser(description='fetch data from linky and push it to mqtt')
 parser.add_argument('usbport', metavar='usbport', help='usb port like /dev/serial0', nargs='?', default='/dev/serial0')
@@ -20,6 +22,7 @@ args = parser.parse_args()
 usbport = args.usbport
 run = True
 previousValue = -1
+previousTimestamp = -1
 
 def lectureTrame(ser):
     """Lecture d'une trame sur le port serie specifie en entree.
@@ -66,27 +69,37 @@ def checksumLigne(ligne):
 
 def signal_handler(signal, frame):
     global run
-    logging.info("Ending and cleaning up")
+    logger.info("Ending and cleaning up")
     run = False
 
+def handle_debug(signal, frame):
+    logger.info("Switching to DEBUG level")
+    logger.setLevel(logging.DEBUG)
+
+def handle_info(signal, frame):
+    logger.info("Switching to INFO level")
+    logger.setLevel(logging.INFO)
+
 try:
-    logging.info("Starting listening Linky")
+    logger.info("Starting listening Linky")
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGUSR1, handle_debug)
+    signal.signal(signal.SIGUSR2, handle_info)
 
     while not os.path.exists(usbport):
-        logging.debug("waiting for %s", usbport)
+        logger.debug("waiting for %s", usbport)
         time.sleep(2)
 
     ser = serial.Serial(port=usbport, baudrate=1200, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1)
 
     client = mqtt.Client()
     client.connect(args.hostname, int(args.port), 60)
-    logging.info("connected to MQTT broker")
+    logger.info("connected to MQTT broker")
     client.loop_start()
-    logging.info("running...")
+    logger.info("running...")
 except Exception as e:
-    logging.exception("Fatal error in main loop")
+    logger.exception("Fatal error in main loop")
     sys.exit(errno.EIO)
 
 while run:
@@ -94,12 +107,14 @@ while run:
         trame = lectureTrame(ser)
         lignes = decodeTrame("".join(trame))
         newValue = lignes["PAPP"]
-        if newValue != previousValue:
-            logging.debug("new value: %s", newValue)
+        newTimestamp = time.time()
+        if newValue != previousValue or newTimestamp > (previousTimestamp + 10):
+            logger.debug("new value: %s", newValue)
             previousValue = newValue
+            previousTimestamp = newTimestamp
             client.publish("sensors/linky/watt", newValue)
     except:
-        logging.exception("error in main loop")
+        logger.exception("error in main loop")
 
 ser.close()
 client.disconnect()
