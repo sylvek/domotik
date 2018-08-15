@@ -19,6 +19,7 @@ args = parser.parse_args()
 
 usbport = args.usbport
 run = True
+previousValue = -1
 
 def lectureTrame(ser):
     """Lecture d'une trame sur le port serie specifie en entree.
@@ -74,7 +75,7 @@ try:
     signal.signal(signal.SIGTERM, signal_handler)
 
     while not os.path.exists(usbport):
-        logging.debug("waiting for ", usbport)
+        logging.debug("waiting for %s", usbport)
         time.sleep(2)
 
     ser = serial.Serial(port=usbport, baudrate=1200, bytesize=serial.SEVENBITS, parity=serial.PARITY_EVEN, stopbits=serial.STOPBITS_ONE, timeout=1)
@@ -92,7 +93,11 @@ while run:
     try:
         trame = lectureTrame(ser)
         lignes = decodeTrame("".join(trame))
-        client.publish("sensors/linky/watt", lignes["PAPP"])
+        newValue = lignes["PAPP"]
+        if newValue != previousValue:
+            logging.debug("new value: %s", newValue)
+            previousValue = newValue
+            client.publish("sensors/linky/watt", newValue)
     except:
         logging.exception("error in main loop")
 
