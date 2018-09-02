@@ -8,7 +8,6 @@ python /domotik/services/service-persistCurrentValue.py domotik_persist_esp12e s
 python /domotik/services/service-persistCurrentValue.py domotik_persist_esp8266 sensors/esp8266/temp current/esp8266/temp $1 &
 python /domotik/services/service-checkSensorsAvailability.py domotik_check_esp12e sensors/esp12e/temp 30 triggers/led/blink e06fb9 $1 &
 
-trap 'echo "trap SIGUSR1"; pkill -SIGUSR1 python' SIGUSR1
 trap 'exit 0' SIGINT SIGTERM
 
 echo "launched"
