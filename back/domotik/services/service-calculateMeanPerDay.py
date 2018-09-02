@@ -6,6 +6,7 @@ import signal
 import datetime
 import json
 import os.path
+import pytz
 
 parser = argparse.ArgumentParser(description='calculate a mean and send a measure one time per day')
 parser.add_argument('service_name', metavar='service_name', help='name of the current service')
@@ -19,6 +20,8 @@ args = parser.parse_args()
 count = 0
 sum = 0
 
+paris = pytz.timezone('Europe/Paris')
+
 def on_connect(client, userdata, flags, rc):
     client.subscribe(args.sensor_in)
 
@@ -30,7 +33,7 @@ def on_message(client, userdata, msg):
     sum += float(msg.payload)
     mean = sum/count
     client.publish(args.sensor_out, mean)
-    currentDay = datetime.datetime.now().day
+    currentDay = datetime.datetime.now(tz=paris).day
     if (currentDay is not day):
         count = 1
         sum = mean
@@ -54,7 +57,7 @@ if os.path.exists("/var/cache/" + __file__ + "." + args.service_name + ".previou
         count = previous['count']
         sum = previous['sum']
 
-day = datetime.datetime.now().day
+day = datetime.datetime.now(tz=paris).day
 
 signal.signal(signal.SIGUSR1, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)

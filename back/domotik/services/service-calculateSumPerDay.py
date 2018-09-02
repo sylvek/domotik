@@ -5,6 +5,7 @@ import signal
 import datetime
 import json
 import os.path
+import pytz
 
 parser = argparse.ArgumentParser(description='calculate a sum of measures per day')
 parser.add_argument('service_name', metavar='service_name', help='name of the current service')
@@ -17,6 +18,8 @@ args = parser.parse_args()
 
 sum = 0
 
+paris = pytz.timezone('Europe/Paris')
+
 def on_connect(client, userdata, flags, rc):
     client.subscribe(args.measure_in)
 
@@ -24,7 +27,7 @@ def on_message(client, userdata, msg):
     global sum
     global day
     sum += float(msg.payload)
-    currentDay = datetime.datetime.now().day
+    currentDay = datetime.datetime.now(tz=paris).day
     if (currentDay is not day):
         client.publish(args.measure_out, sum)
         sum = 0
@@ -42,7 +45,7 @@ def signal_handler(sig, frame):
         print "Ending and cleaning up"
         client.disconnect()
 
-day = datetime.datetime.now().day
+day = datetime.datetime.now(tz=paris).day
 
 if os.path.exists("/var/cache/" + __file__ + "." + args.service_name + ".previous"):
     with open("/var/cache/" + __file__ + "." + args.service_name + ".previous", 'r') as infile:

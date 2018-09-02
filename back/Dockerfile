@@ -3,6 +3,6 @@ COPY domotik /domotik
 
 WORKDIR /domotik
 
-RUN ["pip", "install", "paho-mqtt", "schedule", "xlrd"]
+RUN ["pip", "install", "paho-mqtt", "xlrd", "pytz"]
 
 ENTRYPOINT ["./start-back.sh", "mosquitto"]
