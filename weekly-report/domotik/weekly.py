@@ -20,8 +20,16 @@ args = parser.parse_args()
 
 this_week_datetime = datetime.today() - timedelta(days=7)
 this_week = time.mktime(this_week_datetime.timetuple())
+
+this_20days_datetime = datetime.today() - timedelta(days=30)
+this_20days = time.mktime(this_20days_datetime.timetuple())
+
 power_consumption = 0
 water_consumption = 0
+
+power_20days_consumption = 0
+water_20days_consumption = 0
+
 power = 0
 water = 0
 
@@ -30,9 +38,18 @@ def send_report():
     msg['Subject'] = "[domotik] Votre rapport de progression hebdomadaire"
     msg['From'] = args.from_mail
     msg['To'] = args.to_mail
-    text = "%(water_consumption)s has %(water)s euros and %(power_consumption)s has %(power)s euros" % {'water_consumption': water_consumption, 'water': water, 'power_consumption': power_consumption, 'power': power}
+    text = "%(water)s euros of water and %(power)s euros of electricity" % {'water': water, 'power': power}
     with open('template.html', 'r') as template:
-        html = template.read() % {'water_consumption': water_consumption, 'water': water, 'power_consumption': power_consumption, 'power': power}
+        html = template.read() % {
+        'water_consumption': water_consumption,
+        'power_consumption': power_consumption,
+        'water': water,
+        'power': power,
+        'water_7days_mean': round(water_consumption / 7, 2),
+        'power_7days_mean': round(power_consumption / 7, 2),
+        'water_20days_mean': round(water_20days_consumption / 20, 2),
+        'power_20days_mean': round(power_20days_consumption / 20, 2)
+        }
     part1 = MIMEText(text, 'plain')
     part2 = MIMEText(html, 'html')
     msg.attach(part1)
@@ -51,12 +68,16 @@ signal.signal(signal.SIGINT, signal_handler)
 signal.signal(signal.SIGTERM, signal_handler)
 
 client_mongodb = MongoClient(args.mongodb_hostname, int(args.mongodb_port))
-for day in client_mongodb.domotik['measures'].find({'sensor': 'sumPerDay', 'type': 'watt', 'timestamp': {'$gt': this_week}}):
-    power_consumption += day['value']
-for day in client_mongodb.domotik['measures'].find({'sensor': 'waterPerDay', 'type': 'liter', 'timestamp': {'$gt': this_week}}):
-    water_consumption += day['value']
+for day in client_mongodb.domotik['measures'].find({'sensor': 'sumPerDay', 'type': 'watt', 'timestamp': {'$gt': this_20days}}):
+    power_20days_consumption += day['value']
+    if(day['timestamp'] > this_week):
+        power_consumption += day['value']
+for day in client_mongodb.domotik['measures'].find({'sensor': 'waterPerDay', 'type': 'liter', 'timestamp': {'$gt': this_20days}}):
+    water_20days_consumption += day['value']
+    if(day['timestamp'] > this_week):
+        water_consumption += day['value']
 
-power = power_consumption / 1000 * float(args.power_price)
-water = water_consumption * float(args.water_price)
+power = round(power_consumption / 1000 * float(args.power_price),2)
+water = round(water_consumption * float(args.water_price),2)
 
 send_report()
