@@ -42,13 +42,13 @@ def send_report():
     with open('template.html', 'r') as template:
         html = template.read() % {
         'water_consumption': water_consumption,
-        'power_consumption': power_consumption,
+        'power_consumption': round(power_consumption / 1000, 2),
         'water': water,
         'power': power,
         'water_7days_mean': round(water_consumption / 7, 2),
-        'power_7days_mean': round(power_consumption / 7, 2),
+        'power_7days_mean': round(power_consumption / 7000, 2),
         'water_20days_mean': round(water_20days_consumption / 20, 2),
-        'power_20days_mean': round(power_20days_consumption / 20, 2)
+        'power_20days_mean': round(power_20days_consumption / 20000, 2)
         }
     part1 = MIMEText(text, 'plain')
     part2 = MIMEText(html, 'html')
