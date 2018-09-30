@@ -21,7 +21,7 @@ args = parser.parse_args()
 this_week_datetime = datetime.today() - timedelta(days=7)
 this_week = time.mktime(this_week_datetime.timetuple())
 
-this_20days_datetime = datetime.today() - timedelta(days=30)
+this_20days_datetime = datetime.today() - timedelta(days=20)
 this_20days = time.mktime(this_20days_datetime.timetuple())
 
 power_consumption = 0
