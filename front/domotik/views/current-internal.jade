@@ -32,6 +32,11 @@ html(ng-app='domotikApp')
           div#ephemeris
             div
               {{ ephemeride }}
+          div#rte
+            iframe(
+              src="https://eco2mix.rte-france.com/pluginWeb/data?key=a629c73819db78f4ab5cb204dcfb41590705e0be075bfa3885c044fb944414f0"
+              width="350"
+              height="370")
 
         div#current-to-right
           h2 Maison
