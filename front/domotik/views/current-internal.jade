@@ -34,6 +34,7 @@ html(ng-app='domotikApp')
               {{ ephemeride }}
           div#rte
             iframe(
+              ng-if="slug == 'news'"
               src="https://eco2mix.rte-france.com/pluginWeb/data?key=a629c73819db78f4ab5cb204dcfb41590705e0be075bfa3885c044fb944414f0"
               width="350"
               height="370")
