@@ -1,11 +1,8 @@
 body {
   margin: 0px;
   padding: 0px;
-  background-color: white;
-  color: black;
-}
-
-.stream {
+  background-color: black;
+  color: #ffa;
 }
 
 #wallpaper {
@@ -14,7 +11,7 @@ body {
 }
 
 #clock {
-  font-size: 230%;
+  font-size: 150%;
 }
 #hours {
   font-size: 200%;
@@ -34,9 +31,10 @@ body {
 #left, #current, #history, #capture, #water, #weather {
   float:left;
   text-align: center;
-  font-size: 120%;
-  margin-right: 10px;
-  margin-top: 10px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 15px;
+  margin: 1em;
+  padding: 1em;
 }
 
 button {
@@ -64,6 +62,10 @@ img {
 
 #current-to-right {
   float: right;
+  background: rgba(0,0,0,0.5);
+  border-radius: 15px;
+  margin: 1em;
+  padding: 1em;
 }
 
 #history table, #current table, #water table {
