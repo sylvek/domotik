@@ -1,8 +1,8 @@
-FROM python:2.7
+FROM python:2.7-alpine
 COPY domotik /domotik
 
 WORKDIR /domotik
 
 RUN ["pip", "install", "paho-mqtt", "xlrd", "pytz"]
 
-ENTRYPOINT ["./start-back.sh", "mosquitto"]
+ENTRYPOINT ["sh", "start-back.sh", "mosquitto"]
