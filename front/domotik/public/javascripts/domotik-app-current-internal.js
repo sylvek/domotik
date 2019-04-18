@@ -131,7 +131,10 @@
       }
 
       var quote = function() {
-        domotikSrv.quote().then(function(response) {$scope.quote = response.contents.quotes[0].quote});
+        domotikSrv.quote().then(function(response) {
+          var quote = response.data.contents.quotes[0];
+          $scope.quote = quote.quote + " - " + quote.author;
+        });
       }
 
       var wallpaper = function() {

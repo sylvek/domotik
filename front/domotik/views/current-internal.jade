@@ -43,14 +43,14 @@ html(ng-app='domotikApp')
               height="370")
 
         div#current-to-right
-          table
+          table#temperature
             tr
               th dehors
               td(class="stream") {{temp_outside}} °c
             tr
               th maison
               td(class="stream") {{temp_home}} °c
-          table
+          table#consumption
             tr
               th actuellement
               td(class="stream") {{power_now}} kWh
