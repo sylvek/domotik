@@ -98,17 +98,17 @@
           case "linky":
             switch (categories[2]) {
               case "watt":
-                $scope.power_now = (payload / 1000).toPrecision(4);
+                $scope.power_now = (payload / 1000).toFixed(2);
                 break;
               default:
                 break;
             }
             break;
           case "linkymean":
-            $scope.power_hour = (payload / 1000).toPrecision(4);
+            $scope.power_hour = (payload / 1000).toFixed(2);
             break;
           case "sumPerDay":
-            $scope.sum_watt_today = (payload / 1000).toPrecision(4);
+            $scope.sum_watt_today = (payload / 1000).toFixed(2);
             break;
           default:
             break;
@@ -166,13 +166,13 @@
             var sensor = response.data[0];
             var number_of_values = sensor.values.length;
             if (number_of_values > 0) {
-              $scope.sum_watt_yesterday = (sensor.values[number_of_values - 1][1] / 1000).toPrecision(4);
+              $scope.sum_watt_yesterday = (sensor.values[number_of_values - 1][1] / 1000).toFixed(2);
 
               var sum = 0;
               sensor.values.forEach(function(element) {
                 sum += element[1];
               });
-              $scope.mean_watt_last_30_days = (sum / number_of_values / 1000).toPrecision(4);
+              $scope.mean_watt_last_30_days = (sum / number_of_values / 1000).toFixed(2);
             }
           }
         });
@@ -182,20 +182,20 @@
             var sensor = response.data[0];
             var number_of_values = sensor.values.length;
             if (number_of_values > 0) {
-              $scope.hot_water_comsuption_yesterday = (sensor.values[number_of_values - 1][1]).toPrecision(4);
+              $scope.hot_water_comsuption_yesterday = (sensor.values[number_of_values - 1][1]).toFixed(2);
 
               var sum = 0;
               sensor.values.forEach(function(element) {
                 sum += element[1];
               });
-              $scope.hot_water_mean_last_30_days = (sum / number_of_values).toPrecision(4);
+              $scope.hot_water_mean_last_30_days = (sum / number_of_values).toFixed(2);
             }
           }
         });
 
         domotikSrv.last("year", "sumPerDay").then(function(response) {
           if (response.data.length > 0) {
-            $scope.sum_watt_last_year = (response.data[0].value / 1000).toPrecision(4);
+            $scope.sum_watt_last_year = (response.data[0].value / 1000).toFixed(2);
           }
         });
       };
