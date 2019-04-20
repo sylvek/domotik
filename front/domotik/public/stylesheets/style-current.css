@@ -30,6 +30,13 @@ body {
   font-size: 140%;
 }
 
+#title {
+  position: fixed;
+  bottom: 5px;
+  right: 1em;
+  font-size: 80%;
+}
+
 #left, #current, #history, #capture, #water {
   float:left;
   text-align: center;

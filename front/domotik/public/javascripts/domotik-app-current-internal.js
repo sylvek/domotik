@@ -110,7 +110,9 @@
       var wallpaper = function() {
         var keys = Object.keys($window.images)
         random = Math.floor((Math.random() * keys.length));
-        $scope.background = "img/" + $window.images[keys[random]].file;
+        var wallpaper = $window.images[keys[random]];
+        $scope.background = "img/" + wallpaper.file;
+        $scope.title = wallpaper.title;
       }
 
       var twitter = function() {
