@@ -13,6 +13,7 @@ html(ng-app='domotikApp')
     script(src='bower_components/angularjs-nvd3-directives/dist/angularjs-nvd3-directives.min.js')
     script(src='bower_components/ngtweet/dist/ngtweet.min.js')
     script(src='bower_components/ephemeris/src/ephemeris.min.js')
+    script(src='javascripts/data.js')
     script(src='javascripts/domotik-app-current-internal.js')
 
   block content
@@ -22,7 +23,6 @@ html(ng-app='domotikApp')
 
         div#left
           {{last_date}}
-          image(ng-src="{{last_position}}")
           div#clock
             div {{ current_time | date:'dd MMM yyyy' }}
             div
@@ -89,3 +89,10 @@ html(ng-app='domotikApp')
                 twitter-timeline-owner-screen-name='"sylv3k"'
                 twitter-timeline-slug='"news"'
                 twitter-timeline-options='{"tweetLimit": 2, "theme": "light", "chrome": "noheader nofooter noborders"}')
+
+        div#weather
+            iframe(
+              src="https://www.powr.io/plugins/weather/view/19504734"
+              width="500px"
+              height="200px"
+              frameborder="0")

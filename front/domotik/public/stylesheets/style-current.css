@@ -20,9 +20,6 @@ body {
 #minutes {
   font-size: 300%;
 }
-#weather div.city {
-  font-size: 120%;
-}
 
 #quote {
   font-size: 80%;
@@ -33,13 +30,19 @@ body {
   font-size: 140%;
 }
 
-#left, #current, #history, #capture, #water, #weather {
+#left, #current, #history, #capture, #water {
   float:left;
   text-align: center;
   background: rgba(0,0,0,0.5);
   border-radius: 15px;
   margin: 1em;
   padding: 1em;
+}
+
+#weather {
+  position: fixed;
+  bottom: 0;
+  right: 0;
 }
 
 button {

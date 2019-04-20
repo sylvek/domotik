@@ -5,38 +5,8 @@
 
     return({
       last: last,
-      getWeather: getWeather,
       quote: quote
     });
-
-    function getWeather(query) {
-      var weather = { temp: {}, clouds: null, humidity: null, pressure: null, wind: null };
-      $http.jsonp('http://api.openweathermap.org/data/2.5/weather?q=' + query + '&units=metric&appid=5de8e795c11a94258c9e69cc8f2d87bf&callback=JSON_CALLBACK').success(function(data) {
-          if (data) {
-              if (data.main) {
-                  weather.city = query;
-                  weather.temp.current = data.main.temp;
-                  weather.temp.min = data.main.temp_min;
-                  weather.temp.max = data.main.temp_max;
-                  weather.humidity = data.main.humidity;
-                  weather.pressure = data.main.pressure;
-                  weather.wind = data.wind.speed;
-              }
-              weather.clouds = data.clouds ? data.clouds.all : undefined;
-
-              var baseUrl = 'https://ssl.gstatic.com/onebox/weather/128/';
-                if (weather.clouds < 20) {
-                    weather.img = baseUrl + 'sunny.png';
-                } else if (weather.clouds < 90) {
-                   weather.img = baseUrl + 'partly_cloudy.png';
-                } else {
-                    weather.img = baseUrl + 'cloudy.png';
-                }
-          }
-      });
-
-      return weather;
-    }
 
     function last(time, type) {
       return $http.get("api/last/" + time + "/" + type);
@@ -48,7 +18,7 @@
 
   });
 
-  app.controller('domotikIndexCtrl', function($scope, $interval, domotikSrv){
+  app.controller('domotikIndexCtrl', function($scope, $interval, $window, domotikSrv){
 
       $scope.sum_watt_today = "--";
       $scope.sum_watt_yesterday = "--";
@@ -138,8 +108,9 @@
       }
 
       var wallpaper = function() {
-        random = Math.floor((Math.random() * 80) + 1);
-        $scope.background = "img/" + random + ".jpg";
+        var keys = Object.keys($window.images)
+        random = Math.floor((Math.random() * keys.length));
+        $scope.background = "img/" + $window.images[keys[random]].file;
       }
 
       var twitter = function() {
@@ -160,7 +131,7 @@
         }
       }
 
-      var weather = function() {
+      var sums = function() {
         domotikSrv.last("30d", "sumPerDay").then(function(response) {
           if (response.data.length > 0) {
             var sensor = response.data[0];
@@ -200,7 +171,7 @@
         });
       };
 
-      weather();
+      sums();
       ephemeride();
       quote();
       wallpaper();
