@@ -39,12 +39,6 @@ body {
   padding: 1em;
 }
 
-#weather {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-}
-
 button {
   font-size: 120%;
   width: 352px;
