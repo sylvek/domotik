@@ -51,7 +51,22 @@ router.get('/last/:time(24h|30d)/:sensor(meanPerHour|sumPerDay|tankHotWaterPerDa
                 result.push({"key": entry.sensor, "values":[]});
                 index = type.length - 1;
               }
-              result[index].values.push([entry.timestamp, entry.value]);
+
+              if (req.params.sensor == "tankHotWaterPerDay") {
+                var _found = false;
+                var date = new Date(new Date(entry.timestamp * 1000).toDateString()).getTime() / 1000;
+                result[index].values.forEach(function(value) {
+                  if(value[0] == date && !_found) {
+                    value[1] += entry.value;
+                    _found = true;
+                  }
+                });
+                if (!_found) {
+                  result[index].values.push([date, entry.value]);
+                }
+              } else {
+                result[index].values.push([entry.timestamp, entry.value]);
+              }
           });
 
           res.send(result);

@@ -37,7 +37,7 @@ body {
   font-size: 80%;
 }
 
-#left, #current, #history, #capture, #water {
+#left, #current, #capture, #water {
   float:left;
   text-align: center;
   background: rgba(0,0,0,0.5);
@@ -73,15 +73,11 @@ img {
   float: right;
 }
 
-#temperature, #consumption {
+#temperature, #consumption, #history {
   background: rgba(0,0,0,0.5);
   border-radius: 15px;
   margin: 1em;
   padding: 1em;
-}
-
-#history table, #current table, #water table {
-  padding: 5px;
 }
 
 table {
