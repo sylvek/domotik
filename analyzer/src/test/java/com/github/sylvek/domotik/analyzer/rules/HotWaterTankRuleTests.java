@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -41,7 +42,7 @@ public class HotWaterTankRuleTests {
   }
 
   @Test
-  @DisplayName("Given an human activity during the cheapest period, the hot water goes on and off by itself")
+  @DisplayName("Given an human activity during the LT period, the hot water goes on and off by itself")
   void testWithActivities() {
     // Given
     final EventBus eventBus = mock(EventBus.class);
@@ -83,6 +84,35 @@ public class HotWaterTankRuleTests {
     // Then
     ArgumentCaptor<DeliveryOptions> deliveryOptions = ArgumentCaptor.forClass(DeliveryOptions.class);
     verify(eventBus).publish(eq("measures"), eq(5L), deliveryOptions.capture());
+
+    final List<DeliveryOptions> allValues = deliveryOptions.getAllValues();
+    assertEquals("measures/tankHotWaterPerDay/min", allValues.get(0).getHeaders().get("topic"));
+  }
+
+  @Test
+  @DisplayName("Should be done avec a trigger on and off")
+  void testShouldBeDone() {
+    // Given
+    final EventBus eventBus = mock(EventBus.class);
+    final LocalTime time = LocalTime.of(2, 05);
+
+    // When
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "consumptionIsQuiet").put("value", 276).put("timestamp", 0));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2379).put("timestamp", 60_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2473).put("timestamp", 120_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2361).put("timestamp", 180_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2396).put("timestamp", 240_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2182).put("timestamp", 300_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "consumptionIsQuiet").put("value", 253).put("timestamp", 360_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2473).put("timestamp", 420_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2361).put("timestamp", 480_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2396).put("timestamp", 540_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "activityDetected").put("value", 2182).put("timestamp", 600_000));
+    hotWaterTankRule.process(eventBus, time, new JsonObject().put("name", "consumptionIsQuiet").put("value", 253).put("timestamp", 660_000));
+
+    // Then
+    ArgumentCaptor<DeliveryOptions> deliveryOptions = ArgumentCaptor.forClass(DeliveryOptions.class);
+    verify(eventBus).publish(eq("measures"), any(), deliveryOptions.capture());
 
     final List<DeliveryOptions> allValues = deliveryOptions.getAllValues();
     assertEquals("measures/tankHotWaterPerDay/min", allValues.get(0).getHeaders().get("topic"));

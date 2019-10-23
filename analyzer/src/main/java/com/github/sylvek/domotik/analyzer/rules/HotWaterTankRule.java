@@ -6,14 +6,12 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalTime;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class HotWaterTankRule implements Rule {
 
   public static final double HOT_TANK_WATER_POWER = 2_000;
-  private final AtomicBoolean triggered = new AtomicBoolean();
-  private final AtomicLong time = new AtomicLong();
+  private final AtomicLong time = new AtomicLong(0L);
 
   @Override
   public void process(EventBus eventBus, LocalTime now, JsonObject event) {
@@ -33,29 +31,25 @@ public class HotWaterTankRule implements Rule {
     final boolean isBefore7am4 = now.isBefore(LocalTime.of(7, 4));
     final boolean isAfter1pm4 = now.isAfter(LocalTime.of(13, 4));
     final boolean isBefore4pm4 = now.isBefore(LocalTime.of(16, 4));
-    final boolean isInTheCheapestZone = (isAfter2am4 && isBefore7am4) || (isAfter1pm4 && isBefore4pm4);
+    final boolean lowTariff = (isAfter2am4 && isBefore7am4) || (isAfter1pm4 && isBefore4pm4);
 
-    final String name = event.getString("name");
+    if (!lowTariff) {
+      time.set(0L);
+      return;
+    }
+
     final Integer value = event.getInteger("value");
     final Long timestamp = event.getLong("timestamp");
 
-    if (isInTheCheapestZone
-      && triggered.get()
-      && value < HOT_TANK_WATER_POWER
-    ) {
-      triggered.set(false);
-      final long delay = (timestamp - time.get()) / 1_000 / 60;
-      final int liter = 0;
-      eventBus.publish("measures", delay, new DeliveryOptions().addHeader("topic", "measures/tankHotWaterPerDay/min"));
+    if (value > HOT_TANK_WATER_POWER) {
+      time.compareAndSet(0L, timestamp);
     }
 
-    if ("activityDetected".equals(name)) {
-      if (isInTheCheapestZone
-        && !triggered.get()
-        && value > HOT_TANK_WATER_POWER) {
-        triggered.set(true);
-        time.set(timestamp);
-      }
+    final long triggered = time.get();
+    if (value < HOT_TANK_WATER_POWER && triggered > 0) {
+      time.set(-1L);
+      final long delay = (timestamp - triggered) / 60_000;
+      eventBus.publish("measures", delay, new DeliveryOptions().addHeader("topic", "measures/tankHotWaterPerDay/min"));
     }
   }
 }
