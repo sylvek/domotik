@@ -11,6 +11,9 @@ import java.util.concurrent.atomic.AtomicLong;
 public class HotWaterTankRule implements Rule {
 
   public static final double HOT_TANK_WATER_POWER = 2_000;
+  public static final int TEMP_MAX = 60;
+  public static final int TEMP_MIN = 10;
+  public static final int TANK_CAPACITY = 200;
   private final AtomicLong time = new AtomicLong(0L);
 
   @Override
@@ -50,6 +53,11 @@ public class HotWaterTankRule implements Rule {
       time.set(-1L);
       final long delay = (timestamp - triggered) / 60_000;
       eventBus.publish("measures", delay, new DeliveryOptions().addHeader("topic", "measures/tankHotWaterPerDay/min"));
+
+      final double dt = 2.13 * delay * TEMP_MAX / 1_000;
+      final double temp = TEMP_MAX - dt;
+      final double consumed = ((TANK_CAPACITY * temp) - 12_000) / (TEMP_MIN - TEMP_MAX);
+      eventBus.publish("measures", Math.round(consumed * 100) / 100.0, new DeliveryOptions().addHeader("topic", "measures/waterPerDay/liter"));
     }
   }
 }

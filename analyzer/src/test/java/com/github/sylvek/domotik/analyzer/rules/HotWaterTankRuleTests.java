@@ -13,8 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 public class HotWaterTankRuleTests {
 
@@ -35,10 +34,15 @@ public class HotWaterTankRuleTests {
 
     // Then
     ArgumentCaptor<DeliveryOptions> deliveryOptions = ArgumentCaptor.forClass(DeliveryOptions.class);
-    verify(eventBus).publish(eq("measures"), eq(2L), deliveryOptions.capture());
+    ArgumentCaptor<Object> payload = ArgumentCaptor.forClass(Object.class);
+    verify(eventBus, times(2)).publish(eq("measures"), payload.capture(), deliveryOptions.capture());
 
-    final List<DeliveryOptions> allValues = deliveryOptions.getAllValues();
-    assertEquals("measures/tankHotWaterPerDay/min", allValues.get(0).getHeaders().get("topic"));
+    final List<DeliveryOptions> allDeliveryOptions = deliveryOptions.getAllValues();
+    final List<Object> allPayloads = payload.getAllValues();
+    assertEquals(2L, allPayloads.get(0));
+    assertEquals(1.02, allPayloads.get(1));
+    assertEquals("measures/tankHotWaterPerDay/min", allDeliveryOptions.get(0).getHeaders().get("topic"));
+    assertEquals("measures/waterPerDay/liter", allDeliveryOptions.get(1).getHeaders().get("topic"));
   }
 
   @Test
@@ -112,10 +116,11 @@ public class HotWaterTankRuleTests {
 
     // Then
     ArgumentCaptor<DeliveryOptions> deliveryOptions = ArgumentCaptor.forClass(DeliveryOptions.class);
-    verify(eventBus).publish(eq("measures"), any(), deliveryOptions.capture());
+    verify(eventBus, times(2)).publish(eq("measures"), any(), deliveryOptions.capture());
 
     final List<DeliveryOptions> allValues = deliveryOptions.getAllValues();
     assertEquals("measures/tankHotWaterPerDay/min", allValues.get(0).getHeaders().get("topic"));
+    assertEquals("measures/waterPerDay/liter", allValues.get(1).getHeaders().get("topic"));
   }
 
 }

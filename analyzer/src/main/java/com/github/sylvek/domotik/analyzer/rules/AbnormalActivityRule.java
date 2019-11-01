@@ -21,7 +21,7 @@ public class AbnormalActivityRule implements Rule {
     final boolean isWeekDay = dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY;
 
     final boolean isAfter8am = now.isAfter(LocalTime.of(8, 0));
-    final boolean isAfter23pm30 = now.isAfter(LocalTime.of(23, 0));
+    final boolean isAfter23pm30 = now.isAfter(LocalTime.of(23, 15));
     final boolean isBefore1pm4 = now.isBefore(LocalTime.of(13, 4));
     final boolean isBefore2am4 = now.isBefore(LocalTime.of(2, 4));
 

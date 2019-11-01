@@ -52,7 +52,7 @@ router.get('/last/:time(24h|30d)/:sensor(meanPerHour|sumPerDay|tankHotWaterPerDa
                 index = type.length - 1;
               }
 
-              if (req.params.sensor == "tankHotWaterPerDay") {
+              if (req.params.sensor == "tankHotWaterPerDay" || req.params.sensor == "waterPerDay") {
                 var _found = false;
                 var date = new Date(new Date(entry.timestamp * 1000).toDateString()).getTime() / 1000;
                 result[index].values.forEach(function(value) {
