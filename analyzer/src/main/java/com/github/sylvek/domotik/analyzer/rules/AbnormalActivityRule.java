@@ -1,6 +1,6 @@
 package com.github.sylvek.domotik.analyzer.rules;
 
-import com.github.sylvek.domotik.analyzer.Rule;
+import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 import java.time.LocalTime;
 import java.util.Calendar;
 
-public class AbnormalActivityRule implements Rule {
+public class AbnormalActivityRule implements EventToRulesVerticle.Rule {
   @Override
   public void process(EventBus eventBus, LocalTime now, JsonObject event) {
     /**

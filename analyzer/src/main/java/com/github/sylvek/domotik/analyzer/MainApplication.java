@@ -7,8 +7,10 @@ public class MainApplication {
   public static void main(String[] args) {
     Vertx vertx = Vertx.vertx();
     vertx.deployVerticle(new EchoVerticle());
-    vertx.deployVerticle(new MqttVerticle(args[0]));
-    vertx.deployVerticle(new ConsumptionAggregateVerticle());
-    vertx.deployVerticle(new ConsumptionRulesVerticle());
+    vertx.deployVerticle(new MqttToLogsVerticle(args[0]));
+    vertx.deployVerticle(new LogsToEventVerticle());
+    vertx.deployVerticle(new EventToRulesVerticle());
+    // vertx.deployVerticle(new ConsumptionMeanPerHourVerticle());
+    // vertx.deployVerticle(new ConsumptionSumPerDayVerticle());
   }
 }

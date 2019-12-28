@@ -1,13 +1,13 @@
 package com.github.sylvek.domotik.analyzer.rules;
 
-import com.github.sylvek.domotik.analyzer.Rule;
+import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalTime;
 
-public class LightRule implements Rule {
+public class LightRule implements EventToRulesVerticle.Rule {
 
   private static final String GREEN = "#009900";
   private static final String YELLOW = "#ffa500";

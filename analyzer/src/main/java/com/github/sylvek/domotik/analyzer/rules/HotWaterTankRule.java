@@ -1,6 +1,6 @@
 package com.github.sylvek.domotik.analyzer.rules;
 
-import com.github.sylvek.domotik.analyzer.Rule;
+import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class HotWaterTankRule implements Rule {
+public class HotWaterTankRule implements EventToRulesVerticle.Rule {
 
   public static final double HOT_TANK_WATER_POWER = 2_000;
   public static final int TEMP_MAX = 60;

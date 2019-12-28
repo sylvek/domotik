@@ -9,18 +9,18 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 
-public class MqttVerticle extends AbstractVerticle {
+public class MqttToLogsVerticle extends AbstractVerticle {
 
   public static final int MQTT_PORT = 1883;
   public static final String MQTT_TOPIC = "sensors/#";
   private final String mqttServer;
 
-  public MqttVerticle(String mqttServer) {
+  public MqttToLogsVerticle(String mqttServer) {
     this.mqttServer = mqttServer;
   }
 
   @Override
-  public void start() throws Exception {
+  public void start() {
     final MqttClient client = connect();
     final Handler<Message<Object>> topic = message -> client.publish(
       message.headers().get("topic"),
@@ -42,8 +42,7 @@ public class MqttVerticle extends AbstractVerticle {
         });
         client.subscribe(MQTT_TOPIC, 0);
         client.publishHandler(message -> {
-          DeliveryOptions deliveryOptions = new DeliveryOptions();
-          deliveryOptions.addHeader("topic", message.topicName());
+          DeliveryOptions deliveryOptions = new DeliveryOptions().addHeader("topic", message.topicName());
           getVertx().eventBus().publish("logs", message.payload().toString(), deliveryOptions);
         });
       } else {
