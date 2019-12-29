@@ -7,17 +7,14 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LogsToEventVerticle extends DomotikVerticle<String> {
+public class SensorsToEventVerticle extends DomotikVerticle<String> {
 
   public static final String SENSORS_LINKY_WATT = "sensors/linky/watt";
-  public static final String CONSUMER_NAME = "logs";
-  public static final String TOPIC = "topic";
   public static final String ACTIVITY_DETECTED = "activityDetected";
   public static final String CONSUMPTION_IS_QUIET = "consumptionIsQuiet";
-  public static final long TRIGGER = 500L;
 
-  public LogsToEventVerticle() {
-    super(CONSUMER_NAME);
+  public SensorsToEventVerticle(int trigger) {
+    super(SENSORS);
 
     final Flux<List<Integer>> listFlux = flux()
       .buffer(Duration.ofSeconds(10))
@@ -25,7 +22,7 @@ public class LogsToEventVerticle extends DomotikVerticle<String> {
 
     listFlux.subscribe(elements -> {
       final long avg = Math.round(elements.stream().mapToInt(Integer::intValue).average().orElse(0d));
-      sendEvent((avg > TRIGGER) ? ACTIVITY_DETECTED : CONSUMPTION_IS_QUIET, avg);
+      sendEvent((avg > trigger) ? ACTIVITY_DETECTED : CONSUMPTION_IS_QUIET, avg);
     });
   }
 

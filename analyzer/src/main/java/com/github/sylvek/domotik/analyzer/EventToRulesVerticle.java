@@ -21,7 +21,7 @@ public class EventToRulesVerticle extends DomotikVerticle<JsonObject> {
   private final List<Rule> rules = new ArrayList<>();
 
   public EventToRulesVerticle() {
-    super("event");
+    super(EVENT);
 
     rules.add(new HotWaterTankRule());
     rules.add(new LightRule());

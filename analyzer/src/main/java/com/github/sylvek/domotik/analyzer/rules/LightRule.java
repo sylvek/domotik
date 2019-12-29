@@ -6,12 +6,34 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalTime;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LightRule implements EventToRulesVerticle.Rule {
 
-  private static final String GREEN = "#009900";
-  private static final String YELLOW = "#ffa500";
-  private static final String RED = "#ff0000";
+  enum Color {
+
+    GREEN("#009900"),
+    YELLOW("#ffa500"),
+    RED("#ff0000");
+
+    private String hexadecimal;
+
+    Color(String hexadecimal) {
+      this.hexadecimal = hexadecimal;
+    }
+
+    static Color of(int value) {
+      if (value > 2000) {
+        return RED;
+      }
+      if (value > 1000) {
+        return YELLOW;
+      }
+      return GREEN;
+    }
+  }
+
+  private static final AtomicInteger lastState = new AtomicInteger(-1);
 
   @Override
   public void process(EventBus eventBus, LocalTime now, JsonObject event) {
@@ -32,20 +54,10 @@ public class LightRule implements EventToRulesVerticle.Rule {
      *  - Then  ~ consumption is "abnormal" => red
      */
     final int value = event.getInteger("value");
-    eventBus.publish("trigger", valueToColor(value), new DeliveryOptions().addHeader("topic", "triggers/led/update"));
-  }
-
-  private String valueToColor(int value) {
-    String result = GREEN;
-
-    if (value > 1000) {
-      result = YELLOW;
+    final Color color = Color.of(value);
+    if (lastState.get() != color.ordinal()) {
+      eventBus.publish("trigger", color.hexadecimal, new DeliveryOptions().addHeader("topic", "triggers/led/update"));
+      lastState.set(color.ordinal());
     }
-
-    if (value > 2000) {
-      result = RED;
-    }
-
-    return result;
   }
 }

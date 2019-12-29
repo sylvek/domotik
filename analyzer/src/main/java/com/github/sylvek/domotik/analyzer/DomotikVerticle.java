@@ -12,6 +12,9 @@ import java.util.List;
 
 public abstract class DomotikVerticle<T> extends AbstractVerticle {
 
+  public static final String SENSORS = "sensors";
+  public static final String EVENT = "event";
+  public static final String TOPIC = "topic";
   private final List<FluxSink<T>> handlers = new ArrayList<>();
   private final Flux<T> flux;
   private final String consumerName;
@@ -28,21 +31,13 @@ public abstract class DomotikVerticle<T> extends AbstractVerticle {
   }
 
   protected void sendEvent(String name, Number value) {
-    this.sendMessage("event", name, value);
-  }
-
-  protected void sendMeasure(String name, Number value) {
-    this.sendMessage("measures", name, value);
-  }
-
-  private void sendMessage(String type, String name, Number value) {
-    getVertx().eventBus().publish(type,
+    getVertx().eventBus().publish(EVENT,
       new JsonObject()
         .put("name", name)
         .put("value", value)
         .put("unit", "watt")
         .put("timestamp", System.currentTimeMillis()),
-      new DeliveryOptions().addHeader("topic", "event")
+      new DeliveryOptions().addHeader("topic", EVENT)
     );
   }
 
