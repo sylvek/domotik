@@ -5,6 +5,8 @@ import io.vertx.core.json.JsonObject;
 
 import java.text.DecimalFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class AbstractConsumptionVerticle extends DomotikVerticle<JsonObject> {
@@ -17,7 +19,7 @@ public abstract class AbstractConsumptionVerticle extends DomotikVerticle<JsonOb
   }
 
   protected boolean countdownTimer() {
-    final Instant now = Instant.now();
+    final Instant now = ZonedDateTime.now(ZoneId.of("Europe/Paris")).toInstant();
     if (Instant.ofEpochMilli(this.epoch_for_next_step.get()).isBefore(now)) {
       this.epoch_for_next_step.set(now.toEpochMilli() + millisecondsForTheNextStep(now));
       return true;
