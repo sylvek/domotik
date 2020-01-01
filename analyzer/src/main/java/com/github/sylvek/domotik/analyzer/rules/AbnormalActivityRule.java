@@ -1,8 +1,7 @@
 package com.github.sylvek.domotik.analyzer.rules;
 
 import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
+import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalTime;
@@ -10,7 +9,7 @@ import java.util.Calendar;
 
 public class AbnormalActivityRule implements EventToRulesVerticle.Rule {
   @Override
-  public void process(EventBus eventBus, LocalTime now, JsonObject event) {
+  public void process(MessagingService messagingService, LocalTime now, JsonObject event) {
     /**
      * Rule 1 :
      *  - Given ~ an activity during the week day between 08:00am to 01:04pm and between 11:30pm to 02:04am
@@ -31,7 +30,7 @@ public class AbnormalActivityRule implements EventToRulesVerticle.Rule {
     if (isWeekDay
       && (isBefore2am4 || (isAfter8am && isBefore1pm4) || isAfter23pm30)
       && "activityDetected".equals(name)) {
-      eventBus.publish("measures", value, new DeliveryOptions().addHeader("topic", "measures/abnormal/detected"));
+      messagingService.event("events/consumption/abnormal", "anomalyDetected", value);
     }
   }
 }

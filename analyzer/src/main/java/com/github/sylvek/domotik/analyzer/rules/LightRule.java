@@ -1,8 +1,7 @@
 package com.github.sylvek.domotik.analyzer.rules;
 
 import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
+import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalTime;
@@ -36,7 +35,7 @@ public class LightRule implements EventToRulesVerticle.Rule {
   private static final AtomicInteger lastState = new AtomicInteger(-1);
 
   @Override
-  public void process(EventBus eventBus, LocalTime now, JsonObject event) {
+  public void process(MessagingService messagingService, LocalTime now, JsonObject event) {
     /**
      * Rule 1 :
      *  - Given ~ an activity
@@ -56,7 +55,7 @@ public class LightRule implements EventToRulesVerticle.Rule {
     final int value = event.getInteger("value");
     final Color color = Color.of(value);
     if (lastState.get() != color.ordinal()) {
-      eventBus.publish("trigger", color.hexadecimal, new DeliveryOptions().addHeader("topic", "triggers/led/update"));
+      messagingService.publish("triggers/led/update", color.hexadecimal);
       lastState.set(color.ordinal());
     }
   }

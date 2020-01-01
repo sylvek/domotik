@@ -1,8 +1,7 @@
 package com.github.sylvek.domotik.analyzer.rules;
 
 import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
-import io.vertx.core.eventbus.DeliveryOptions;
-import io.vertx.core.eventbus.EventBus;
+import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.json.JsonObject;
 
 import java.time.LocalTime;
@@ -17,7 +16,7 @@ public class HotWaterTankRule implements EventToRulesVerticle.Rule {
   private final AtomicLong time = new AtomicLong(0L);
 
   @Override
-  public void process(EventBus eventBus, LocalTime now, JsonObject event) {
+  public void process(MessagingService messagingService, LocalTime now, JsonObject event) {
     /**
      * Rule 1 :
      *  - Given ~ a detected activity during the "cheapest zone" (meaning between 02:04am and 07:04am or 01:04pm and 04:04pm)
@@ -52,12 +51,12 @@ public class HotWaterTankRule implements EventToRulesVerticle.Rule {
     if (value < HOT_TANK_WATER_POWER && triggered > 0) {
       time.set(-1L);
       final long delay = (timestamp - triggered) / 60_000;
-      eventBus.publish("measures", delay, new DeliveryOptions().addHeader("topic", "measures/tankHotWaterPerDay/min"));
+      messagingService.publish("measures/tankHotWaterPerDay/min", delay);
 
       final double dt = 2.13 * delay * TEMP_MAX / 1_000;
       final double temp = TEMP_MAX - dt;
       final double consumed = ((TANK_CAPACITY * temp) - 12_000) / (TEMP_MIN - TEMP_MAX);
-      eventBus.publish("measures", Math.round(consumed * 100) / 100.0, new DeliveryOptions().addHeader("topic", "measures/waterPerDay/liter"));
+      messagingService.publish("measures/waterPerDay/liter", Math.round(consumed * 100) / 100.0);
     }
   }
 }

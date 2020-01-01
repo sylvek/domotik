@@ -9,6 +9,8 @@ import io.vertx.core.eventbus.Message;
 import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 
+import java.util.Arrays;
+
 public class MqttToSensorsVerticle extends AbstractVerticle {
 
   public static final int MQTT_PORT = 1883;
@@ -21,9 +23,11 @@ public class MqttToSensorsVerticle extends AbstractVerticle {
   private final String mqttServer;
   private final boolean devMode;
 
+  private static final Handler<Message<Object>> DEV_NULL = objectMessage -> {};
+
   public MqttToSensorsVerticle(String... args) {
     this.mqttServer = args[0];
-    this.devMode = (args.length > 1) ? Boolean.valueOf(args[1]) : Boolean.FALSE;
+    this.devMode = Arrays.asList(args).contains("--dev");
   }
 
   @Override
@@ -33,13 +37,14 @@ public class MqttToSensorsVerticle extends AbstractVerticle {
     final Handler<Message<Object>> topic = message -> client.publish(
       message.headers().get(TOPIC),
       Buffer.buffer(message.body().toString()),
-      MqttQoS.AT_LEAST_ONCE, false, false
+      MqttQoS.AT_LEAST_ONCE, false,
+      Boolean.parseBoolean(message.headers().get(RETAIN))
     );
 
-    final Handler<Message<Object>> devNull = objectMessage -> {};
+    final Handler<Message<Object>> handler = (devMode) ? DEV_NULL : topic;
 
-    getVertx().eventBus().consumer(TRIGGER, (devMode) ? devNull : topic);
-    getVertx().eventBus().consumer(MEASURES, (devMode) ? devNull : topic);
+    getVertx().eventBus().consumer(TRIGGER, handler);
+    getVertx().eventBus().consumer(MEASURES, handler);
   }
 
   private MqttClient connect() {

@@ -1,9 +1,7 @@
 package com.github.sylvek.domotik.analyzer;
 
 import io.vertx.core.AbstractVerticle;
-import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.json.JsonObject;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 
@@ -12,11 +10,21 @@ import java.util.List;
 
 public abstract class DomotikVerticle<T> extends AbstractVerticle {
 
+  protected class Tuple<A, B> {
+    final A a;
+    final B b;
+
+    Tuple(A a, B b) {
+      this.a = a;
+      this.b = b;
+    }
+  }
+
   public static final String SENSORS = "sensors";
   public static final String EVENT = "event";
   public static final String TOPIC = "topic";
-  private final List<FluxSink<T>> handlers = new ArrayList<>();
-  private final Flux<T> flux;
+  private final List<FluxSink<Tuple<String, T>>> handlers = new ArrayList<>();
+  private final Flux<Tuple<String, T>> flux;
   private final String consumerName;
 
   public DomotikVerticle(String consumerName) {
@@ -30,18 +38,7 @@ public abstract class DomotikVerticle<T> extends AbstractVerticle {
     });
   }
 
-  protected void sendEvent(String name, Number value) {
-    getVertx().eventBus().publish(EVENT,
-      new JsonObject()
-        .put("name", name)
-        .put("value", value)
-        .put("unit", "watt")
-        .put("timestamp", System.currentTimeMillis()),
-      new DeliveryOptions().addHeader("topic", EVENT)
-    );
-  }
-
-  protected Flux<T> flux() {
+  protected Flux<Tuple<String, T>> flux() {
     return flux;
   }
 
@@ -50,7 +47,7 @@ public abstract class DomotikVerticle<T> extends AbstractVerticle {
     getVertx().eventBus().consumer(this.consumerName, message -> {
       final Message<T> _m = (Message<T>) message;
       if (accept(_m)) {
-        handlers.forEach(handlers -> handlers.next(_m.body()));
+        handlers.forEach(handlers -> handlers.next(new Tuple<String, T>(_m.headers().get(TOPIC).split("/")[1], _m.body())));
       }
     });
   }
