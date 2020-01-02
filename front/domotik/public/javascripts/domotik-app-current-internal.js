@@ -74,7 +74,7 @@
                 break;
             }
             break;
-          case "linkymean":
+          case "meanPerHour":
             $scope.power_hour = (payload / 1000).toFixed(2);
             break;
           case "sumPerDay":
