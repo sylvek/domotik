@@ -9,7 +9,7 @@ public class SensorsToCurrentVerticle extends DomotikVerticle<String> {
   public SensorsToCurrentVerticle() {
     super(SENSORS);
 
-    flux().subscribe(tuple -> MessagingService.getInstance(getVertx().eventBus()).publish("current/" + tuple.a + "/temp", tuple.b, true));
+    flux().subscribe(tuple -> MessagingService.eventBus(getVertx()).publish("current/" + tuple.a + "/temp", tuple.b, true));
   }
 
   @Override

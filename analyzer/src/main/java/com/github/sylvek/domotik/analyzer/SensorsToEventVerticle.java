@@ -25,7 +25,7 @@ public class SensorsToEventVerticle extends DomotikVerticle<String> {
       final long avg = Math.round(elements.stream().mapToInt(Integer::parseInt).average().orElse(0d));
       final String name = (avg > trigger) ? ACTIVITY_DETECTED : CONSUMPTION_IS_QUIET;
       MessagingService
-        .getInstance(getVertx().eventBus())
+        .eventBus(getVertx())
         .event(EVENT_GENERATED, name, avg);
     });
   }

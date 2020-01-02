@@ -1,5 +1,6 @@
 package com.github.sylvek.domotik.analyzer;
 
+import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -22,13 +23,13 @@ public class MessagingService {
     this.eventBus = eventBus;
   }
 
-  public static MessagingService getInstance(EventBus eventBus) {
+  public static MessagingService eventBus(Vertx vertx) {
     if (_instance == null) {
-      _instance = new MessagingService(eventBus);
+      _instance = new MessagingService(vertx.eventBus());
       return _instance;
     }
 
-    if (!_instance.eventBus.equals(eventBus)) {
+    if (!_instance.eventBus.equals(vertx.eventBus())) {
       throw new RuntimeException("eventBus instance is different oO");
     }
 

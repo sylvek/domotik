@@ -1,31 +1,32 @@
 package com.github.sylvek.domotik.analyzer;
 
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonObject;
+
 import java.time.Instant;
 import java.util.Calendar;
-import java.util.OptionalLong;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ConsumptionSumPerDayVerticle extends AbstractConsumptionVerticle {
 
   private static final String SUM_PER_DAY = "sumPerDay";
-  private final AtomicLong sum;
+  private final AtomicLong sum = new AtomicLong(0L);
 
-  public ConsumptionSumPerDayVerticle(OptionalLong initialSum) {
+  public ConsumptionSumPerDayVerticle() {
     super(EVENT);
-    this.sum = new AtomicLong(initialSum.orElse(0L));
 
     flux()
       .map(jsonObject -> jsonObject.b.getInteger("value"))
       .subscribe(value -> {
 
-        final MessagingService messagingService = MessagingService.getInstance(getVertx().eventBus());
+        final MessagingService messagingService = MessagingService.eventBus(getVertx());
 
         long _sum;
         if (countdownTimer()) {
           _sum = sum.getAndSet(value);
-          // if (_sum > 0)
-            // messagingService.publish("measures/" + SUM_PER_DAY + "/watt", _sum * 10 / 3_600.0);
+          if (_sum > 0)
+            messagingService.publish("measures/" + SUM_PER_DAY + "/watt", _sum * 10 / 3_600.0);
         } else {
           _sum = sum.addAndGet(value);
           messagingService.publish("sensors/" + SUM_PER_DAY + "/watt", _sum * 10 / 3_600.0);
@@ -42,4 +43,17 @@ public class ConsumptionSumPerDayVerticle extends AbstractConsumptionVerticle {
 
     return c.getTimeInMillis() - now.toEpochMilli();
   }
+
+  @Override
+  protected void deserialize(Buffer buffer) {
+    final JsonObject jsonObject = new JsonObject(buffer);
+    this.sum.set(jsonObject.getLong("sum"));
+    this.epoch_for_next_step.set(jsonObject.getLong("epoch_for_next_step"));
+  }
+
+  @Override
+  protected Buffer serialize() {
+    return new JsonObject().put("sum", this.sum.get()).put("epoch_for_next_step", this.epoch_for_next_step.get()).toBuffer();
+  }
+
 }

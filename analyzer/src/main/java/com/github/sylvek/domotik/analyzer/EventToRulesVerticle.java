@@ -29,7 +29,7 @@ public class EventToRulesVerticle extends DomotikVerticle<JsonObject> {
     flux().buffer(5).subscribe(events -> Flux.fromIterable(events)
       .distinctUntilChanged(json -> json.b.getString("name"))
       .subscribe(e -> {
-        final MessagingService messagingService = MessagingService.getInstance(getVertx().eventBus());
+        final MessagingService messagingService = MessagingService.eventBus(getVertx());
         final LocalTime now = LocalTime.now(ZoneId.of("Europe/Paris"));
         rules.forEach((r) -> r.process(messagingService, now, e.b));
       }));
