@@ -51,7 +51,7 @@ public class ConsumptionMeanPerHourVerticle extends AbstractConsumptionVerticle 
   protected void deserialize(Buffer buffer) {
     final JsonObject jsonObject = new JsonObject(buffer);
     this.nb.set(jsonObject.getLong("nb"));
-    this.sum.set(jsonObject.getLong("sm"));
+    this.sum.set(jsonObject.getLong("sum"));
     this.epoch_for_next_step.set(jsonObject.getLong("epoch_for_next_step"));
   }
 
