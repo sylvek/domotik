@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>domotik</title>
+    <link rel="stylesheet" type="text/css" href='stylesheets/style.css'/>
+    <link rel="stylesheet" type="text/css" href='stylesheets/style-current.css'/>
+
+    <script src="javascripts/data.js"></script>
+    <script src="javascripts/ephemeris.js"></script>
+
+    <script src="../bower_components/bower-mqttws/mqttws31.js"></script>
+
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/javascript">
+// MQTT connection part
+var client = new Paho.MQTT.Client(window.location.hostname, 9883, "gh-" + new Date().getTime());
+client.onConnectionLost = function(responseObject) {
+  if (responseObject.errorCode !== 0) {
+      console.log("onConnectionLost:" + responseObject.errorMessage);
+      console.log("Reconnecting... [" + new Date() + "]");
+      client.connect({
+          onSuccess: function() {
+            client.subscribe("current/+/temp");
+            client.subscribe("current/+/watt");
+            client.subscribe("sensors/+/watt");
+          }
+      });
+  }
+};
+client.connect({
+  onSuccess: function() {
+    client.subscribe("current/+/temp");
+    client.subscribe("current/+/watt");
+    client.subscribe("sensors/+/watt");
+  }
+});
+client.onMessageArrived = function(message) {
+  const topic = message.destinationName;
+  const categories = topic.split("/");
+  const payload = message.payloadString;
+  switch(categories[1]) {
+    case "esp12e":
+      client.outsideCallback(payload);
+      break;
+    case "esp8266":
+      client.insideCallback(payload);
+      break;
+    case "linky":
+      client.linkyNowCallback((payload / 1000).toFixed(2));
+      break;
+    case "meanPerHour":
+      client.linkyHourCallback((payload / 1000).toFixed(2));
+      break;
+    case "sumPerDay":
+      client.linkyTodayCallback((payload / 1000).toFixed(2));
+      break;
+    default:
+      break;
+  }
+};
+    </script>
+    <script type="text/babel">
+class Wallpaper extends React.Component {
+  constructor(props) {
+    super(props);
+    const wallpaper = this.wallpaper(props.images);
+    this.state = {background: "url(img/" + wallpaper.file + ")", title: wallpaper.title};
+  }
+  wallpaper(images) {
+    const keys = Object.keys(images)
+    const random = Math.floor((Math.random() * keys.length));
+    return images[keys[random]];
+  }
+  render() {
+    return(
+      <div id="wallpaper" style={{backgroundImage: this.state.background}}>
+        <Left />
+        <Right />
+        <Twitter />
+        <Title title={this.state.title} />
+      </div>);}
+}
+class Left extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return(
+      <div id="left">
+        <Clock />
+        <Ephemeris />
+        <Quote />
+        <Rte isDisplayed="false" />
+      </div>
+    );
+  }
+}
+class Twitter extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return (
+      <div id="right">
+      </div>
+    );
+  }
+}
+class Right extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return(
+      <div id="current-to-right">
+        <Temperature />
+        <PowerConsumption />
+        <HistoryConsumption />
+      </div>
+    )
+  }
+}
+class PowerConsumption extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {current: "-", hour: "-", today: "-"};
+  }
+  componentDidMount() {
+    client.linkyNowCallback = (message) => {
+      this.setState({current: message});
+    }
+    client.linkyHourCallback = (message) => {
+      this.setState({hour: message});
+    }
+    client.linkyTodayCallback = (message) => {
+      this.setState({today: message});
+    }
+  }
+  render() {
+    return(
+      <table id="consumption">
+        <tbody>
+          <tr>
+            <th>aujourd'hui</th>
+            <td>{this.state.current} kWh</td>
+          </tr>
+          <tr>
+            <th>cette heure</th>
+            <td>{this.state.hour} kWh</td>
+          </tr>
+          <tr>
+            <th>aujourd'hui</th>
+            <td>{this.state.today} kWh</td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
+}
+class Temperature extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {outside: "-", inside: "-"}
+  }
+  componentDidMount() {
+    client.outsideCallback = (message) => {
+      this.setState({outside: message});
+    }
+    client.insideCallback = (message) => {
+      this.setState({inside: message});
+    }
+  }
+  render() {
+    return(
+      <table id="temperature">
+        <tbody>
+          <tr>
+            <th>dehors</th>
+            <td>{this.state.outside} °c</td>
+          </tr>
+          <tr>
+            <th>maison</th>
+            <td>{this.state.inside} °c</td>
+          </tr>
+        </tbody>
+      </table>
+    )
+  }
+}
+class Title extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    return(
+      <div id="title">
+        {this.props.title}
+      </div>
+    )
+  }
+}
+class Ephemeris extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {ephemeris: ephemeris.getTodayEphemeris()};
+  }
+  render() {
+    return <div id="ephemeris"><div>{this.state.ephemeris}</div></div>;
+  }
+}
+class Quote extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {quote: "", author: ""};
+    fetch("http://quotes.rest/qod.json")
+      .then(response => response.json())
+      .then((jsonData) => {
+        const result = jsonData.contents.quotes[0];
+        this.setState({quote: result.quote, author: result.author});
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+  render() {
+    return <div id="quote"><div>{this.state.quote} - {this.state.author}</div></div>;
+  }
+}
+class Clock extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {date: new Date()};
+  }
+
+  componentDidMount() {
+    this.timerID = setInterval(
+      () => this.tick(),
+      1000
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+    this.setState({
+      date: new Date()
+    });
+  }
+
+  render() {
+    return (
+      <div id="clock">
+        <div>{this.state.date.toLocaleDateString('fr-FR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+        <div>
+          <span id="hours">{('0' + this.state.date.getHours()).slice(-2)}</span>
+          <span id="minutes">{('0' + this.state.date.getMinutes()).slice(-2)}</span>
+          <span id="seconds">{('0' + this.state.date.getSeconds()).slice(-2)}</span>
+        </div>
+      </div>
+    );
+  }
+}
+class Rte extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  render() {
+    if (this.props.isDisplayed == "true") {
+      return <div id="rte"><iframe src="https://eco2mix.rte-france.com/pluginWeb/data?key=a629c73819db78f4ab5cb204dcfb41590705e0be075bfa3885c044fb944414f0" height="370" width="350"/></div>;  
+    }
+    return null;
+  }
+}
+class HistoryConsumption extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {yesterday: "-", last_year: "-", thirty_days: "-"};
+    fetch("/api/last/year/sumPerDay")
+      .then(response => response.json())
+      .then((jsonData) => {
+        const result = (jsonData[0].value / 1000).toFixed(2);
+        this.setState({last_year: result});
+      })
+      .catch((error) => {
+        console.error(error)
+      });
+    fetch("/api/last/30d/sumPerDay")
+      .then(response => response.json())
+      .then((jsonData) => {
+        const result = (jsonData[0].value / 1000).toFixed(2);
+        this.setState({thirty_days: result});     
+      })
+      .catch((error) => {
+        console.error(error)
+      });
+    fetch("/api/last/24h/sumPerDay")
+      .then(response => response.json())
+      .then((jsonData) => {
+        const result = (jsonData[0].value / 1000).toFixed(2);
+        this.setState({yesterday: result});     
+      })
+      .catch((error) => {
+        console.error(error)
+      });
+  }
+  render() {
+    return (
+      <table id="history">
+        <tbody>
+          <tr>
+            <th>hier</th>
+            <td>{this.state.yesterday} kWh</td>
+          </tr>
+          <tr>
+            <th>l'année dernière</th>
+            <td>{this.state.last_year} kWh</td>
+          </tr>
+          <tr>
+            <th>sur 30 jours</th>
+            <td>{this.state.thirty_days} kWh</td>
+          </tr>
+        </tbody>
+      </table>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Wallpaper images={images} />,
+  document.getElementById('root')
+);
+
+    </script>
+    <!--
+      Note: this page is a great way to try React but it's not suitable for production.
+      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
+
+      Read this section for a production-ready setup with JSX:
+      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
+
+      In a larger project, you can use an integrated toolchain that includes JSX instead:
+      https://reactjs.org/docs/create-a-new-react-app.html
+
+      You can also use React without JSX, in which case you can remove Babel:
+      https://reactjs.org/docs/react-without-jsx.html
+    -->
+  </body>
+</html>

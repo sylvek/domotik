@@ -2,6 +2,8 @@
 .vertx/
 
 ### Eclipse ###
+.classpath
+.project
 
 .metadata
 bin/

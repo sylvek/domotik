@@ -134,35 +134,15 @@
       }
 
       var sums = function() {
-        domotikSrv.last("30d", "sumPerDay").then(function(response) {
+        domotikSrv.last("24h", "sumPerDay").then(function(response) {
           if (response.data.length > 0) {
-            var sensor = response.data[0];
-            var number_of_values = sensor.values.length;
-            if (number_of_values > 0) {
-              $scope.sum_watt_yesterday = (sensor.values[number_of_values - 1][1] / 1000).toFixed(2);
-
-              var sum = 0;
-              sensor.values.forEach(function(element) {
-                sum += element[1];
-              });
-              $scope.mean_watt_last_30_days = (sum / number_of_values / 1000).toFixed(2);
-            }
+            $scope.sum_watt_yesterday = (response.data[0].value / 1000).toFixed(2);
           }
         });
 
-        domotikSrv.last("30d", "tankHotWaterPerDay").then(function(response) {
+        domotikSrv.last("30d", "sumPerDay").then(function(response) {
           if (response.data.length > 0) {
-            var sensor = response.data[0];
-            var number_of_values = sensor.values.length;
-            if (number_of_values > 0) {
-              $scope.hot_water_comsuption_yesterday = (sensor.values[number_of_values - 1][1]).toFixed(2);
-
-              var sum = 0;
-              sensor.values.forEach(function(element) {
-                sum += element[1];
-              });
-              $scope.hot_water_mean_last_30_days = (sum / number_of_values).toFixed(2);
-            }
+            $scope.mean_watt_last_30_days = (response.data[0].value / 1000).toFixed(2);
           }
         });
 
