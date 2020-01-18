@@ -1,7 +1,0 @@
-web/node_modules
-web/npm-debug.log
-web/bower_components
-*.previous
-front/domotik/public/img/
-front/domotik/public/javascripts/data.js
-front/blacklist

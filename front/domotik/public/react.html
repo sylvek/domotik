@@ -298,12 +298,17 @@ class HistoryConsumption extends React.Component {
     fetch("/api/last/30d/sumPerDay")
       .then(response => response.json())
       .then((jsonData) => {
-        const result = jsonData[0].values;
-        const number_of_values = result.length;
-        const sum = result.reduce((total, arg) => total + arg[1], 0);
-        const yesterday = (result[number_of_values - 1][1] / 1000).toFixed(2);
-        const thirty_days = (sum / number_of_values / 1000).toFixed(2);
-        this.setState({yesterday: yesterday, thirty_days: thirty_days});     
+        const result = (jsonData[0].value / 1000).toFixed(2);
+        this.setState({thirty_days: result});     
+      })
+      .catch((error) => {
+        console.error(error)
+      });
+    fetch("/api/last/24h/sumPerDay")
+      .then(response => response.json())
+      .then((jsonData) => {
+        const result = (jsonData[0].value / 1000).toFixed(2);
+        this.setState({yesterday: result});     
       })
       .catch((error) => {
         console.error(error)
