@@ -56,7 +56,7 @@ client.onMessageArrived = function(message) {
     case "linky":
       client.linkyNowCallback((payload / 1000).toFixed(2));
       break;
-    case "linkymean":
+    case "meanPerHour":
       client.linkyHourCallback((payload / 1000).toFixed(2));
       break;
     case "sumPerDay":
