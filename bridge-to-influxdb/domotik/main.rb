@@ -15,6 +15,7 @@ begin
             _unit = elements[2]
 
             data = {
+                tags: { sensor: _name },
                 values: { value: message.to_f, type: _type, name: _name, unit: _unit },
                 timestamp: Time.now.to_i
             }
