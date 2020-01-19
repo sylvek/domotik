@@ -40,7 +40,10 @@ After that, the ability to store more data (before InfluxDB, i stored only 2d of
 ## Build it
 
 ```
+back> mvn package
 back> docker build -t domotik-back .
+front> npm install
+front> node_modules/bower/bin/bower install
 front> docker build -t domotik-front .
 bridge-to-infludb> docker build -t domotik-bridge-to-influxdb .
 ```
