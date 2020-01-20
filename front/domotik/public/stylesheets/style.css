@@ -1,8 +1,100 @@
 body {
   padding: 24px;
   font: 24px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin: 0px;
+  padding: 0px;
+  background-color: black;
+  color: #ffa;
 }
 
 a {
   color: #00B7FF;
+}
+
+#wallpaper {
+  height: 1200px;
+  width: 1920;
+}
+
+#clock {
+  font-size: 150%;
+}
+#hours {
+  font-size: 200%;
+}
+
+#minutes {
+  font-size: 300%;
+}
+
+#quote {
+  font-size: 80%;
+  padding: 1em;
+}
+
+#ephemeris div {
+  font-size: 140%;
+}
+
+#title {
+  position: fixed;
+  bottom: 5px;
+  right: 1em;
+  font-size: 80%;
+}
+
+#left, #current, #capture, #water {
+  float:left;
+  text-align: center;
+  background: rgba(0,0,0,0.5);
+  border-radius: 15px;
+  margin: 1em;
+  padding: 1em;
+}
+
+button {
+  font-size: 120%;
+  width: 352px;
+}
+
+img {
+  border-radius: 5px;
+}
+
+#capture {
+  width: 300px;
+}
+
+#left {
+  width: 450px;
+}
+
+#right {
+  padding: 10px;
+  float: right;
+  width: 500px;
+}
+
+#current-to-right {
+  float: right;
+}
+
+#temperature, #consumption, #history {
+  background: rgba(0,0,0,0.5);
+  border-radius: 15px;
+  margin: 1em;
+  padding: 1em;
+}
+
+table {
+  width: 450px;
+}
+
+th {
+  width: 250px;
+  text-align: left;
+}
+
+td {
+  text-align: right;
 }
