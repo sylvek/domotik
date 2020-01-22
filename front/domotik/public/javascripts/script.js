@@ -28,7 +28,8 @@
       $scope.hot_water_mean_last_30_days = "--";
 
       $scope.temp_outside = "--";
-      $scope.temp_home = "--";
+      $scope.temp_living = "--";
+      $scope.temp_room = "--";
       $scope.power_hour = "--";
       $scope.power_now = "--";
 
@@ -62,7 +63,10 @@
             break;
           // home
           case "esp8266":
-            $scope.temp_home = payload;
+            $scope.temp_living = payload;
+            break;
+          case "esp32":
+            $scope.temp_room = payload;
             break;
           // power
           case "linky":
