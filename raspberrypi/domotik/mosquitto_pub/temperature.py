@@ -49,7 +49,9 @@ def read_temp():
 
 while run:
     try:
-        client.publish("sensors/esp8266/temp", read_temp())
+        temp = read_temp()
+        if temp < 50:
+            client.publish("sensors/esp8266/temp", temp)
         time.sleep(60)
     except:
         pass
