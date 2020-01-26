@@ -33,10 +33,6 @@ This dashboard is displayed thanks to my original Raspberry Pi 1 (yes!) over an 
 
 Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. Basically, everything ran on my raspberry pi. In ~2016, i used Ansible to deploy it. In 2017, I decided to bought a real computer (sorry for Raspberry pi fans). Indeed, raspberries are cool for thin devices but the IO stack and using an HDD disk (to display movies for example) crashes too much my raspberry and my data. So I deciced to move on an [Intel NUC](https://en.wikipedia.org/wiki/Next_Unit_of_Computing) based on an x86 CPU (with 4GB of RAM) and an SSD. It's not so expansive comparing to a raspberry pi 2 or 3 with an SSD Disk on USB port.  I decided to depoy my script with Docker and slowly, i rewrote the backend in Java (VertX). I decided to migrate my data from Mongo to InfluxDB (after tested during 1y Elasticsearch). So, i went to a micro-services architecture to a monolith. I learnt that begining with a micro-services architecture was cool to experiment some stuff, but using a VertX code with only one project to maintain is better when you want to consolidate domain _(and reduce ops works)_.
 
-Now, the next step is to learn more stuff about influxdb, [like downsampling (did presently by java code) and data retention (originally did by scripts)](https://docs.influxdata.com/influxdb/v1.7/guides/downsampling_and_retention/).
-
-After that, the ability to store more data (before InfluxDB, i stored only 2d of data and measures - mean consumption per hour and sum per day) opens the door of the "Machine Learning" and the "AI" :) 
-
 ## Build it
 
 ```
