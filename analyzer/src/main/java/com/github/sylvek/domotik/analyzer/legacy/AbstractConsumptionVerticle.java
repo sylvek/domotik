@@ -1,5 +1,6 @@
-package com.github.sylvek.domotik.analyzer;
+package com.github.sylvek.domotik.analyzer.legacy;
 
+import com.github.sylvek.domotik.analyzer.DomotikVerticle;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 

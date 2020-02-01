@@ -3,7 +3,6 @@ package com.github.sylvek.domotik.analyzer;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonObject;
 
 import java.text.DecimalFormat;
 
@@ -45,23 +44,6 @@ public class MessagingService {
   public void publish(String topic, String value) {
     this.eventBus.publish(TRIGGER,
       value,
-      new DeliveryOptions().addHeader(TOPIC, topic));
-  }
-
-  public void publish(String topic, String value, boolean retain) {
-    this.eventBus.publish(TRIGGER,
-      value,
-      new DeliveryOptions().addHeader(TOPIC, topic).addHeader(RETAIN, Boolean.toString(retain)));
-  }
-
-  public void event(String topic, String name, Number value) {
-    this.eventBus.publish(EVENT,
-      new JsonObject()
-        .put("name", name)
-        .put("value", value)
-        .put("unit", "watt")
-        .put("timestamp", System.currentTimeMillis()),
-      new DeliveryOptions().addHeader(TOPIC, topic)
-    );
+      new DeliveryOptions().addHeader(TOPIC, topic).addHeader(RETAIN, Boolean.toString(Boolean.TRUE)));
   }
 }

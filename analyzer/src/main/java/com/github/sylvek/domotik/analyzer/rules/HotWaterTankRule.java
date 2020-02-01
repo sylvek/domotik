@@ -2,9 +2,9 @@ package com.github.sylvek.domotik.analyzer.rules;
 
 import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
 import com.github.sylvek.domotik.analyzer.MessagingService;
+import com.github.sylvek.domotik.analyzer.SensorsToEventVerticle;
 import io.vertx.core.json.JsonObject;
 
-import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class HotWaterTankRule implements EventToRulesVerticle.Rule {
@@ -16,32 +16,27 @@ public class HotWaterTankRule implements EventToRulesVerticle.Rule {
   private final AtomicLong time = new AtomicLong(0L);
 
   @Override
-  public void process(MessagingService messagingService, LocalTime now, JsonObject event) {
+  public void process(MessagingService messagingService, JsonObject event) {
     /**
      * Rule 1 :
-     *  - Given ~ a detected activity during the "cheapest zone" (meaning between 02:04am and 07:04am or 01:04pm and 04:04pm)
+     *  - Given ~ a detected activity during the "low area" (meaning between 02:04am and 07:04am or 01:04pm and 04:04pm)
      *  - When  ~ the measured power consumption value is greater than the current hot water tank consumption (~2kW)
      *  - Then  ~ it seems that hot water tank is working
      *
      * Rule 2 :
-     *  - Given ~ a worked hot water tank during the "cheapest zone"
+     *  - Given ~ a worked hot water tank during the "low area"
      *  - When  ~ the current power consumption value is lower than the hot tank water consumption (ex. 300 vs 2000)
-     *          ~
      *  - Then  ~ it seems that hot water tank have finished it work
      */
-    final boolean isAfter2am4 = now.isAfter(LocalTime.of(2, 4));
-    final boolean isBefore7am4 = now.isBefore(LocalTime.of(7, 4));
-    final boolean isAfter1pm4 = now.isAfter(LocalTime.of(13, 4));
-    final boolean isBefore4pm4 = now.isBefore(LocalTime.of(16, 4));
-    final boolean lowTariff = (isAfter2am4 && isBefore7am4) || (isAfter1pm4 && isBefore4pm4);
+
+    final Integer value = event.getInteger("value");
+    final Long timestamp = event.getLong("timestamp");
+    final boolean lowTariff = event.getString("time_slots").equals(SensorsToEventVerticle.LOW);
 
     if (!lowTariff) {
       time.set(0L);
       return;
     }
-
-    final Integer value = event.getInteger("value");
-    final Long timestamp = event.getLong("timestamp");
 
     if (value > HOT_TANK_WATER_POWER) {
       time.compareAndSet(0L, timestamp);

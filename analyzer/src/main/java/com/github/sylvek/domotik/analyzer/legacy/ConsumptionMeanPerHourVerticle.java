@@ -1,5 +1,6 @@
-package com.github.sylvek.domotik.analyzer;
+package com.github.sylvek.domotik.analyzer.legacy;
 
+import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
@@ -18,7 +19,7 @@ public class ConsumptionMeanPerHourVerticle extends AbstractConsumptionVerticle 
     super(EVENT);
 
     flux()
-      .map(jsonObject -> jsonObject.b.getInteger("value"))
+      .map(jsonObject -> jsonObject.getPayload().getInteger("value"))
       .subscribe(value -> {
 
         final MessagingService messagingService = MessagingService.eventBus(getVertx());

@@ -4,7 +4,6 @@ import com.github.sylvek.domotik.analyzer.EventToRulesVerticle;
 import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.json.JsonObject;
 
-import java.time.LocalTime;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LightRule implements EventToRulesVerticle.Rule {
@@ -35,7 +34,7 @@ public class LightRule implements EventToRulesVerticle.Rule {
   private static final AtomicInteger lastState = new AtomicInteger(-1);
 
   @Override
-  public void process(MessagingService messagingService, LocalTime now, JsonObject event) {
+  public void process(MessagingService messagingService, JsonObject event) {
     /**
      * Rule 1 :
      *  - Given ~ an activity

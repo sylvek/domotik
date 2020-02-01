@@ -11,13 +11,22 @@ import java.util.List;
 public abstract class DomotikVerticle<T> extends AbstractVerticle {
 
   protected class Tuple<A, B> {
-    final A a;
-    final B b;
+    private final A topic;
+    private final B payload;
 
-    Tuple(A a, B b) {
-      this.a = a;
-      this.b = b;
+    Tuple(A topic, B payload) {
+      this.topic = topic;
+      this.payload = payload;
     }
+
+    public final A getTopic() {
+      return this.topic;
+    }
+
+    public final B getPayload() {
+      return this.payload;
+    }
+
   }
 
   public static final String SENSORS = "sensors";

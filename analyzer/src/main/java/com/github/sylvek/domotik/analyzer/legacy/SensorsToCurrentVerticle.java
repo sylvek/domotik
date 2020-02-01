@@ -1,5 +1,7 @@
-package com.github.sylvek.domotik.analyzer;
+package com.github.sylvek.domotik.analyzer.legacy;
 
+import com.github.sylvek.domotik.analyzer.DomotikVerticle;
+import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.eventbus.Message;
 
 import java.util.Arrays;
@@ -9,7 +11,7 @@ public class SensorsToCurrentVerticle extends DomotikVerticle<String> {
   public SensorsToCurrentVerticle() {
     super(SENSORS);
 
-    flux().subscribe(tuple -> MessagingService.eventBus(getVertx()).publish("current/" + tuple.a + "/temp", tuple.b, true));
+    flux().subscribe(tuple -> MessagingService.eventBus(getVertx()).publish("current/" + tuple.getTopic() + "/temp", tuple.getPayload()));
   }
 
   @Override
