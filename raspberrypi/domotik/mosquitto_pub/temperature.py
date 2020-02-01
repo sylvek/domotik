@@ -51,7 +51,7 @@ while run:
     try:
         temp = read_temp()
         if temp < 50:
-            client.publish("sensors/esp8266/temp", temp)
+            client.publish("sensors/esp8266/temp", temp, retain=True)
         time.sleep(60)
     except:
         pass

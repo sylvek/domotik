@@ -14,6 +14,6 @@ public class SensorsToCurrentVerticle extends DomotikVerticle<String> {
 
   @Override
   public boolean accept(Message message) {
-    return Arrays.asList(new String[]{"sensors/esp12e/temp", "sensors/esp8266/temp"}).contains(message.headers().get(TOPIC));
+    return Arrays.asList(new String[]{"sensors/esp12e/temp"}).contains(message.headers().get(TOPIC));
   }
 }
