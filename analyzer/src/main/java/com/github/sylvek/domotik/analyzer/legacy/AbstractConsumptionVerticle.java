@@ -24,13 +24,13 @@ public abstract class AbstractConsumptionVerticle extends DomotikVerticle<JsonOb
   protected boolean countdownTimer() {
     final Instant now = ZonedDateTime.now(ZoneId.of("Europe/Paris")).toInstant();
     if (Instant.ofEpochMilli(this.epoch_for_next_step.get()).isBefore(now)) {
-      this.epoch_for_next_step.set(now.toEpochMilli() + millisecondsForTheNextStep(now));
+      this.epoch_for_next_step.set(epochForTheNextStep());
       return true;
     }
     return false;
   }
 
-  protected abstract long millisecondsForTheNextStep(Instant now);
+  protected abstract long epochForTheNextStep();
 
   protected abstract void deserialize(final Buffer buffer);
 

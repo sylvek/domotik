@@ -4,7 +4,6 @@ import com.github.sylvek.domotik.analyzer.MessagingService;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonObject;
 
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
@@ -35,14 +34,13 @@ public class ConsumptionSumPerDayVerticle extends AbstractConsumptionVerticle {
       });
   }
 
-  protected long millisecondsForTheNextStep(Instant now) {
+  protected long epochForTheNextStep() {
     final Calendar c = Calendar.getInstance(TimeZone.getTimeZone("Europe/Paris"));
-    c.set(Calendar.HOUR, 23);
+    c.set(Calendar.HOUR_OF_DAY, 23);
     c.set(Calendar.MINUTE, 59);
     c.set(Calendar.SECOND, 59);
     c.set(Calendar.MILLISECOND, 0);
-
-    return c.getTimeInMillis() - now.toEpochMilli();
+    return c.getTimeInMillis();
   }
 
   @Override
