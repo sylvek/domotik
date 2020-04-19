@@ -83,9 +83,9 @@ name query
 name: domotik
 name      query
 ----      -----
-sumPerDay CREATE CONTINUOUS QUERY sumPerDay ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_power_consumption FROM domotik.autogen.measures WHERE "name" = 'sumPerDay' GROUP BY time(1d) END
-outside   CREATE CONTINUOUS QUERY outside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_outside FROM domotik.autogen.measures WHERE "name" = 'esp12e' GROUP BY time(1d) END
-inside    CREATE CONTINUOUS QUERY inside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_inside FROM domotik.autogen.measures WHERE ("name" = 'esp8266' OR "name" = 'esp32') GROUP BY time(1d) END
+outside   CREATE CONTINUOUS QUERY outside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_outside FROM domotik.autogen.sensors WHERE "name" = 'esp12e' GROUP BY time(1d) END
+inside    CREATE CONTINUOUS QUERY inside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_inside FROM domotik.autogen.sensors WHERE ("name" = 'esp8266' OR "name" = 'esp32') GROUP BY time(1d) END
+sumPerDay CREATE CONTINUOUS QUERY sumPerDay ON domotik BEGIN SELECT sum(value) AS value INTO domotik.infinite.daily_power_consumption FROM domotik.autogen.measures WHERE "name" = 'meanPerHour' GROUP BY time(1d) END
 ```
 
 ```
