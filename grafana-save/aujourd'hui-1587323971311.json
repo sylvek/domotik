@@ -1,0 +1,1241 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 3,
+  "links": [],
+  "panels": [
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 25,
+        "w": 2,
+        "x": 0,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "displayMode": "lcd",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 10000,
+            "min": 0,
+            "thresholds": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 1000
+              },
+              {
+                "color": "#EAB839",
+                "value": 3000
+              },
+              {
+                "color": "red",
+                "value": 6000
+              }
+            ],
+            "title": "consommation",
+            "unit": "watt"
+          },
+          "override": {},
+          "values": false
+        },
+        "orientation": "vertical"
+      },
+      "pluginVersion": "6.5.2",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "10s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "linky"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "watt"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 5,
+        "w": 5,
+        "x": 2,
+        "y": 0
+      },
+      "id": 8,
+      "interval": "10s",
+      "options": {
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 80000,
+            "min": 0,
+            "thresholds": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 20000
+              },
+              {
+                "color": "#EAB839",
+                "value": 35000
+              },
+              {
+                "color": "red",
+                "value": 50000
+              }
+            ],
+            "title": "consommation journalière",
+            "unit": "watt"
+          },
+          "override": {},
+          "values": false
+        },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "6.5.2",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "sumPerDay"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 7,
+        "y": 0
+      },
+      "id": 10,
+      "interval": "1h",
+      "options": {
+        "fieldOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 500,
+            "min": 0,
+            "thresholds": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 150
+              },
+              {
+                "color": "red",
+                "value": 300
+              }
+            ],
+            "title": "consommation journalière",
+            "unit": "litre"
+          },
+          "override": {},
+          "values": false
+        },
+        "orientation": "auto",
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "6.5.2",
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "measures",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "waterPerDay"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "",
+      "transparent": true,
+      "type": "gauge"
+    },
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 5,
+        "w": 7,
+        "x": 11,
+        "y": 0
+      },
+      "id": 12,
+      "interval": "5m",
+      "options": {
+        "displayMode": "lcd",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 50,
+            "min": -10,
+            "thresholds": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 0
+              },
+              {
+                "color": "super-light-blue",
+                "value": 10
+              },
+              {
+                "color": "super-light-red",
+                "value": 20
+              },
+              {
+                "color": "red",
+                "value": 30
+              }
+            ],
+            "title": "",
+            "unit": "celsius"
+          },
+          "override": {},
+          "values": false
+        },
+        "orientation": "horizontal"
+      },
+      "pluginVersion": "6.5.2",
+      "targets": [
+        {
+          "alias": "maintenant",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp12e"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "temp"
+            }
+          ]
+        },
+        {
+          "alias": "max.",
+          "groupBy": [
+            {
+              "params": [
+                "1d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp12e"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "temp"
+            }
+          ]
+        },
+        {
+          "alias": "min.",
+          "groupBy": [
+            {
+              "params": [
+                "1d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "min"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp12e"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "temp"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "dehors",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "datasource": null,
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 13,
+      "interval": "1m",
+      "options": {
+        "displayMode": "lcd",
+        "fieldOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "defaults": {
+            "mappings": [],
+            "max": 30,
+            "min": 15,
+            "thresholds": [
+              {
+                "color": "dark-blue",
+                "value": null
+              },
+              {
+                "color": "#6ED0E0",
+                "value": 17
+              },
+              {
+                "color": "super-light-red",
+                "value": 19
+              },
+              {
+                "color": "red",
+                "value": 25
+              }
+            ],
+            "title": "",
+            "unit": "celsius"
+          },
+          "override": {},
+          "values": false
+        },
+        "orientation": "horizontal"
+      },
+      "pluginVersion": "6.5.2",
+      "targets": [
+        {
+          "alias": "maintenant",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp8266"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "temp"
+            }
+          ]
+        },
+        {
+          "alias": "max.",
+          "groupBy": [
+            {
+              "params": [
+                "1d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp8266"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "temp"
+            }
+          ]
+        },
+        {
+          "alias": "min.",
+          "groupBy": [
+            {
+              "params": [
+                "1d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "min"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp8266"
+            },
+            {
+              "condition": "AND",
+              "key": "unit",
+              "operator": "=",
+              "value": "temp"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "dedans",
+      "transparent": true,
+      "type": "bargauge"
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "decimals": null,
+      "description": "Current Temperature",
+      "fill": 1,
+      "fillGradient": 1,
+      "gridPos": {
+        "h": 8,
+        "w": 22,
+        "x": 2,
+        "y": 5
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "interval": "1m",
+      "legend": {
+        "alignAsTable": true,
+        "avg": false,
+        "current": false,
+        "max": true,
+        "min": true,
+        "rightSide": false,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": [
+          {
+            "title": "",
+            "url": ""
+          }
+        ]
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "salon",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "5m",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "metrics": [
+            {
+              "field": "value",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "avg"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "sensor:esp8266",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp8266"
+            }
+          ],
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "dehors",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "10m",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "metrics": [
+            {
+              "field": "value",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "avg"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "sensor:esp12e",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp12e"
+            }
+          ],
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "chambres",
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "esp32"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Temperature",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "celsius",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "dateTimeAsIso",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "description": "Power consumption given by Linky ERL WIFI",
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 12,
+        "w": 22,
+        "x": 2,
+        "y": 13
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "interval": "10s",
+      "legend": {
+        "alignAsTable": true,
+        "avg": true,
+        "current": false,
+        "max": true,
+        "min": true,
+        "show": true,
+        "total": false,
+        "values": true
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "repeat": null,
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "moyenne",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "1m",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "sensors",
+          "metrics": [
+            {
+              "field": "value",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "avg"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "sensor:meanPerHour",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "meanPerHour"
+            }
+          ],
+          "timeField": "timestamp"
+        },
+        {
+          "alias": "consommation",
+          "bucketAggs": [
+            {
+              "field": "timestamp",
+              "id": "2",
+              "settings": {
+                "interval": "1m",
+                "min_doc_count": 0,
+                "trimEdges": 0
+              },
+              "type": "date_histogram"
+            }
+          ],
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "sensors",
+          "metrics": [
+            {
+              "field": "value",
+              "id": "1",
+              "meta": {},
+              "settings": {},
+              "type": "avg"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "sensor:linky",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "name",
+              "operator": "=",
+              "value": "linky"
+            }
+          ],
+          "timeField": "timestamp"
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "Linky",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "watt",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "dateTimeAsIso",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 21,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now/d",
+    "to": "now/d"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "5s",
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "aujourd'hui",
+  "uid": "51GuJIEWz",
+  "version": 15
+}

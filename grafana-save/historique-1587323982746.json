@@ -1,0 +1,593 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "-- Grafana --",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fill": 8,
+      "fillGradient": 7,
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "hiddenSeries": false,
+      "id": 2,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "nullPointMode": "connected",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "consommation journalière",
+          "groupBy": [
+            {
+              "params": [
+                "2d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "query": "SELECT distinct(\"value\") FROM \"measures\" WHERE (\"name\" = 'sumPerDay' AND \"unit\" = 'watt') AND $timeFilter GROUP BY time($__interval) fill(linear)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "median"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "moyenne glissante sur 1 semaine",
+          "groupBy": [
+            {
+              "params": [
+                "7d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "median"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "moyenne glissante sur 1 mois",
+          "groupBy": [
+            {
+              "params": [
+                "30d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "median"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "consommation par jour",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "watt",
+          "label": "",
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "hiddenSeries": false,
+      "id": 4,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "consommation mensuelle",
+          "groupBy": [
+            {
+              "params": [
+                "30d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "différence par rapport au mois précèdent",
+          "groupBy": [
+            {
+              "params": [
+                "30d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "consommation par mois",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "watt",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": null,
+      "fill": 1,
+      "fillGradient": 0,
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 18
+      },
+      "hiddenSeries": false,
+      "id": 6,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "nullPointMode": "null",
+      "options": {
+        "dataLinks": []
+      },
+      "percentage": false,
+      "pointradius": 2,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "consommation annuelle",
+          "groupBy": [
+            {
+              "params": [
+                "365d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "différence par rapport à l'année précèdente",
+          "groupBy": [
+            {
+              "params": [
+                "365d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "consommation par saison",
+          "groupBy": [
+            {
+              "params": [
+                "90d"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "daily_power_consumption",
+          "orderByTime": "ASC",
+          "policy": "infinite",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "sum"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeRegions": [],
+      "timeShift": null,
+      "title": "consommation par année",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "transparent": true,
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "watt",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": false
+        }
+      ],
+      "yaxis": {
+        "align": false,
+        "alignLevel": null
+      }
+    }
+  ],
+  "refresh": false,
+  "schemaVersion": 21,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-5y",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "",
+  "title": "historique",
+  "uid": "9z-lrnEWz",
+  "version": 20
+}
