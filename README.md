@@ -71,3 +71,27 @@ I use Grafana to display more dasboards. It compatibles with influxdb ;)
 
 ![today](extras/grafana_1.png)
 ![over 5y](extras/grafana_2.png)
+
+## influxdb tips
+
+```
+> show continuous queries;
+name: _internal
+name query
+---- -----
+
+name: domotik
+name      query
+----      -----
+sumPerDay CREATE CONTINUOUS QUERY sumPerDay ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_power_consumption FROM domotik.autogen.measures WHERE "name" = 'sumPerDay' GROUP BY time(1d) END
+outside   CREATE CONTINUOUS QUERY outside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_outside FROM domotik.autogen.measures WHERE "name" = 'esp12e' GROUP BY time(1d) END
+inside    CREATE CONTINUOUS QUERY inside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_inside FROM domotik.autogen.measures WHERE ("name" = 'esp8266' OR "name" = 'esp32') GROUP BY time(1d) END
+```
+
+```
+> show retention policies;
+name     duration  shardGroupDuration replicaN default
+----     --------  ------------------ -------- -------
+autogen  2160h0m0s 168h0m0s           1        true
+infinite 0s        168h0m0s           1        false
+```
