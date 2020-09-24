@@ -3,8 +3,6 @@
 ## build it
 
 ```
-$> npm install
-$> node_modules/bower/bin/bower install
 $> docker build -t domotik-bridge-to-influxdb .
 ```
 
