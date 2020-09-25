@@ -37,7 +37,7 @@ Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. 
 
 ```
 domotik-analyzer> ./mvnw package
-domotik-analyzer> docker build -t domotik-back .
+domotik-analyzer> docker build -t domotik-analyzer .
 front> npm install
 front> node_modules/bower/bin/bower install
 front> docker build -t domotik-front .
