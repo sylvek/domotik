@@ -79,7 +79,7 @@ img {
   float: right;
 }
 
-#temperature, #consumption, #history {
+#temperature, #consumption, #consumption_history, #temperature_outside_history {
   background: rgba(0,0,0,0.5);
   border-radius: 15px;
   margin: 1em;

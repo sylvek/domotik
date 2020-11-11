@@ -58,7 +58,7 @@ html(ng-app='domotikApp')
             tr
               th aujourd'hui
               td {{sum_watt_today}} kWh
-          table#history
+          table#consumption_history
             tr
               th hier
               td {{sum_watt_yesterday}} kWh
@@ -68,6 +68,16 @@ html(ng-app='domotikApp')
             tr
               th sur 30 jours
               td {{mean_watt_last_30_days}} kWh
+          table#temperature_outside_history
+            tr
+              th hier
+              td {{outside_temp_yesterday}} °c
+            tr
+              th l'année dernière
+              td {{outside_temp_last_year}} °c
+            tr
+              th sur 30 jours
+              td {{outside_temp_last_30_days}} °c
 
         div#right
           twitter-timeline(

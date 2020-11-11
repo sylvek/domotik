@@ -24,8 +24,10 @@
       $scope.sum_watt_yesterday = "--";
       $scope.sum_watt_last_year = "--";
       $scope.mean_watt_last_30_days = "--";
-      $scope.hot_water_comsuption_yesterday = "--";
-      $scope.hot_water_mean_last_30_days = "--";
+
+      $scope.outside_temp_yesterday = "--";
+      $scope.outside_temp_last_year = "--";
+      $scope.outside_temp_last_30_days = "--";
 
       $scope.temp_outside = "--";
       $scope.temp_living = "--";
@@ -138,26 +140,47 @@
       }
 
       var sums = function() {
-        domotikSrv.last("24h", "sumPerDay").then(function(response) {
+        domotikSrv.last("24h", "daily_power_consumption").then(function(response) {
           if (response.data.length > 0) {
             $scope.sum_watt_yesterday = (response.data[0].value / 1000).toFixed(2);
           }
         });
 
-        domotikSrv.last("30d", "sumPerDay").then(function(response) {
+        domotikSrv.last("30d", "daily_power_consumption").then(function(response) {
           if (response.data.length > 0) {
             $scope.mean_watt_last_30_days = (response.data[0].value / 1000).toFixed(2);
           }
         });
 
-        domotikSrv.last("year", "sumPerDay").then(function(response) {
+        domotikSrv.last("year", "daily_power_consumption").then(function(response) {
           if (response.data.length > 0) {
             $scope.sum_watt_last_year = (response.data[0].value / 1000).toFixed(2);
           }
         });
       };
 
+      var temperatures = function() {
+        domotikSrv.last("24h", "daily_temp_outside").then(function(response) {
+          if (response.data.length > 0) {
+            $scope.outside_temp_yesterday = (response.data[0].value).toFixed(2);
+          }
+        });
+
+        domotikSrv.last("30d", "daily_temp_outside").then(function(response) {
+          if (response.data.length > 0) {
+            $scope.outside_temp_last_30_days = (response.data[0].value).toFixed(2);
+          }
+        });
+
+        domotikSrv.last("year", "daily_temp_outside").then(function(response) {
+          if (response.data.length > 0) {
+            $scope.outside_temp_last_year = (response.data[0].value).toFixed(2);
+          }
+        });
+      };
+
       sums();
+      temperatures();
       ephemeride();
       quote();
       wallpaper();
