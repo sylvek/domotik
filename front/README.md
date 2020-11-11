@@ -2,7 +2,15 @@
 
 ## Build it
 
+### download wallpapers
 ```
+$> pip3 install image python-resize-image tqdm
+$> python3 wallpapers.py
+```
+
+### install dependencies
+```
+$> cd domotik
 $> npm install
 $> node_modules/bower/bin/bower install
 $> docker build -t domotik-front .

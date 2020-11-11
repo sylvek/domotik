@@ -7,7 +7,7 @@ from tqdm import tqdm
 # Variables
 subreddits = ["earthporn"]  # which subreddits should we fetch?
 timeranges = ["all"]        # top images from: all, year, month, week, day?
-limit = 500                 # how many posts should we fetch?
+limit = 5000                # how many posts should we fetch?
 
 output_list = "domotik/public/javascripts/data.js"
 output_path = "domotik/public/img/"
@@ -45,7 +45,7 @@ for subreddit in subreddits:
         for i in tqdm(range(limit)):
 
             # Reddit API to fetch posts
-            url = "https://www.reddit.com/r/" + subreddit + "/top/.json?t=" + timerange + "&limit=1" + "&after=" + last
+            url = "https://www.reddit.com/r/" + subreddit + "/best/.json?t=" + timerange + "&limit=1" + "&after=" + last
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1'})
 
             with urllib.request.urlopen(req) as url:
