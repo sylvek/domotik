@@ -98,3 +98,17 @@ th {
 td {
   text-align: right;
 }
+
+.green {
+  color: lightgreen;
+}
+
+.yellow {
+  color: lightyellow;
+  font-weight: bold;
+}
+
+.red {
+  color: red;
+  font-weight: bolder;
+}

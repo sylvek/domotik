@@ -1,5 +1,38 @@
 (function (angular) {
   var app = angular.module("domotikApp", ['ngtweet']);
+  var magical = {
+    0:90000,
+    1:60000,
+    2:50000,
+    3:47000,
+    4:45000,
+    5:44000,
+    6:43000,
+    7:42500,
+    8:37000,
+    9:34000,
+    10:34000,
+    11:28000,
+    12:26500,
+    13:23500,
+    14:23000,
+    15:19500,
+    16:17500,
+    17:17500,
+    18:17000,
+    19:16500,
+    20:15000,
+    21:14000,
+    22:14000,
+    23:14000,
+    24:13000,
+    25:12000,
+    26:11500,
+    27:11500,
+    28:11000,
+    29:10000,
+    30:9000
+  }
 
   app.service('domotikSrv', function ($http) {
 
@@ -28,6 +61,10 @@
       $scope.outside_temp_yesterday = "--";
       $scope.outside_temp_last_year = "--";
       $scope.outside_temp_last_30_days = "--";
+
+      $scope.consumption_scoring_yesterday = "--";
+      $scope.consumption_scoring_last_year = "--";
+      $scope.consumption_scoring_last_30_days = "--";
 
       $scope.temp_outside = "--";
       $scope.temp_living = "--";
@@ -139,22 +176,38 @@
         }
       }
 
+      var scoring = function(power, temperature) {
+        if (!isNaN(power) && !isNaN(temperature)) {
+          let score = ((power*1000)/magical[Math.floor(temperature)]).toFixed(2);
+          if (score > 1.15) {
+            return "red";
+          }
+          if (score < 1.0) {
+            return "green";
+          }
+        }
+        return "yellow";
+      }
+
       var sums = function() {
         domotikSrv.last("24h", "daily_power_consumption").then(function(response) {
           if (response.data.length > 0) {
             $scope.sum_watt_yesterday = (response.data[0].value / 1000).toFixed(2);
+            $scope.consumption_scoring_yesterday = scoring($scope.sum_watt_yesterday, $scope.outside_temp_yesterday);
           }
         });
 
         domotikSrv.last("30d", "daily_power_consumption").then(function(response) {
           if (response.data.length > 0) {
             $scope.mean_watt_last_30_days = (response.data[0].value / 1000).toFixed(2);
+            $scope.consumption_scoring_last_30_days = scoring($scope.mean_watt_last_30_days, $scope.outside_temp_last_30_days);
           }
         });
 
         domotikSrv.last("year", "daily_power_consumption").then(function(response) {
           if (response.data.length > 0) {
             $scope.sum_watt_last_year = (response.data[0].value / 1000).toFixed(2);
+            $scope.consumption_scoring_last_year = scoring($scope.sum_watt_last_year, $scope.outside_temp_last_year);
           }
         });
       };
@@ -163,18 +216,21 @@
         domotikSrv.last("24h", "daily_temp_outside").then(function(response) {
           if (response.data.length > 0) {
             $scope.outside_temp_yesterday = (response.data[0].value).toFixed(2);
+            $scope.consumption_scoring_yesterday = scoring($scope.sum_watt_yesterday, $scope.outside_temp_yesterday);
           }
         });
 
         domotikSrv.last("30d", "daily_temp_outside").then(function(response) {
           if (response.data.length > 0) {
             $scope.outside_temp_last_30_days = (response.data[0].value).toFixed(2);
+            $scope.consumption_scoring_last_30_days = scoring($scope.mean_watt_last_30_days, $scope.outside_temp_last_30_days);
           }
         });
 
         domotikSrv.last("year", "daily_temp_outside").then(function(response) {
           if (response.data.length > 0) {
             $scope.outside_temp_last_year = (response.data[0].value).toFixed(2);
+            $scope.consumption_scoring_last_year = scoring($scope.sum_watt_last_year, $scope.outside_temp_last_year);
           }
         });
       };
