@@ -6,7 +6,7 @@ import org.jeasy.rules.annotation.Condition;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
-@Rule(name = "meanPerDay", description = "calculate hourly power consumption")
+@Rule(name = "meanPerDay", description = "calculate hourly power consumption", priority = 4)
 public class MeanPerHourRule extends BroadcastableAction {
 
   public MeanPerHourRule(DomotikRulesEngine.Broadcaster broadcaster) {

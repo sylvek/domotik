@@ -7,7 +7,7 @@ import org.jeasy.rules.annotation.Fact;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
-@Rule(name = "detectHotWaterStartingRule", description = "detect the beginning of hot water production")
+@Rule(name = "detectHotWaterStartingRule", description = "detect the beginning of hot water production", priority = 4)
 public class DetectHotWaterStartingRule extends BroadcastableAction {
 
   private static final double HOT_TANK_WATER_POWER = 2_000;

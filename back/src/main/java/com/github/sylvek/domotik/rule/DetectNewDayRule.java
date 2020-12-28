@@ -9,7 +9,7 @@ import org.jeasy.rules.api.Facts;
 
 import java.util.Calendar;
 
-@Rule(name = "detectNewDayRule", description = "detect a new day")
+@Rule(name = "detectNewDayRule", description = "detect a new day", priority = 1)
 public class DetectNewDayRule extends BroadcastableAction {
 
   private final Calendar calendar = Calendar.getInstance();

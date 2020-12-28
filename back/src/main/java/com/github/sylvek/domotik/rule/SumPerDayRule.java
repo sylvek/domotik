@@ -6,7 +6,7 @@ import org.jeasy.rules.annotation.Condition;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
-@Rule(name = "sumPerDay", description = "calculate daily power consumption")
+@Rule(name = "sumPerDay", description = "calculate daily power consumption", priority = 4)
 public class SumPerDayRule extends BroadcastableAction {
 
   public SumPerDayRule(DomotikRulesEngine.Broadcaster broadcaster) {

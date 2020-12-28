@@ -8,7 +8,7 @@ import org.jeasy.rules.api.Facts;
 
 import java.time.LocalTime;
 
-@Rule(name = "detectHighTariffRule", description = "detect when we are in high tariff of electricity")
+@Rule(name = "detectHighTariffRule", description = "detect when we are in high tariff of electricity", priority = 2)
 public class DetectHighTariffRule extends BroadcastableAction {
 
   public DetectHighTariffRule(DomotikRulesEngine.Broadcaster broadcaster) {
