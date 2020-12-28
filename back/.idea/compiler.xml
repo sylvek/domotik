@@ -20,6 +20,6 @@
         <module name="analyzer" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="8" />
+    <bytecodeTargetLevel target="11" />
   </component>
 </project>
