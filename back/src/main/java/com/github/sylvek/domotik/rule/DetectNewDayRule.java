@@ -12,8 +12,6 @@ import java.util.Calendar;
 @Rule(name = "detectNewDayRule", description = "detect a new day", priority = 1)
 public class DetectNewDayRule extends BroadcastableAction {
 
-  private final Calendar calendar = Calendar.getInstance();
-
   public DetectNewDayRule(DomotikRulesEngine.Broadcaster broadcaster) {
     super(broadcaster);
   }
@@ -33,6 +31,6 @@ public class DetectNewDayRule extends BroadcastableAction {
   }
 
   private double getDay() {
-    return calendar.get(Calendar.DAY_OF_YEAR);
+    return Calendar.getInstance().get(Calendar.DAY_OF_YEAR);
   }
 }
