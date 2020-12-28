@@ -31,17 +31,16 @@ public class DomotikRulesEngine {
   private final Rules rules = new Rules();
   private final RulesEngine rulesEngine = new DefaultRulesEngine();
 
-  public DomotikRulesEngine(Path backupPath, Calendar calendar, Broadcaster broadcaster) {
+  public DomotikRulesEngine(Path backupPath, Broadcaster broadcaster) {
     this.backupPath = backupPath;
     this.gson = new GsonBuilder().create();
 
     rules.register(
-      new DetectLowTariffRule(calendar.getTimeZone().toZoneId(), broadcaster),
-      new DetectHighTariffRule(calendar.getTimeZone().toZoneId(), broadcaster),
-      new DetectNewDayRule(calendar, broadcaster),
-      new DetectNewHourRule(calendar, broadcaster),
+      new DetectLowTariffRule(broadcaster),
+      new DetectHighTariffRule(broadcaster),
+      new DetectNewDayRule(broadcaster),
+      new DetectNewHourRule(broadcaster),
       new SumPerDayRule(broadcaster),
-      new DetectNewDayRule(calendar, broadcaster),
       new MeanPerHourRule(broadcaster),
       new DetectHotWaterStartingRule(broadcaster),
       new DetectHotWaterEndingRule(broadcaster));

@@ -12,11 +12,10 @@ import java.util.Calendar;
 @Rule(name = "detectNewHourRule", description = "detect a new hour")
 public class DetectNewHourRule extends BroadcastableAction {
 
-  private final Calendar calendar;
+  private final Calendar calendar = Calendar.getInstance();
 
-  public DetectNewHourRule(Calendar calendar, DomotikRulesEngine.Broadcaster broadcaster) {
+  public DetectNewHourRule(DomotikRulesEngine.Broadcaster broadcaster) {
     super(broadcaster);
-    this.calendar = calendar;
   }
 
   @Condition

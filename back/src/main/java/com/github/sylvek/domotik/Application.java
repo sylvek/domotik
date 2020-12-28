@@ -25,7 +25,7 @@ public class Application {
     LOGGER.info("backup: " + backup);
 
     var domotikService = new DomotikService(host, prefix);
-    var domotikRulesEngine = new DomotikRulesEngine(backup, calendar, domotikService::publish);
+    var domotikRulesEngine = new DomotikRulesEngine(backup, domotikService::publish);
 
     domotikService.addConsumptionListener(domotikRulesEngine::fire);
     domotikService.start();

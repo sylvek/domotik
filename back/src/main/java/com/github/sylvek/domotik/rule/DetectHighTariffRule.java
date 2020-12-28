@@ -7,21 +7,17 @@ import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
 import java.time.LocalTime;
-import java.time.ZoneId;
 
 @Rule(name = "detectHighTariffRule", description = "detect when we are in high tariff of electricity")
 public class DetectHighTariffRule extends BroadcastableAction {
 
-  private final ZoneId zoneId;
-
-  public DetectHighTariffRule(ZoneId zoneId, DomotikRulesEngine.Broadcaster broadcaster) {
+  public DetectHighTariffRule(DomotikRulesEngine.Broadcaster broadcaster) {
     super(broadcaster);
-    this.zoneId = zoneId;
   }
 
   @Condition
   public boolean when() {
-    var now = LocalTime.now(this.zoneId);
+    var now = LocalTime.now();
     var isAfter7am4 = now.isAfter(LocalTime.of(7, 4));
     var isAfter4pm4 = now.isAfter(LocalTime.of(16, 4));
     var isBefore1pm4 = now.isBefore(LocalTime.of(13, 4));
