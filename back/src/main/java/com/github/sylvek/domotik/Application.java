@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 public class Application {
 
@@ -17,7 +18,7 @@ public class Application {
     var devMode = argsList.contains("--dev");
     var prefix = (devMode) ? "test/" : "";
     var calendar = Calendar.getInstance();
-    var backup = Path.of("/domotik/backup.json");
+    var backup = Path.of(Optional.ofNullable(System.getenv("BACKUP_PATH")).orElse("/domotik/backup.json"));
 
     LOGGER.info("host: " + host);
     LOGGER.info("prefix: " + prefix);
