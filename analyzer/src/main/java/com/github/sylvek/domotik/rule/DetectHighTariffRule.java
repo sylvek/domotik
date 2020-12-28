@@ -1,0 +1,38 @@
+package com.github.sylvek.domotik.rule;
+
+import com.github.sylvek.domotik.DomotikRulesEngine;
+import org.jeasy.rules.annotation.Action;
+import org.jeasy.rules.annotation.Condition;
+import org.jeasy.rules.annotation.Rule;
+import org.jeasy.rules.api.Facts;
+
+import java.time.LocalTime;
+import java.time.ZoneId;
+
+@Rule(name = "detectHighTariffRule", description = "detect when we are in high tariff of electricity")
+public class DetectHighTariffRule extends BroadcastableAction {
+
+  private final ZoneId zoneId;
+
+  public DetectHighTariffRule(ZoneId zoneId, DomotikRulesEngine.Broadcaster broadcaster) {
+    super(broadcaster);
+    this.zoneId = zoneId;
+  }
+
+  @Condition
+  public boolean when() {
+    var now = LocalTime.now(this.zoneId);
+    var isAfter7am4 = now.isAfter(LocalTime.of(7, 4));
+    var isAfter4pm4 = now.isAfter(LocalTime.of(16, 4));
+    var isBefore1pm4 = now.isBefore(LocalTime.of(13, 4));
+    var isBefore2am4 = now.isBefore(LocalTime.of(2, 4));
+
+    return isBefore2am4 && isAfter7am4 || isBefore1pm4 && isAfter4pm4;
+  }
+
+  @Action
+  public void then(Facts facts) {
+    facts.put("tariffLow", false);
+  }
+
+}
