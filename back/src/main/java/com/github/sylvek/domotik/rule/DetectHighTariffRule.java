@@ -23,7 +23,7 @@ public class DetectHighTariffRule extends BroadcastableAction {
     var isBefore1pm4 = now.isBefore(LocalTime.of(13, 4));
     var isBefore2am4 = now.isBefore(LocalTime.of(2, 4));
 
-    return isBefore2am4 && isAfter7am4 || isBefore1pm4 && isAfter4pm4;
+    return isAfter4pm4 && isBefore2am4 || isAfter7am4 && isBefore1pm4;
   }
 
   @Action

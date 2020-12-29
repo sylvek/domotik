@@ -25,6 +25,6 @@ public class DetectHotWaterStartingRule extends BroadcastableAction {
 
   @Action
   public void then(Facts facts) {
-    facts.put("hotWaterStartedAt", System.currentTimeMillis());
+    facts.put("hotWaterStartedAt", (double) System.currentTimeMillis());
   }
 }
