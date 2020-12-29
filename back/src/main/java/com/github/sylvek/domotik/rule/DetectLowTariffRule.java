@@ -29,7 +29,6 @@ public class DetectLowTariffRule extends BroadcastableAction {
   @Action
   public void then(Facts facts) {
     facts.put("tariffLow", true);
-    facts.put("hotWaterStartedAt", 0d);
   }
 
 }
