@@ -18,10 +18,10 @@ public class Application {
     var prefix = (argsList.contains("--dev")) ? "test/" : "";
     var backup = Path.of(Optional.ofNullable(System.getenv("BACKUP_PATH")).orElse("/domotik/backup.json"));
 
-    LOGGER.info("host: " + host);
-    LOGGER.info("prefix: " + prefix);
-    LOGGER.info("timezone: " + Calendar.getInstance().getTimeZone().getDisplayName());
-    LOGGER.info("backup: " + backup);
+    LOGGER.info("host: {}", host);
+    LOGGER.info("prefix: {}", prefix);
+    LOGGER.info("timezone: {}", Calendar.getInstance().getTimeZone().getDisplayName());
+    LOGGER.info("backup: {}", backup);
 
     var domotikService = new DomotikService(host, prefix);
     var domotikRulesEngine = new DomotikRulesEngine(backup, domotikService::publish);

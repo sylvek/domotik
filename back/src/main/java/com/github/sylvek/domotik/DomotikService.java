@@ -30,7 +30,7 @@ public class DomotikService {
   }
 
   public void publish(String topic, String payload) {
-    LOGGER.debug("publish: " + topic + " -> " + payload);
+    LOGGER.debug("publish: {} -> {}", topic, payload);
     this.client.publishWith().topic(this.prefix + topic).payload(payload.getBytes()).send();
   }
 
@@ -43,7 +43,7 @@ public class DomotikService {
   }
 
   public void start() {
-    LOGGER.info("connection: " + client.connect().getReturnCode());
+    LOGGER.info("connection: {}", client.connect().getReturnCode());
     var publishes = Mqtt3ReactorClient.from(client).publishes(MqttGlobalPublishFilter.SUBSCRIBED);
     publishes
       .filter(p -> p.getTopic().toString().equals("sensors/esp12e/temp"))
@@ -63,7 +63,7 @@ public class DomotikService {
         this.consumptionListeners.forEach(action -> action.apply(mean));
       });
     client.subscribeWith().topicFilter("sensors/#").send()
-      .getReturnCodes().forEach(s -> LOGGER.info("subscription: " + s));
+      .getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
   }
 
   public void stop() {
