@@ -16,12 +16,11 @@ public class Application {
     var argsList = List.of(args);
     var host = argsList.stream().findFirst().orElse("localhost");
     var prefix = (argsList.contains("--dev")) ? "test/" : "";
-    var calendar = Calendar.getInstance();
     var backup = Path.of(Optional.ofNullable(System.getenv("BACKUP_PATH")).orElse("/domotik/backup.json"));
 
     LOGGER.info("host: " + host);
     LOGGER.info("prefix: " + prefix);
-    LOGGER.info("timezone: " + calendar.getTimeZone().getDisplayName());
+    LOGGER.info("timezone: " + Calendar.getInstance().getTimeZone().getDisplayName());
     LOGGER.info("backup: " + backup);
 
     var domotikService = new DomotikService(host, prefix);
