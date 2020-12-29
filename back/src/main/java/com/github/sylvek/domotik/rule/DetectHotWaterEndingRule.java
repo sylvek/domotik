@@ -37,6 +37,6 @@ public class DetectHotWaterEndingRule extends BroadcastableAction {
     this.broadcaster.broadcast("measures/waterPerDay/liter",
       Double.toString(Math.round(consumed * 100) / 100.0));
 
-    facts.put("hotWaterStartedAt", 0d);
+    facts.put("hotWaterStartedAt", -1d);
   }
 }
