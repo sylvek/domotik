@@ -3,6 +3,7 @@ package com.github.sylvek.domotik.rule;
 import com.github.sylvek.domotik.DomotikRulesEngine;
 import org.jeasy.rules.annotation.Action;
 import org.jeasy.rules.annotation.Condition;
+import org.jeasy.rules.annotation.Fact;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
@@ -16,7 +17,7 @@ public class DetectHighTariffRule extends BroadcastableAction {
   }
 
   @Condition
-  public boolean when() {
+  public boolean when(@Fact("tariffLow") boolean isLow) {
     var now = LocalTime.now();
     var isAfter7am4 = now.isAfter(LocalTime.of(7, 4));
     var isAfter4pm4 = now.isAfter(LocalTime.of(16, 4));
@@ -25,7 +26,7 @@ public class DetectHighTariffRule extends BroadcastableAction {
     var isBeforeMidnight = now.isBefore(LocalTime.of(23, 59));
     var isAfterMidnight = now.isAfter(LocalTime.of(0, 0));
 
-    return isAfter7am4 && isBefore1pm4 || isAfter4pm4 && isBeforeMidnight || isAfterMidnight && isBefore2am4;
+    return isLow && (isAfter7am4 && isBefore1pm4 || isAfter4pm4 && isBeforeMidnight || isAfterMidnight && isBefore2am4);
   }
 
   @Action
