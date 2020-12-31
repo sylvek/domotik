@@ -58,10 +58,7 @@ public class DomotikService {
       .filter(p -> p.getTopic().toString().equals("sensors/linky/watt"))
       .buffer(Duration.ofSeconds(10))
       .map(e -> e.stream().filter(d -> d.getPayload().isPresent()).mapToInt(f -> Integer.parseInt(new String(f.getPayloadAsBytes()))))
-      .subscribe(e -> {
-        var mean = e.average().orElse(0d);
-        this.consumptionListeners.forEach(action -> action.apply(mean));
-      });
+      .subscribe(e -> this.consumptionListeners.forEach(action -> action.apply(e.average().orElse(0d))));
     client.subscribeWith().topicFilter("sensors/#").send()
       .getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
   }
