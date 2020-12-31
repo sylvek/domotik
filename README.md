@@ -36,8 +36,7 @@ Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. 
 ## Build it
 
 ```
-domotik-analyzer> ./mvnw package
-domotik-analyzer> docker build -t domotik-analyzer .
+back> docker build -t domotik-back .
 front> npm install
 front> node_modules/bower/bin/bower install
 front> docker build -t domotik-front .
@@ -51,7 +50,7 @@ bridge-to-infludb> docker build -t domotik-bridge-to-influxdb .
 $> docker run -d --name influxdb -p 8086:8086 influxdb
 $> docker run -d --name mosquitto -p 1883:1883 -p 9883:9883 jllopis/mosquitto:v1.4.14 mosquitto
 
-$> docker run -d --name domotik-analyzer --link mosquitto:mosquitto domotik-analyzer
+$> docker run -d --name domotik-back --link mosquitto:mosquitto domotik-back app.jar mosquitto
 $> docker run -d --name domotik-front --link influxdb:influxdb -p 3000:3000 domotik-front
 
 $> docker run -d --name domotik-bridge-to-influxdb --link mosquitto:mosquitto --link influxdb:influxdb domotik-bridge-to-influxdb

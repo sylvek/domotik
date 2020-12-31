@@ -1,0 +1,27 @@
+= Backend
+
+== Building
+
+To launch your tests:
+```
+./mvnw clean test
+```
+
+To package your application:
+```
+./mvnw clean package
+```
+
+To run your application:
+```
+./mvnw clean compile exec:java
+```
+
+To deploy:
+```
+./mvnw package
+docker build -t domotik-back .
+docker run -d --name domotik-back --link mosquitto:mosquitto -e TZ="Europe/Paris" -v /var/cache/domotik/:/domotik domotik-back app.jar mosquitto
+```
+
+
