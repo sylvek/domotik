@@ -62,16 +62,24 @@ $> docker run -d --name domotik-bridge-to-influxdb --link mosquitto:mosquitto --
 | MQTT broker | tcp://your_ip:1883 |
 | influxdb | http://your_ip:8086/domotik |
 
-I use Grafana to display more dasboards. It compatibles with influxdb ;)
-
-*Note, I reduced by 23% my consumption!*
+I use Grafana _(plugged on InfluxDB)_ to display more dasboards.
 
 ![today](extras/grafana_1.png)
 ![over 5y](extras/grafana_2.png)
 
-## influxdb tips
+## InfluxDB
 
 ```
+> create database "domotik" with duration 2160h
+> show databases;
+name: databases
+name
+----
+_internal
+domotik
+```
+```
+> use domotik;
 > show continuous queries;
 name: _internal
 name query
@@ -86,6 +94,7 @@ sumPerDay CREATE CONTINUOUS QUERY sumPerDay ON domotik BEGIN SELECT sum(value) A
 ```
 
 ```
+> use domotik;
 > show retention policies;
 name     duration  shardGroupDuration replicaN default
 ----     --------  ------------------ -------- -------
