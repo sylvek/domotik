@@ -37,8 +37,6 @@ Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. 
 
 ```
 back> docker build -t domotik-back .
-front> npm install
-front> node_modules/bower/bin/bower install
 front> docker build -t domotik-front .
 bridge-to-infludb> docker build -t domotik-bridge-to-influxdb .
 ```

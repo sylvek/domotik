@@ -16,8 +16,7 @@ html(ng-app='domotikApp')
 
       div#wallpaper(ng-style="{'background-image':'url({{background}})'}")
 
-        div#left
-          {{last_date}}
+        div#left {{last_date}}
           div#clock
             div {{ current_time | date:'dd MMM yyyy' }}
             div
@@ -25,11 +24,9 @@ html(ng-app='domotikApp')
               span#minutes {{ current_time | date:'mm' }}
               span#seconds {{ current_time | date:'ss' }}
           div#ephemeris
-            div
-              {{ ephemeride }}
+            div {{ ephemeride }}
           div#quote
-            div
-              {{ quote }}
+            div {{ quote }}
           div#rte
             iframe(
               ng-if="slug == 'news'"
@@ -99,5 +96,4 @@ html(ng-app='domotikApp')
                 twitter-timeline-slug='"news"'
                 twitter-timeline-options='{"tweetLimit": 2, "theme": "light", "chrome": "noheader nofooter noborders"}')
 
-        div#title
-          {{ title }}
+        div#title {{ title }}

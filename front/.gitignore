@@ -2,4 +2,3 @@ blacklist
 domotik/bower_components/
 domotik/node_modules/
 domotik/package-lock.json
-domotik/public/img/

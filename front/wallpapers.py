@@ -9,8 +9,8 @@ subreddits = ["earthporn"]  # which subreddits should we fetch?
 timeranges = ["all"]        # top images from: all, year, month, week, day?
 limit = 5000                # how many posts should we fetch?
 
-output_list = "domotik/public/javascripts/data.js"
-output_path = "domotik/public/img/"
+output_list = "/data.js"
+output_path = "/img/"
 
 min_width  = 1920           # minimal width, height and ratio to keep the image
 min_height = 1080
