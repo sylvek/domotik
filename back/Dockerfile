@@ -7,3 +7,5 @@ RUN mvn package
 FROM gcr.io/distroless/java:11
 COPY --from=MAVEN_TOOL_CHAIN /tmp/target/app.jar /app.jar
 WORKDIR /
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
