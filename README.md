@@ -33,6 +33,8 @@ This dashboard is displayed thanks to my original Raspberry Pi 1 (yes!) over an 
 
 Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. Basically, everything ran on my raspberry pi. In ~2016, i used Ansible to deploy it. In 2017, I decided to bought a real computer (sorry for Raspberry pi fans). Indeed, raspberries are cool for thin devices but the IO stack and using an HDD disk (to display movies for example) crashes too much my raspberry and my data. So I deciced to move on an [Intel NUC](https://en.wikipedia.org/wiki/Next_Unit_of_Computing) based on an x86 CPU (with 4GB of RAM) and an SSD. It's not so expansive comparing to a raspberry pi 2 or 3 with an SSD Disk on USB port.  I decided to depoy my script with Docker and slowly, i rewrote the backend in Java. I decided to migrate my data from Mongo to InfluxDB (after tested during a year Elasticsearch). So, i went to a micro-services architecture to a monolith. I learnt that begining by a micro-services architecture was cool to experiment some stuff, but using less code to maintain is better when you want to consolidate domain _(and reduce ops works)_.
 
+In 2020, i replaced my raspberry-pi "TV" by a [Kindle TV Stick + Fully Kiosk](https://www.fully-kiosk.com/en/#download-box).
+
 ## Build / Run it
 
 ```
