@@ -31,27 +31,17 @@ My main objective was to understand my power consumption in order to reduce bill
 
 This dashboard is displayed thanks to my original Raspberry Pi 1 (yes!) over an HDMI cable. I built a [small web browser that fits well with an embedded device](github.com/sylvek/kiosk-browser/) (angularjs 1.4 works well on it, i did an unsuccesful test with reactjs)
 
-Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. Basically, everything ran on my raspberry pi. In ~2016, i used Ansible to deploy it. In 2017, I decided to bought a real computer (sorry for Raspberry pi fans). Indeed, raspberries are cool for thin devices but the IO stack and using an HDD disk (to display movies for example) crashes too much my raspberry and my data. So I deciced to move on an [Intel NUC](https://en.wikipedia.org/wiki/Next_Unit_of_Computing) based on an x86 CPU (with 4GB of RAM) and an SSD. It's not so expansive comparing to a raspberry pi 2 or 3 with an SSD Disk on USB port.  I decided to depoy my script with Docker and slowly, i rewrote the backend in Java (VertX). I decided to migrate my data from Mongo to InfluxDB (after tested during 1y Elasticsearch). So, i went to a micro-services architecture to a monolith. I learnt that begining with a micro-services architecture was cool to experiment some stuff, but using a VertX code with only one project to maintain is better when you want to consolidate domain _(and reduce ops works)_.
+Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. Basically, everything ran on my raspberry pi. In ~2016, i used Ansible to deploy it. In 2017, I decided to bought a real computer (sorry for Raspberry pi fans). Indeed, raspberries are cool for thin devices but the IO stack and using an HDD disk (to display movies for example) crashes too much my raspberry and my data. So I deciced to move on an [Intel NUC](https://en.wikipedia.org/wiki/Next_Unit_of_Computing) based on an x86 CPU (with 4GB of RAM) and an SSD. It's not so expansive comparing to a raspberry pi 2 or 3 with an SSD Disk on USB port.  I decided to depoy my script with Docker and slowly, i rewrote the backend in Java. I decided to migrate my data from Mongo to InfluxDB (after tested during a year Elasticsearch). So, i went to a micro-services architecture to a monolith. I learnt that begining by a micro-services architecture was cool to experiment some stuff, but using less code to maintain is better when you want to consolidate domain _(and reduce ops works)_.
 
-## Build it
-
-```
-back> docker build -t domotik-back .
-front> docker build -t domotik-front .
-bridge-to-infludb> docker build -t domotik-bridge-to-influxdb .
-```
-
-## Run it
+## Build / Run it
 
 ```
+> docker-compose up
 
-$> docker run -d --name influxdb -p 8086:8086 influxdb
-$> docker run -d --name mosquitto -p 1883:1883 -p 9883:9883 jllopis/mosquitto:v1.4.14 mosquitto
+> #open http://localhost:3000
 
-$> docker run -d --name domotik-back --link mosquitto:mosquitto domotik-back app.jar mosquitto
-$> docker run -d --name domotik-front --link influxdb:influxdb -p 3000:3000 domotik-front
-
-$> docker run -d --name domotik-bridge-to-influxdb --link mosquitto:mosquitto --link influxdb:influxdb domotik-bridge-to-influxdb
+> mosquitto_pub -h localhost -t sensors/esp8266/temp -m 4
+> mosquitto_pub -h localhost -t sensors/linky/watt -m 4000
 ```
 
 ## Use it
