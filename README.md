@@ -29,9 +29,9 @@ My main objective was to understand my power consumption in order to reduce bill
 
 ![tv2](extras/tv2.jpg)
 
-This dashboard is displayed thanks to my original Raspberry Pi 1 (yes!) over an HDMI cable. I built a [small web browser that fits well with an embedded device](github.com/sylvek/kiosk-browser/) (angularjs 1.4 works well on it, i did an unsuccesful test with reactjs)
+This dashboard is displayed thanks to my original Raspberry Pi 1 (yes!) over an HDMI cable. ~~I built a [small web browser that fits well with an embedded device](github.com/sylvek/kiosk-browser/) (angularjs 1.4 works well on it, i did an unsuccesful test with reactjs)~~
 
-Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. Basically, everything ran on my raspberry pi. In ~2016, i used Ansible to deploy it. In 2017, I decided to bought a real computer (sorry for Raspberry pi fans). Indeed, raspberries are cool for thin devices but the IO stack and using an HDD disk (to display movies for example) crashes too much my raspberry and my data. So I deciced to move on an [Intel NUC](https://en.wikipedia.org/wiki/Next_Unit_of_Computing) based on an x86 CPU (with 4GB of RAM) and an SSD. It's not so expansive comparing to a raspberry pi 2 or 3 with an SSD Disk on USB port.  I decided to depoy my script with Docker and slowly, i rewrote the backend in Java. I decided to migrate my data from Mongo to InfluxDB (after tested during a year Elasticsearch). So, i went to a micro-services architecture to a monolith. I learnt that begining by a micro-services architecture was cool to experiment some stuff, but using less code to maintain is better when you want to consolidate domain _(and reduce ops works)_.
+Code side, i wrote several small scripts in Python using Mosquitto and Mongodb. Basically, everything ran on my raspberry pi. In 2016, i used Ansible to deploy it. In 2017, I decided to bought a real computer _(sorry for Raspberry pi fans)_. Indeed, raspberries are cool for thin devices but the IO stack and using an HDD disk _(to display movies for example)_ crashes too much my raspberry and my data. So I deciced to move on an [Intel NUC](https://en.wikipedia.org/wiki/Next_Unit_of_Computing) based on an x86 CPU (with 4GB of RAM) and an SSD. It's not so expansive comparing to a raspberry pi 2 or 3 with an SSD Disk on USB port. I decided to deploy my scripts using Docker and slowly, i rewrote the backend in Java. I also, decided to migrate my data from MongoDB to InfluxDB _(much more suitable for timeseries data - i also tested Elastisearch but it took to much space, around 3 times more and too big for my needs)_. So, i went to a micro-services architecture to a monolith. I learnt that begining by a micro-services architecture was cool to experiment some stuff, but using less code to maintain is better when you want to consolidate domain _(and reduce ops works)_.
 
 In 2020, i replaced my raspberry-pi "TV" by a [Kindle TV Stick + Fully Kiosk](https://www.fully-kiosk.com/en/#download-box).
 
@@ -54,7 +54,7 @@ In 2020, i replaced my raspberry-pi "TV" by a [Kindle TV Stick + Fully Kiosk](ht
 | MQTT broker | tcp://your_ip:1883 |
 | influxdb | http://your_ip:8086/domotik |
 
-I use Grafana _(plugged on InfluxDB)_ to display more dasboards.
+I use Grafana _(plugged on InfluxDB)_ to display more dasboards. _(look extras/grafana-save folder)_
 
 ![today](extras/grafana_1.png)
 ![over 5y](extras/grafana_2.png)
