@@ -27,5 +27,5 @@ services:
     image: "influxdb:alpine"
     ports:
       - 8086:8086
-    environment:
-      INFLUXDB_DB: "domotik"
+    volumes:
+      - ./influxdb-scripts:/docker-entrypoint-initdb.d

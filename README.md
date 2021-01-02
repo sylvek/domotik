@@ -58,38 +58,3 @@ I use Grafana _(plugged on InfluxDB)_ to display more dasboards.
 
 ![today](extras/grafana_1.png)
 ![over 5y](extras/grafana_2.png)
-
-## InfluxDB
-
-```
-> create database "domotik" with duration 2160h
-> show databases;
-name: databases
-name
-----
-_internal
-domotik
-```
-```
-> use domotik;
-> show continuous queries;
-name: _internal
-name query
----- -----
-
-name: domotik
-name      query
-----      -----
-outside   CREATE CONTINUOUS QUERY outside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_outside FROM domotik.autogen.sensors WHERE "name" = 'esp12e' GROUP BY time(1d) END
-inside    CREATE CONTINUOUS QUERY inside ON domotik BEGIN SELECT mean(value) AS value INTO domotik.infinite.daily_temp_inside FROM domotik.autogen.sensors WHERE ("name" = 'esp8266' OR "name" = 'esp32') GROUP BY time(1d) END
-sumPerDay CREATE CONTINUOUS QUERY sumPerDay ON domotik BEGIN SELECT sum(value) AS value INTO domotik.infinite.daily_power_consumption FROM domotik.autogen.measures WHERE "name" = 'meanPerHour' GROUP BY time(1d) END
-```
-
-```
-> use domotik;
-> show retention policies;
-name     duration  shardGroupDuration replicaN default
-----     --------  ------------------ -------- -------
-autogen  2160h0m0s 168h0m0s           1        true
-infinite 0s        168h0m0s           1        false
-```
