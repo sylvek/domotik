@@ -48,11 +48,21 @@ In 2020, i replaced my raspberry-pi "TV" by a [Kindle TV Stick + Fully Kiosk](ht
 
 ## Use it
 
+Basically i use 3 temperature sensors and a "watt meter".
+
+| name | topic | unit | usage |
+|---------|------|------|-----|
+| outside | sensors/esp12e/temp | xx.xx °c | basically, a value every 5 min |
+| living room | sensors/esp8266/temp | xx.xx °c | a value every minute |
+| rooms | sensors/esp32/temp | xx.xx °c | a value every minute |
+| power consumption | sensors/linky/watt | xxxxx | a watt-hour value every second |
+
+You can simulate data by using [`mosquitto_pub`](https://mosquitto.org/man/mosquitto_pub-1.html).
+
 | service | link |
 |---------|------|
 | tv dashboard | http://your_ip:3000 |
 | MQTT broker | tcp://your_ip:1883 |
-| influxdb | http://your_ip:8086/domotik |
 
 I use Grafana _(plugged on InfluxDB)_ to display more dasboards. _(look extras/grafana-save folder)_
 
