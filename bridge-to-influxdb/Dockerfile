@@ -1,5 +1,8 @@
-FROM ruby:2.6-alpine
-RUN ["gem", "install", "mqtt", "influxdb"]
+FROM golang:1.18-alpine AS builder
 COPY domotik /domotik
 WORKDIR /domotik
-CMD ["ruby", "main.rb", "mosquitto", "influxdb"]
+RUN go build
+
+FROM alpine
+COPY --from=builder /domotik/bridge /bridge
+CMD ["/bridge", "mosquitto", "influxdb"]
