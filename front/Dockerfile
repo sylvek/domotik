@@ -1,12 +1,12 @@
 FROM python:3 AS WALLPAPER
 RUN pip3 install image python-resize-image tqdm
 COPY wallpapers.py /wallpapers.py
-#RUN python3 wallpapers.py
+RUN python3 wallpapers.py
 
 FROM library/node:13-alpine
 COPY domotik /domotik
-#COPY --from=WALLPAPER /img /domotik/public/img
-#COPY --from=WALLPAPER /data.js /domotik/public/javascripts/data.js
+COPY --from=WALLPAPER /img /domotik/public/img
+COPY --from=WALLPAPER /data.js /domotik/public/javascripts/data.js
 
 WORKDIR /domotik
 RUN apk --no-cache add git
