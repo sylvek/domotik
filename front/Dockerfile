@@ -1,7 +1,4 @@
-FROM python:3 AS WALLPAPER
-RUN pip3 install image python-resize-image tqdm
-COPY wallpapers.py /wallpapers.py
-RUN python3 wallpapers.py
+FROM ghcr.io/sylvek/domotik-wallpapers:latest AS WALLPAPER
 
 FROM library/node:13-alpine
 COPY domotik /domotik
