@@ -15,6 +15,13 @@ import (
 	_ "github.com/glebarez/go-sqlite"
 )
 
+type Log struct {
+	Kind  string
+	Name  string
+	Unit  string
+	Value float32
+}
+
 func main() {
 
 	log.Printf("starting : %s", os.Args)
@@ -31,7 +38,23 @@ func main() {
 	db.Exec("CREATE INDEX IF NOT EXISTS indx_sensors on sensors (ts);")
 
 	// connect
-	client := connect(os.Args[1], db)
+	logs := make(chan Log, 10)
+	client := connect(os.Args[1], logs)
+
+	go func() {
+		for {
+			log := <-logs
+			_, err := db.Exec(fmt.Sprintf("INSERT INTO %s (ts, name, unit, value) VALUES (%d, '%s', '%s', %f);",
+				log.Kind,
+				time.Now().Unix(),
+				log.Name,
+				log.Unit,
+				log.Value))
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
 
 	sub(client)
 	defer client.Disconnect(250)
@@ -42,7 +65,7 @@ func main() {
 	log.Println("ciao.")
 }
 
-func connect(mqttBroker string, db *sql.DB) (client mqtt.Client) {
+func connect(mqttBroker string, logs chan Log) (client mqtt.Client) {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", mqttBroker, 1883))
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
@@ -50,15 +73,7 @@ func connect(mqttBroker string, db *sql.DB) (client mqtt.Client) {
 		payload := string(msg.Payload()[:])
 		elements := strings.Split(msg.Topic(), "/")
 		value, _ := strconv.ParseFloat(payload, 32)
-		_, err := db.Exec(fmt.Sprintf("INSERT INTO %s (ts, name, unit, value) VALUES (%d, '%s', '%s', %f);",
-			elements[0],
-			time.Now().Unix(),
-			elements[1],
-			elements[2],
-			value))
-		if err != nil {
-			panic(err)
-		}
+		logs <- Log{Kind: elements[0], Name: elements[1], Unit: elements[2], Value: float32(value)}
 	})
 	client = mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
