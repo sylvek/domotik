@@ -43,15 +43,17 @@ func main() {
 
 	go func() {
 		for {
-			log := <-logs
+			item := <-logs
 			_, err := db.Exec(fmt.Sprintf("INSERT INTO %s (ts, name, unit, value) VALUES (%d, '%s', '%s', %f);",
-				log.Kind,
+				item.Kind,
 				time.Now().Unix(),
-				log.Name,
-				log.Unit,
-				log.Value))
+				item.Name,
+				item.Unit,
+				item.Value))
 			if err != nil {
-				panic(err)
+				log.Printf(" - error - %s", err)
+				time.Sleep(time.Second)
+				logs <- item
 			}
 		}
 	}()
