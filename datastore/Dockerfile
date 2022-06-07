@@ -5,4 +5,8 @@ RUN CGO_ENABLED=0 go build
 
 FROM gcr.io/distroless/static
 COPY --from=builder /domotik/datastore /datastore
-CMD ["/datastore", "mosquitto", "/database/domotik.db"]
+
+ENV MQTT_HOST=mosquitto
+ENV DB_PATH=/database/
+
+CMD ["/datastore"]
