@@ -16,15 +16,34 @@ import (
 )
 
 type Log struct {
-	Kind  string
-	Name  string
-	Unit  string
-	Value float32
+	kind  string
+	name  string
+	unit  string
+	value float32
+}
+
+type Aggregation string
+
+const (
+	AVG Aggregation = "AVG"
+	SUM Aggregation = "SUM"
+)
+
+const (
+	WATT string = "watt"
+	TEMP string = "temp"
+)
+
+type Operation struct {
+	aggregat Aggregation
+	from     string
+	to       string
+	unit     string
 }
 
 type Database struct {
-	Db       *sql.DB
-	Volatile bool
+	db              *sql.DB
+	dailyOperations []Operation
 }
 
 func main() {
@@ -34,8 +53,12 @@ func main() {
 
 	// prepare database
 	databases := make(map[string]Database)
-	databases["sensors"] = Database{Db: prepareDatabase(databasePath + "/sensors.db"), Volatile: true}
-	databases["measures"] = Database{Db: prepareDatabase(databasePath + "/measures.db"), Volatile: false}
+	databases["sensors"] = Database{db: prepareDatabase(databasePath + "/sensors.db"), dailyOperations: []Operation{
+		{aggregat: AVG, from: "esp12e", to: "daily_temp_outside", unit: TEMP},
+		{aggregat: AVG, from: "esp8266", to: "daily_temp_inside", unit: TEMP}}}
+	databases["measures"] = Database{db: prepareDatabase(databasePath + "/measures.db"), dailyOperations: []Operation{
+		{aggregat: SUM, from: "meanPerHour", to: "daily_power_consumption", unit: WATT}}}
+	databases["history"] = Database{db: prepareDatabase(databasePath + "/history.db")}
 
 	// connect
 	client, logs := connect(mqttHost, []string{"sensors", "measures"})
@@ -43,8 +66,9 @@ func main() {
 	go treatLogs(logs, databases)
 
 	defer func() {
-		databases["sensors"].Db.Close()
-		databases["measures"].Db.Close()
+		databases["sensors"].db.Close()
+		databases["measures"].db.Close()
+		databases["history"].db.Close()
 		client.Disconnect(250)
 	}()
 
@@ -74,7 +98,7 @@ func connect(mqttBroker string, kinds []string) (client mqtt.Client, logs chan L
 		payload := string(msg.Payload()[:])
 		elements := strings.Split(msg.Topic(), "/")
 		value, _ := strconv.ParseFloat(payload, 32)
-		logs <- Log{Kind: elements[0], Name: elements[1], Unit: elements[2], Value: float32(value)}
+		logs <- Log{kind: elements[0], name: elements[1], unit: elements[2], value: float32(value)}
 	})
 	logs = make(chan Log, 10)
 	client = mqtt.NewClient(opts)
@@ -94,23 +118,37 @@ func treatLogs(logs chan Log, databases map[string]Database) {
 		t := time.Now()
 		currentDay := t.YearDay()
 
-		item := <-logs
-		log.Printf("%s: %s -> %f (%s)\n", item.Kind, item.Name, item.Value, item.Unit)
-
-		db := databases[item.Kind].Db
-		volatile := databases[item.Kind].Volatile
-		if currentDay != previousDay && volatile {
+		if currentDay != previousDay {
 			previousDay = currentDay
 			epoch := t.Unix()
 
 			// we clean old data (meaning older than 2days)
-			db.Exec(fmt.Sprintf("DELETE FROM data where ts < %d", epoch-172800 /* 2days */))
+			databases["sensors"].db.Exec("DELETE FROM data where ts < ?", epoch-172800 /* 2days */)
+			databases["measures"].db.Exec("DELETE FROM data where ts < ?", epoch-172800 /* 2days */)
+
+			// aggregate data
+			var value float64
+			for _, kind := range []string{"sensors", "measures"} {
+				for _, sensorsOperation := range databases[kind].dailyOperations {
+					databases["sensors"].db.QueryRow(fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s' AND ts>%d", sensorsOperation.aggregat, sensorsOperation.from, 0)).Scan(&value)
+					databases["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
+						0,
+						sensorsOperation.to,
+						sensorsOperation.unit,
+						value)
+				}
+			}
 		}
-		_, err := db.Exec(fmt.Sprintf("INSERT INTO data (ts, name, unit, value) VALUES (%d, '%s', '%s', %f);",
+
+		item := <-logs
+		log.Printf("%s: %s -> %f (%s)\n", item.kind, item.name, item.value, item.unit)
+
+		db := databases[item.kind].db
+		_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
 			t.Unix(),
-			item.Name,
-			item.Unit,
-			item.Value))
+			item.name,
+			item.unit,
+			item.value)
 		if err != nil {
 			log.Printf(" - error - %s", err)
 			time.Sleep(time.Second)
