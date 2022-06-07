@@ -83,8 +83,6 @@
               console.log("Reconnecting... [" + new Date() + "]");
               client.connect({
                   onSuccess: function() {
-                      client.subscribe("current/+/temp");
-                      client.subscribe("current/+/watt");
                       client.subscribe("sensors/+/temp");
                       client.subscribe("sensors/+/watt");
                   }
@@ -132,8 +130,6 @@
       client.connect({
         onSuccess: function() {
           console.log("onSuccess => subscribe to sensors, triggers (temp) & positions");
-          client.subscribe("current/+/temp");
-          client.subscribe("current/+/watt");
           client.subscribe("sensors/+/temp");
           client.subscribe("sensors/+/watt");
         }
