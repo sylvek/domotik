@@ -14,7 +14,7 @@ public class Application {
 
   public static void main(String[] args) {
     var argsList = List.of(args);
-    var host = argsList.stream().findFirst().orElse("localhost");
+    var host = Optional.ofNullable(System.getenv("MQTT_HOST")).orElse("localhost");
     var prefix = (argsList.contains("--dev")) ? "test/" : "";
     var backup = Path.of(Optional.ofNullable(System.getenv("BACKUP_PATH")).orElse("/domotik/backup.json"));
 
