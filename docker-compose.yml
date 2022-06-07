@@ -4,28 +4,19 @@ services:
     depends_on:
       - mosquitto
     environment:
-      TZ: "Europe/Paris"
-    command: mosquitto
+      TZ: 'Europe/Paris'
   domotik-front:
     build: front
     ports:
       - 3000:3000
     depends_on:
       - mosquitto
-      - influxdb
-  domotik-bridge-to-influxdb:
-    build: bridge-to-influxdb
+  domotik-datastore:
+    build: datastore
     depends_on:
       - mosquitto
-      - influxdb
   mosquitto:
-    image: "jllopis/mosquitto:v1.4.14"
+    image: 'jllopis/mosquitto:v1.4.14'
     ports:
       - 1883:1883
       - 9883:9883
-  influxdb:
-    image: "influxdb:alpine"
-    ports:
-      - 8086:8086
-    volumes:
-      - ./influxdb-scripts:/docker-entrypoint-initdb.d
