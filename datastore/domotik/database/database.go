@@ -114,8 +114,8 @@ func (d *Database) AddSeries(
 	unit string,
 	value float32) error {
 
-	t := time.Now().UTC()
-	currentDayOfYear := time.Now().UTC().YearDay()
+	t := time.Now()
+	currentDayOfYear := time.Now().YearDay()
 
 	if currentDayOfYear != d.parameters.CurrentIndex {
 		d.parameters.CurrentIndex = currentDayOfYear
