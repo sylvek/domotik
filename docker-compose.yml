@@ -5,16 +5,24 @@ services:
       - mosquitto
     environment:
       TZ: 'Europe/Paris'
+    volumes:
+      - .:/domotik
   domotik-front:
     build: front
     ports:
       - 3000:3000
     depends_on:
       - mosquitto
+    volumes:
+      - .:/database
   domotik-datastore:
     build: datastore
     depends_on:
       - mosquitto
+    environment:
+      TZ: 'Europe/Paris'
+    volumes:
+      - .:/database
   mosquitto:
     image: 'jllopis/mosquitto:v1.4.14'
     ports:
