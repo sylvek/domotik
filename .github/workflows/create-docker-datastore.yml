@@ -1,11 +1,11 @@
-name: create docker bridge
+name: create docker datastore
 on:
   workflow_dispatch:
     branches:
       - master
 jobs:
   create-docker-bridge:
-    name: create docker Domotik Bridge
+    name: create docker Domotik Datastore
     runs-on: ubuntu-latest
     steps:
       - uses: docker/setup-qemu-action@v2
@@ -17,7 +17,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v2
         with:
-          context: '{{defaultContext}}:bridge-to-influxdb'
+          context: '{{defaultContext}}:datastore'
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/sylvek/domotik-bridge:latest
+          tags: ghcr.io/sylvek/domotik-datastore:latest

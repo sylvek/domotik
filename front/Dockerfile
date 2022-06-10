@@ -10,6 +10,6 @@ RUN apk --no-cache add git
 RUN npm install
 RUN node_modules/bower/bin/bower install --allow-root
 
-ENV INFLUX_DB=http://influxdb:8086/domotik
+ENV DB_PATH=/database
 EXPOSE 3000
 ENTRYPOINT ["npm", "start"]

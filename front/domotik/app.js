@@ -6,7 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var render = require('./routes/render');
-var api = require('./routes/influx');
+var api = require('./routes/sqlite');
 
 var app = express();
 

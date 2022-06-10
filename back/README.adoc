@@ -21,7 +21,7 @@ To deploy:
 ```
 ./mvnw package
 docker build -t domotik-back .
-docker run -d --name domotik-back --link mosquitto:mosquitto -e TZ="Europe/Paris" -v /var/cache/domotik/:/domotik domotik-back app.jar mosquitto
+docker run -d --name domotik-back --link mosquitto:mosquitto -e TZ="Europe/Paris" -v /var/cache/domotik/:/domotik domotik-back app.jar
 ```
 
 
