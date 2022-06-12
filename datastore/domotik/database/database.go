@@ -14,7 +14,7 @@ type Aggregation string
 
 const (
 	AVG Aggregation = "AVG"
-	SUM Aggregation = "SUM"
+	MAX Aggregation = "MAX"
 )
 
 const (
@@ -64,7 +64,7 @@ func NewDatabase(databasePath string) Database {
 		db:       prepareDatabase(databasePath + "/measures.db"),
 		volatile: true,
 		dailyOperations: []Operation{
-			{aggregate: SUM, from: "meanPerHour", to: "daily_power_consumption", unit: WATT}}}
+			{aggregate: MAX, from: "sumPerDay", to: "daily_power_consumption", unit: WATT}}}
 	instances["history"] = &Instance{
 		db:       prepareDatabase(databasePath + "/history.db"),
 		volatile: false}
@@ -91,7 +91,7 @@ func (d *Database) aggregation() {
 	for _, kind := range []string{"sensors", "measures"} {
 		for _, sensorsOperation := range d.instances[kind].dailyOperations {
 			sql := fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s'", sensorsOperation.aggregate, sensorsOperation.from)
-			err := d.instances[kind].db.QueryRow(sql + " AND ts>strftime('%s','now','start of day','-1 day') AND ts<strftime('%s','now','start of day','+1 hour')").Scan(&value)
+			err := d.instances[kind].db.QueryRow(sql + " AND ts>strftime('%s','now','start of day','-1 day') AND ts<strftime('%s','now','start of day')").Scan(&value)
 
 			if err == nil {
 				d.instances["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (strftime('%s','now','start of day','-1 day'), ?, ?, ?)",
