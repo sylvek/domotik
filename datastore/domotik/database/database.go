@@ -8,6 +8,8 @@ import (
 	"log"
 	"os"
 	"time"
+
+	_ "github.com/glebarez/go-sqlite"
 )
 
 type Aggregation string

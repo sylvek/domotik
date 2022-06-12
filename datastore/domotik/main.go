@@ -11,7 +11,6 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	_ "github.com/glebarez/go-sqlite"
 	database "github.com/sylvek/domotik/datastore/database"
 )
 
