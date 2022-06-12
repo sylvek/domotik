@@ -74,7 +74,9 @@ func connect(logs chan Log, mqttBroker string, kinds []string) (client mqtt.Clie
 	}
 
 	for _, kind := range kinds {
-		client.Subscribe(kind+"/#", 1, nil)
+		if !client.Subscribe(kind+"/#", 1, nil).WaitTimeout(5 * time.Second) {
+			panic(" - error - during subscription")
+		}
 	}
 	return client
 }

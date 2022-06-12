@@ -93,6 +93,10 @@ func (d *Database) aggregation() {
 			sql := fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s'", sensorsOperation.aggregate, sensorsOperation.from)
 			err := d.instances[kind].db.QueryRow(sql + " AND ts>strftime('%s','now','start of day','-1 day') AND ts<strftime('%s','now','start of day')").Scan(&value)
 
+			if err != nil {
+				log.Println(err)
+			}
+
 			if err == nil {
 				d.instances["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (strftime('%s','now','start of day','-1 day'), ?, ?, ?)",
 					sensorsOperation.to,
@@ -116,8 +120,6 @@ func (d *Database) AddSeries(
 
 	t := time.Now()
 
-	log.Printf("%s: %s -> %f (%s)\n", kind, name, value, unit)
-
 	db := d.instances[kind].db
 	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
 		t.Unix(),
@@ -132,7 +134,7 @@ func (d *Database) AddSeries(
 	if currentDayOfYear != d.parameters.CurrentIndex {
 		d.parameters.CurrentIndex = currentDayOfYear
 
-		log.Println("daily work is starting")
+		log.Printf("daily work is starting (%d)\n", currentDayOfYear)
 
 		d.synchronization()
 		d.aggregation()
