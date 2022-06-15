@@ -83,7 +83,9 @@ func (d *Database) Close() {
 func (d *Database) cleaning() {
 	for _, v := range d.instances {
 		if v.volatile {
-			v.db.Exec("DELETE FROM data where ts < strftime('%s','now', '-2 day')")
+			if _, err := v.db.Exec("DELETE FROM data where ts < strftime('%s','now', '-2 day')"); err != nil {
+				log.Println("cleaning", err)
+			}
 		}
 	}
 }
@@ -93,17 +95,15 @@ func (d *Database) aggregation() {
 	for _, kind := range []string{"sensors", "measures"} {
 		for _, sensorsOperation := range d.instances[kind].dailyOperations {
 			sql := fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s'", sensorsOperation.aggregate, sensorsOperation.from)
-			err := d.instances[kind].db.QueryRow(sql + " AND ts>strftime('%s','now','start of day','-1 day') AND ts<strftime('%s','now','start of day')").Scan(&value)
-
-			if err != nil {
-				log.Println(err)
-			}
-
-			if err == nil {
-				d.instances["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (strftime('%s','now','start of day','-1 day'), ?, ?, ?)",
+			if err := d.instances[kind].db.QueryRow(sql + " AND ts>strftime('%s','now','start of day','-1 day') AND ts<strftime('%s','now','start of day')").Scan(&value); err != nil {
+				log.Println("aggregation", "select", kind, err)
+			} else {
+				if _, err := d.instances["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (strftime('%s','now','start of day','-1 day'), ?, ?, ?)",
 					sensorsOperation.to,
 					sensorsOperation.unit,
-					value)
+					value); err != nil {
+					log.Println("aggregation", "history", kind, err)
+				}
 			}
 		}
 	}
