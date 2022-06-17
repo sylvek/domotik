@@ -150,7 +150,8 @@ func (d *Database) AddSeries(
 
 func prepareDatabase(entity string) (db *sql.DB) {
 	// https://www.sqlite.org/pragma.html#pragma_busy_timeout
-	db, err := sql.Open("sqlite", entity+"?_pragma=busy_timeout(5000)")
+	// https://www.sqlite.org/pragma.html#pragma_journal_mode
+	db, err := sql.Open("sqlite", entity+"?_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)")
 	if err != nil {
 		panic(err)
 	}
