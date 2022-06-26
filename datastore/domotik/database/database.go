@@ -17,11 +17,13 @@ type Aggregation string
 const (
 	AVG Aggregation = "AVG"
 	MAX Aggregation = "MAX"
+	SUM Aggregation = "SUM"
 )
 
 const (
-	WATT string = "watt"
-	TEMP string = "temp"
+	WATT  string = "watt"
+	TEMP  string = "temp"
+	LITER string = "liter"
 )
 
 type Operation struct {
@@ -66,7 +68,8 @@ func NewDatabase(databasePath string) Database {
 		db:       prepareDatabase(databasePath + "/measures.db"),
 		volatile: true,
 		dailyOperations: []Operation{
-			{aggregate: MAX, from: "sumPerDay", to: "daily_power_consumption", unit: WATT}}}
+			{aggregate: MAX, from: "sumPerDay", to: "daily_power_consumption", unit: WATT},
+			{aggregate: SUM, from: "waterPerDay", to: "daily_water_consumption", unit: LITER}}}
 	instances["history"] = &Instance{
 		db:       prepareDatabase(databasePath + "/history.db"),
 		volatile: false}
