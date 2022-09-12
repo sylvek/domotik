@@ -12,6 +12,8 @@ public class Application {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Application.class);
 
+  public static final long TICK_IN_SECONDS = 60;
+
   public static void main(String[] args) {
     var argsList = List.of(args);
     var host = Optional.ofNullable(System.getenv("MQTT_HOST")).orElse("localhost");

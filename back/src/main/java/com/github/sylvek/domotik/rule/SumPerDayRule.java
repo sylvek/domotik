@@ -1,5 +1,6 @@
 package com.github.sylvek.domotik.rule;
 
+import com.github.sylvek.domotik.Application;
 import com.github.sylvek.domotik.DomotikRulesEngine;
 import org.jeasy.rules.annotation.Action;
 import org.jeasy.rules.annotation.Condition;
@@ -25,7 +26,7 @@ public class SumPerDayRule extends BroadcastableAction {
     double newCurrentSumPerDay = currentConsumption + currentSumPerDay;
     facts.put("currentSumPerDay", newCurrentSumPerDay);
     this.broadcaster.broadcast(
-      "sensors/sumPerDay/watt",
-      Long.toString(Math.round(currentSumPerDay * 10 / 3_600.0)));
+        "sensors/sumPerDay/watt",
+        Long.toString(Math.round(currentSumPerDay * Application.TICK_IN_SECONDS / 3_600.0)));
   }
 }

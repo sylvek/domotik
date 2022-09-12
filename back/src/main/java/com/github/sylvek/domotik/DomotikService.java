@@ -22,8 +22,7 @@ public class DomotikService {
 
   public DomotikService(String host, String prefix) {
     this.prefix = prefix;
-    this.client =
-      Mqtt3Client.builder()
+    this.client = Mqtt3Client.builder()
         .identifier(UUID.randomUUID().toString())
         .serverHost(host)
         .buildBlocking();
@@ -46,22 +45,21 @@ public class DomotikService {
     LOGGER.info("connection: {}", client.connect().getReturnCode());
     var publishes = Mqtt3ReactorClient.from(client).publishes(MqttGlobalPublishFilter.SUBSCRIBED);
     publishes
-      .filter(p -> p.getTopic().toString().equals("sensors/esp12e/temp"))
-      .filter(p -> p.getPayload().isPresent())
-      .subscribe(e ->
-        client.publishWith()
-          .topic(prefix + "current/esp12e/temp")
-          .payload(e.getPayload().orElseThrow())
-          .retain(true)
-          .send());
+        .filter(p -> p.getTopic().toString().equals("sensors/esp12e/temp"))
+        .filter(p -> p.getPayload().isPresent())
+        .subscribe(e -> client.publishWith()
+            .topic(prefix + "current/esp12e/temp")
+            .payload(e.getPayload().orElseThrow())
+            .retain(true)
+            .send());
     publishes
-      .filter(p -> p.getTopic().toString().equals("sensors/linky/watt"))
-      .filter(p -> p.getPayload().isPresent())
-      .buffer(Duration.ofSeconds(10))
-      .map(e -> e.stream().mapToInt(f -> Integer.parseInt(new String(f.getPayloadAsBytes()))))
-      .subscribe(e -> this.consumptionListeners.forEach(action -> action.apply(e.average().orElse(0d))));
+        .filter(p -> p.getTopic().toString().equals("sensors/linky/watt"))
+        .filter(p -> p.getPayload().isPresent())
+        .buffer(Duration.ofSeconds(Application.TICK_IN_SECONDS))
+        .map(e -> e.stream().mapToInt(f -> Integer.parseInt(new String(f.getPayloadAsBytes()))))
+        .subscribe(e -> this.consumptionListeners.forEach(action -> action.apply(e.average().orElse(0d))));
     client.subscribeWith().topicFilter("sensors/#").send()
-      .getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
+        .getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
   }
 
   public void stop() {
