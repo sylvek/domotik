@@ -27,7 +27,7 @@ public class DetectNewHourRule extends BroadcastableAction {
     double currentSumPerHour = facts.get("currentSumPerHour");
     double currentNumberOfStatementPerHour = facts.get("currentNumberOfStatementPerHour");
     this.broadcaster.broadcast("measures/meanPerHour/watt",
-      Long.toString(Math.round(currentSumPerHour / currentNumberOfStatementPerHour)));
+        Long.toString(Math.round(currentSumPerHour / currentNumberOfStatementPerHour)), false);
     facts.put("currentSumPerHour", facts.get("consumption"));
     facts.put("currentNumberOfStatementPerHour", 1d);
   }

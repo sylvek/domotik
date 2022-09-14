@@ -27,7 +27,7 @@ public class DetectNewDayRule extends BroadcastableAction {
     facts.put("currentDay", getDay());
     double currentSumPerDay = facts.get("currentSumPerDay");
     this.broadcaster.broadcast("measures/sumPerDay/watt",
-        Long.toString(Math.round(currentSumPerDay * Application.TICK_IN_SECONDS / 3_600.0)));
+        Long.toString(Math.round(currentSumPerDay * Application.TICK_IN_SECONDS / 3_600.0)), false);
     facts.put("currentSumPerDay", 0d);
   }
 

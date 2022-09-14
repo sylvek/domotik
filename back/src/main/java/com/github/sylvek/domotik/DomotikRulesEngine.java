@@ -23,7 +23,7 @@ public class DomotikRulesEngine {
   private final Path backupPath;
 
   public interface Broadcaster {
-    void broadcast(String topic, String payload);
+    void broadcast(String topic, String payload, boolean retain);
   }
 
   private final Facts facts = new Facts();
@@ -35,14 +35,14 @@ public class DomotikRulesEngine {
     this.gson = new GsonBuilder().create();
 
     rules.register(
-      new DetectLowTariffRule(broadcaster),
-      new DetectHighTariffRule(broadcaster),
-      new DetectNewDayRule(broadcaster),
-      new DetectNewHourRule(broadcaster),
-      new SumPerDayRule(broadcaster),
-      new MeanPerHourRule(broadcaster),
-      new DetectHotWaterStartingRule(broadcaster),
-      new DetectHotWaterEndingRule(broadcaster));
+        new DetectLowTariffRule(broadcaster),
+        new DetectHighTariffRule(broadcaster),
+        new DetectNewDayRule(broadcaster),
+        new DetectNewHourRule(broadcaster),
+        new SumPerDayRule(broadcaster),
+        new MeanPerHourRule(broadcaster),
+        new DetectHotWaterStartingRule(broadcaster),
+        new DetectHotWaterEndingRule(broadcaster));
 
     restore();
   }

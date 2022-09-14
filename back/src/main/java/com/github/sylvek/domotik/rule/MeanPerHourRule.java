@@ -28,6 +28,7 @@ public class MeanPerHourRule extends BroadcastableAction {
     facts.put("currentSumPerHour", newCurrentSumPerHour);
     facts.put("currentNumberOfStatementPerHour", newCurrentNumberOfStatementPerHour);
     this.broadcaster.broadcast("sensors/meanPerHour/watt",
-        Long.toString(Math.round(newCurrentSumPerHour / newCurrentNumberOfStatementPerHour)));
+        Long.toString(Math.round(newCurrentSumPerHour / newCurrentNumberOfStatementPerHour)),
+        true);
   }
 }

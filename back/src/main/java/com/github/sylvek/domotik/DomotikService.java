@@ -28,9 +28,9 @@ public class DomotikService {
         .buildBlocking();
   }
 
-  public void publish(String topic, String payload) {
+  public void publish(String topic, String payload, boolean retain) {
     LOGGER.debug("publish: {} -> {}", topic, payload);
-    this.client.publishWith().topic(this.prefix + topic).payload(payload.getBytes()).send();
+    this.client.publishWith().topic(this.prefix + topic).payload(payload.getBytes()).retain(retain).send();
   }
 
   interface ConsumptionListener {
