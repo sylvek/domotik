@@ -35,8 +35,6 @@ public class DomotikRulesEngine {
     this.gson = new GsonBuilder().create();
 
     rules.register(
-        new DetectLowTariffRule(broadcaster),
-        new DetectHighTariffRule(broadcaster),
         new DetectNewDayRule(broadcaster),
         new DetectNewHourRule(broadcaster),
         new SumPerDayRule(broadcaster),
@@ -44,11 +42,20 @@ public class DomotikRulesEngine {
         new DetectHotWaterStartingRule(broadcaster),
         new DetectHotWaterEndingRule(broadcaster));
 
+    facts.put("consumption", 0);
+    facts.put("tariffLow", false);
+
     restore();
   }
 
-  public void fire(double mean) {
+  public void fireConsumption(double mean) {
     facts.put("consumption", mean);
+    rulesEngine.fire(rules, facts);
+    backup();
+  }
+
+  public void fireState(boolean state) {
+    facts.put("tariffLow", state);
     rulesEngine.fire(rules, facts);
     backup();
   }

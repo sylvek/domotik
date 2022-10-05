@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public class DomotikService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DomotikService.class);
 
-  private final List<ConsumptionListener> consumptionListeners = new ArrayList<>();
+  private final List<LinkyListener> linkyListeners = new ArrayList<>();
   private final String prefix;
   private final Mqtt3BlockingClient client;
 
@@ -33,12 +34,19 @@ public class DomotikService {
     this.client.publishWith().topic(this.prefix + topic).payload(payload.getBytes()).retain(retain).send();
   }
 
-  interface ConsumptionListener {
-    void apply(double mean);
+  interface LinkyListener {
+    void applyConsumption(double mean);
+
+    void applyState(boolean state);
   }
 
-  public void addConsumptionListener(ConsumptionListener c) {
-    this.consumptionListeners.add(c);
+  public void addConsumptionListener(LinkyListener c) {
+    this.linkyListeners.add(c);
+  }
+
+  public void start(LinkyListener c) {
+    this.addConsumptionListener(c);
+    start();
   }
 
   public void start() {
@@ -57,7 +65,12 @@ public class DomotikService {
         .filter(p -> p.getPayload().isPresent())
         .buffer(Duration.ofSeconds(Application.TICK_IN_SECONDS))
         .map(e -> e.stream().mapToInt(f -> Integer.parseInt(new String(f.getPayloadAsBytes()))))
-        .subscribe(e -> this.consumptionListeners.forEach(action -> action.apply(e.average().orElse(0d))));
+        .subscribe(e -> this.linkyListeners.forEach(action -> action.applyConsumption(e.average().orElse(0d))));
+    publishes
+        .filter(p -> p.getTopic().toString().equals("sensors/linky/state"))
+        .filter(p -> p.getPayload().isPresent())
+        .map(e -> Arrays.equals(e.getPayloadAsBytes(), "0".getBytes()))
+        .subscribe(e -> this.linkyListeners.forEach(action -> action.applyState(e)));
     client.subscribeWith().topicFilter("sensors/#").send()
         .getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
   }

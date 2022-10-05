@@ -17,8 +17,8 @@ public class DetectNewHourRule extends BroadcastableAction {
   }
 
   @Condition
-  public boolean when(@Fact("currentHour") double currentHour) {
-    return currentHour != getHour();
+  public boolean when(@Fact("currentHour") double currentHour, @Fact("consumption") double mean) {
+    return currentHour != getHour() && mean != 0;
   }
 
   @Action

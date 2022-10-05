@@ -3,6 +3,7 @@ package com.github.sylvek.domotik.rule;
 import com.github.sylvek.domotik.DomotikRulesEngine;
 import org.jeasy.rules.annotation.Action;
 import org.jeasy.rules.annotation.Condition;
+import org.jeasy.rules.annotation.Fact;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
@@ -14,8 +15,8 @@ public class MeanPerHourRule extends BroadcastableAction {
   }
 
   @Condition
-  public boolean when() {
-    return true;
+  public boolean when(@Fact("consumption") double mean) {
+    return mean != 0;
   }
 
   @Action

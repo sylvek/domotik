@@ -3,6 +3,8 @@ package com.github.sylvek.domotik;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.sylvek.domotik.DomotikService.LinkyListener;
+
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.List;
@@ -28,8 +30,19 @@ public class Application {
     var domotikService = new DomotikService(host, prefix);
     var domotikRulesEngine = new DomotikRulesEngine(backup, domotikService::publish);
 
-    domotikService.addConsumptionListener(domotikRulesEngine::fire);
-    domotikService.start();
+    domotikService.start(new LinkyListener() {
+
+      @Override
+      public void applyConsumption(double mean) {
+        domotikRulesEngine.fireConsumption(mean);
+      }
+
+      @Override
+      public void applyState(boolean state) {
+        domotikRulesEngine.fireState(state);
+      }
+
+    });
 
     Runtime.getRuntime().addShutdownHook(new Thread(() -> {
       domotikService.stop();
