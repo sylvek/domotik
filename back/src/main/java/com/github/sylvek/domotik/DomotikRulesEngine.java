@@ -57,6 +57,9 @@ public class DomotikRulesEngine {
 
   public void fireState(boolean state) {
     facts.put("tariffLow", state);
+    if (state) {
+      facts.put("hotWaterStartedAt", 0d);
+    }
     rulesEngine.fire(rules, facts);
     backup();
   }
