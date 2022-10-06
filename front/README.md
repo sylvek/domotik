@@ -17,13 +17,12 @@ $> node_modules/bower/bin/bower install
 
 ### run locally
 ```
-$> npm start
+$> DB_PATH=. npm start
 ```
 
 ## Run it
 
 ```
 $> docker build -t domotik-front .
-$> docker run -d --name influxdb influx
-$> docker run -d --name domotik-front -p 3000:3000 --link influxdb:influxdb domotik-front
+$> docker run -d --name domotik-front -p 3000:3000 -e DB_PATH=/ -v .:/ domotik-front
 ```
