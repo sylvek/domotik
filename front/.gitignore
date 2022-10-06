@@ -2,3 +2,4 @@ blacklist
 domotik/bower_components/
 domotik/node_modules/
 domotik/package-lock.json
+history.db*
