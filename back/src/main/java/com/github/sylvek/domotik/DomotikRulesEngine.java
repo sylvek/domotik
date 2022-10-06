@@ -43,9 +43,6 @@ public class DomotikRulesEngine {
         new DetectHotWaterEndingRule(broadcaster),
         new CurrentPriceRule(broadcaster));
 
-    facts.put("consumption", 0);
-    facts.put("tariffLow", false);
-
     restore();
   }
 
@@ -56,7 +53,7 @@ public class DomotikRulesEngine {
   }
 
   public void fireState(boolean state) {
-    facts.put("tariffLow", state);
+    facts.put("lowPrice", state);
     if (state) {
       facts.put("hotWaterStartedAt", 0d);
     }
@@ -81,7 +78,8 @@ public class DomotikRulesEngine {
       restore.forEach(facts::put);
     } catch (IOException e) {
       LOGGER.warn("unable to restore facts. default value loaded");
-      facts.put("tariffLow", false);
+      facts.put("consumption", 0);
+      facts.put("lowPrice", false);
       facts.put("currentDay", 0d);
       facts.put("currentHour", 0d);
       facts.put("currentSumPerDay", 0d);

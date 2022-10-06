@@ -17,9 +17,9 @@ public class DetectHotWaterStartingRule extends BroadcastableAction {
   }
 
   @Condition
-  public boolean when(@Fact("tariffLow") boolean isLow,
-                      @Fact("consumption") double mean,
-                      @Fact("hotWaterStartedAt") double started) {
+  public boolean when(@Fact("lowPrice") boolean isLow,
+      @Fact("consumption") double mean,
+      @Fact("hotWaterStartedAt") double started) {
     return isLow && mean > HOT_TANK_WATER_POWER && started == 0d;
   }
 

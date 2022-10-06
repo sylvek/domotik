@@ -24,9 +24,9 @@ public class CurrentPriceRule extends BroadcastableAction {
   public void then(Facts facts) {
     double currentConsumption = facts.get("consumption");
     double currentPrice = facts.get("currentPrice");
-    boolean tariffLow = facts.get("tariffLow");
+    boolean lowPrice = facts.get("lowPrice");
 
-    double currentSlotPrice = (tariffLow)
+    double currentSlotPrice = (lowPrice)
         ? (currentConsumption * 0.1457) / 60_000
         : (currentConsumption * 0.1963) / 60_000;
     double newCurrentPrice = currentPrice + currentSlotPrice;
