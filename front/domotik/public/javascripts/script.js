@@ -131,7 +131,7 @@
                 $scope.sum_watt_today = (payload / 1000).toFixed(2);
                 break;
               case 'euro':
-                $scope.sum_euro_today = (payload / 1000).toFixed(2);
+                $scope.sum_euro_today = payload;
                 break;
               default:
                 break;
@@ -152,6 +152,7 @@
           client.subscribe('current/+/watt');
           client.subscribe('sensors/+/temp');
           client.subscribe('sensors/+/watt');
+          client.subscribe('sensors/+/euro');
         },
       });
 
