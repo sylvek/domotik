@@ -1,0 +1,13 @@
+FROM balenalib/raspberry-pi-debian:stretch AS MAVEN_TOOL_CHAIN
+RUN apt-get update && apt-get upgrade && apt-get install -y curl
+RUN curl -SL https://archive.apache.org/dist/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz | tar -xzv
+RUN curl -SL https://cdn.azul.com/zulu-embedded/bin/zulu11.41.75-ca-jdk11.0.8-linux_aarch32hf.tar.gz | tar -xzv
+ENV JAVA_HOME=/zulu11.41.75-ca-jdk11.0.8-linux_aarch32hf
+COPY src /src
+COPY pom.xml /pom.xml
+RUN /apache-maven-3.6.3/bin/mvn package
+
+FROM balenalib/raspberry-pi-debian:stretch
+COPY --from=MAVEN_TOOL_CHAIN /zulu11.41.75-ca-jdk11.0.8-linux_aarch32hf /java
+COPY --from=MAVEN_TOOL_CHAIN /target/app.jar /app.jar
+ENTRYPOINT ["/java/bin/java", "-jar", "app.jar"]
