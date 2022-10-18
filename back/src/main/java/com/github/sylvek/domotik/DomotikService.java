@@ -1,5 +1,7 @@
 package com.github.sylvek.domotik;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
@@ -11,11 +13,14 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class DomotikService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DomotikService.class);
+
+  private static final Gson GSON = new GsonBuilder().create();
 
   private final List<LinkyListener> linkyListeners = new ArrayList<>();
   private final String prefix;
@@ -52,6 +57,27 @@ public class DomotikService {
   public void start() {
     LOGGER.info("connection: {}", client.connect().getReturnCode());
     var publishes = Mqtt3ReactorClient.from(client).publishes(MqttGlobalPublishFilter.SUBSCRIBED);
+    // --- we convert tele-transmitted data from tasmota devices into sensors topic
+    publishes
+        .filter(p -> p.getTopic().toString().startsWith("tele/"))
+        .filter(p -> p.getPayload().isPresent())
+        .subscribe(e -> {
+          var device = e.getTopic().toString().split("/")[1];
+          var AM2301 = (Map) GSON.fromJson(new String(e.getPayloadAsBytes()), Map.class).get("AM2301");
+          client.publishWith()
+              .topic(prefix + "sensors/" + device + "/temp")
+              .payload(Double.toString((double) AM2301.get("Temperature")).getBytes())
+              .retain(true).send();
+          client.publishWith()
+              .topic(prefix + "sensors/" + device + "/humidity")
+              .payload(Double.toString((double) AM2301.get("Humidity")).getBytes())
+              .retain(true).send();
+          client.publishWith()
+              .topic(prefix + "sensors/" + device + "/dewpoint")
+              .payload(Double.toString((double) AM2301.get("DewPoint")).getBytes())
+              .retain(true).send();
+        });
+    // --- should be removed as soon as possible
     publishes
         .filter(p -> p.getTopic().toString().equals("sensors/esp12e/temp"))
         .filter(p -> p.getPayload().isPresent())
@@ -60,6 +86,7 @@ public class DomotikService {
             .payload(e.getPayload().orElseThrow())
             .retain(true)
             .send());
+    // ---
     publishes
         .filter(p -> p.getTopic().toString().equals("sensors/linky/watt"))
         .filter(p -> p.getPayload().isPresent())
@@ -71,8 +98,12 @@ public class DomotikService {
         .filter(p -> p.getPayload().isPresent())
         .map(e -> Arrays.equals(e.getPayloadAsBytes(), "0".getBytes()))
         .subscribe(e -> this.linkyListeners.forEach(action -> action.applyState(e)));
-    client.subscribeWith().topicFilter("sensors/#").send()
-        .getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
+    // ---
+    client.subscribeWith()
+        .addSubscription().topicFilter("sensors/esp12e/temp").applySubscription()
+        .addSubscription().topicFilter("sensors/linky/+").applySubscription()
+        .addSubscription().topicFilter("tele/+/SENSOR").applySubscription()
+        .send().getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
   }
 
   public void stop() {
