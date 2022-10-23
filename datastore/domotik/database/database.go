@@ -62,8 +62,8 @@ func NewDatabase(databasePath string) Database {
 		db:       prepareDatabase(databasePath + "/sensors.db"),
 		volatile: true,
 		dailyOperations: []Operation{
-			{aggregate: AVG, from: "esp12e", to: "daily_temp_outside", unit: TEMP},
-			{aggregate: AVG, from: "esp8266", to: "daily_temp_inside", unit: TEMP}}}
+			{aggregate: AVG, from: "outside", to: "daily_temp_outside", unit: TEMP},
+			{aggregate: AVG, from: "living", to: "daily_temp_inside", unit: TEMP}}}
 	instances["measures"] = &Instance{
 		db:       prepareDatabase(databasePath + "/measures.db"),
 		volatile: true,

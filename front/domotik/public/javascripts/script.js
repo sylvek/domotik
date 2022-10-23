@@ -87,8 +87,6 @@
           console.log('Reconnecting... [' + new Date() + ']');
           client.connect({
             onSuccess: function () {
-              client.subscribe('current/+/temp');
-              client.subscribe('current/+/watt');
               client.subscribe('sensors/+/temp');
               client.subscribe('sensors/+/watt');
               client.subscribe('sensors/+/euro');
@@ -102,14 +100,14 @@
         var categories = topic.split('/');
         switch (categories[1]) {
           // room
-          case 'esp12e':
+          case 'outside':
             $scope.temp_outside = payload;
             break;
           // home
-          case 'esp8266':
+          case 'living':
             $scope.temp_living = payload;
             break;
-          case 'esp32':
+          case 'room':
             $scope.temp_room = payload;
             break;
           // power
@@ -123,8 +121,13 @@
             }
             break;
           case 'meanPerHour':
-            $scope.power_hour = (payload / 1000).toFixed(2);
-            break;
+            switch (categories[2]) {
+              case 'euro':
+                $scope.power_hour = (payload / 1000).toFixed(2);
+                break;
+              default:
+                break;
+            }
           case 'sumPerDay':
             switch (categories[2]) {
               case 'watt':
@@ -148,8 +151,6 @@
           console.log(
             'onSuccess => subscribe to sensors, triggers (temp) & positions'
           );
-          client.subscribe('current/+/temp');
-          client.subscribe('current/+/watt');
           client.subscribe('sensors/+/temp');
           client.subscribe('sensors/+/watt');
           client.subscribe('sensors/+/euro');

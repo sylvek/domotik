@@ -77,15 +77,6 @@ public class DomotikService {
               .payload(Double.toString((double) AM2301.get("DewPoint")).getBytes())
               .retain(true).send();
         });
-    // --- should be removed as soon as possible
-    publishes
-        .filter(p -> p.getTopic().toString().equals("sensors/esp12e/temp"))
-        .filter(p -> p.getPayload().isPresent())
-        .subscribe(e -> client.publishWith()
-            .topic(prefix + "current/esp12e/temp")
-            .payload(e.getPayload().orElseThrow())
-            .retain(true)
-            .send());
     // ---
     publishes
         .filter(p -> p.getTopic().toString().equals("sensors/linky/watt"))
@@ -100,7 +91,6 @@ public class DomotikService {
         .subscribe(e -> this.linkyListeners.forEach(action -> action.applyState(e)));
     // ---
     client.subscribeWith()
-        .addSubscription().topicFilter("sensors/esp12e/temp").applySubscription()
         .addSubscription().topicFilter("sensors/linky/+").applySubscription()
         .addSubscription().topicFilter("tele/+/SENSOR").applySubscription()
         .send().getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
