@@ -1,6 +1,6 @@
 FROM ghcr.io/sylvek/domotik-wallpapers:latest AS WALLPAPER
 
-FROM library/node:13-alpine
+FROM library/node:14-alpine
 COPY domotik /domotik
 COPY --from=WALLPAPER /img /domotik/public/img
 COPY --from=WALLPAPER /data.js /domotik/public/javascripts/data.js
