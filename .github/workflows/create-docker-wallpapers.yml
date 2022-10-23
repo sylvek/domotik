@@ -4,7 +4,7 @@ on:
     branches:
       - master
 jobs:
-  create-docker-front:
+  create-docker-wallpapers:
     name: create docker Domotik wallpapers
     runs-on: ubuntu-latest
     steps:
