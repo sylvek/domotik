@@ -1,0 +1,5 @@
+FROM sylvek/grafana-8.5.14:arm32v6
+USER root
+COPY grafana-backup.tgz /grafana-backup.tgz
+RUN tar xzf /grafana-backup.tgz
+RUN mv grafana /grafana-8.5.14/data
