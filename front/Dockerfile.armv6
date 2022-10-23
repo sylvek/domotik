@@ -1,0 +1,11 @@
+FROM library/node:14-alpine
+COPY domotik /domotik
+
+WORKDIR /domotik
+RUN apk --no-cache add git sqlite python3 make build-base
+RUN npm install --build-from-source
+RUN node_modules/bower/bin/bower install --allow-root
+
+ENV DB_PATH=/database
+EXPOSE 3000
+ENTRYPOINT ["npm", "start"]
