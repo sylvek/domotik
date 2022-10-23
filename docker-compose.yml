@@ -1,5 +1,5 @@
 services:
-  domotik-back:
+  back:
     build: back
     depends_on:
       - mosquitto
@@ -7,7 +7,7 @@ services:
       TZ: 'Europe/Paris'
     volumes:
       - .:/domotik
-  domotik-front:
+  front:
     build: front
     ports:
       - 3000:3000
@@ -15,7 +15,7 @@ services:
       - mosquitto
     volumes:
       - .:/database
-  domotik-datastore:
+  datastore:
     build: datastore
     depends_on:
       - mosquitto
@@ -24,7 +24,17 @@ services:
     volumes:
       - .:/database
   mosquitto:
-    image: 'jllopis/mosquitto:v1.4.14'
+    build: mosquitto-image-with-websocket
     ports:
       - 1883:1883
       - 9883:9883
+  grafana:
+    build: grafana
+    ports:
+      - 3333:3000
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: true
+    depends_on:
+      - datastore
+    volumes:
+      - .:/database

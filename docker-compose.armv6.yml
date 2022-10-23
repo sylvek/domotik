@@ -1,0 +1,41 @@
+services:
+  mosquitto:
+    image: sylvek/mosquitto-1.5:arm32v6
+    ports:
+      - 1883:1883
+      - 9883:9883
+  datastore:
+    image: sylvek/domotik-datastore:arm32v6
+    volumes:
+      - /home/pi/domotik:/database
+    depends_on:
+      - mosquitto
+  back:
+    image: sylvek/domotik-back:arm32v6
+    volumes:
+      - /home/pi/domotik:/domotik
+    environment:
+      - MQTT_HOST=mosquitto
+      - TZ="Europe/Paris"
+    depends_on:
+      - mosquitto
+  front:
+    image: sylvek/domotik-front:arm32v6
+    ports:
+      - 80:3000
+    volumes:
+      - /home/pi/domotik:/database
+    depends_on:
+      - datastore
+      - mosquitto
+  grafana:
+    image: sylvek/domotik-grafana:arm32v6
+    ports:
+      - 3000:3000
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: true
+    depends_on:
+      - datastore
+    volumes:
+      - /home/pi/domotik:/database
+      - /home/pi/grafana:/grafana-8.5.14/data
