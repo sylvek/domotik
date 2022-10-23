@@ -42,6 +42,7 @@ Basically, everything was running on a raspberry pi 0/1.
 ### On AMD64/ARM64
 
 ```
+> wget https://raw.githubusercontent.com/sylvek/domotik/master/docker-compose.yml
 > docker compose up
 
 > #open http://localhost:3000 for the TV show
@@ -56,6 +57,9 @@ Basically, everything was running on a raspberry pi 0/1.
 ### On Raspberry Pi Zero/1 (armhf)
 
 ```
+> mkdir /home/pi/domotik
+> mkdir /home/pi/grafana <- (optional)
+> https://raw.githubusercontent.com/sylvek/domotik/master/docker-compose.armv6.yml
 > docker compose -f docker-compose.armv6 up
 ```
 
