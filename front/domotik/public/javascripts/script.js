@@ -1,5 +1,5 @@
 (function (angular) {
-  var app = angular.module('domotikApp', ['ngtweet']);
+  var app = angular.module('domotikApp', []);
   var magical = {
     0: 90000,
     1: 60000,
@@ -45,7 +45,7 @@
     }
 
     function quote() {
-      return $http.get('http://quotes.rest/qod.json');
+      return $http.get('https://quotes.rest/qod.json');
     }
   });
 
@@ -176,10 +176,7 @@
         $scope.title = wallpaper.title;
       };
 
-      var twitter = function () {
-        // twitter
-        // https://github.com/arusahni/ngtweet/issues/30
-        // took too much CPU.
+      var infos = function () {
         $scope.slug = '';
         var now = new Date();
         if (
@@ -298,7 +295,7 @@
       ephemeride();
       quote();
       wallpaper();
-      twitter();
+      infos();
 
       // clock
       var timeController = this;

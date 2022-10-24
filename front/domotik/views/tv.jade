@@ -6,7 +6,6 @@ html(ng-app='domotikApp')
     link(rel='stylesheet', href='stylesheets/style.css')
     script(src='bower_components/angular/angular.min.js')
     script(src='bower_components/bower-mqttws/mqttws31.js')
-    script(src='bower_components/ngtweet/dist/ngtweet.min.js')
     script(src='bower_components/ephemeris/src/ephemeris.min.js')
     script(src='javascripts/data.js')
     script(src='javascripts/script.js')
@@ -78,25 +77,5 @@ html(ng-app='domotikApp')
             tr
               th sur 30 jours
               td(class="{{consumption_scoring_last_30_days}}") {{mean_watt_last_30_days}} kWh
-
-        div#right
-          twitter-timeline(
-                ng-if="slug == 'beauty'"
-                twitter-timeline-type='list'
-                twitter-timeline-owner-screen-name='"sylv3k"'
-                twitter-timeline-slug='"beauty"'
-                twitter-timeline-options='{"tweetLimit": 2, "theme": "light", "chrome": "noheader nofooter noborders"}')
-          twitter-timeline(
-                ng-if="slug == 'transilien'"
-                twitter-timeline-type='list'
-                twitter-timeline-owner-screen-name='"sylv3k"'
-                twitter-timeline-slug='"transilien"'
-                twitter-timeline-options='{"tweetLimit": 6, "theme": "light", "chrome": "noheader nofooter noborders"}')
-          twitter-timeline(
-                ng-if="slug == 'news'"
-                twitter-timeline-type='list'
-                twitter-timeline-owner-screen-name='"sylv3k"'
-                twitter-timeline-slug='"news"'
-                twitter-timeline-options='{"tweetLimit": 2, "theme": "light", "chrome": "noheader nofooter noborders"}')
 
         div#title {{ title }}

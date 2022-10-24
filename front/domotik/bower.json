@@ -2,21 +2,12 @@
   "name": "domotik",
   "version": "0.0.0",
   "homepage": "https://github.com/sylvek/domotik",
-  "authors": [
-    "smaucourt@gmail.com"
-  ],
+  "authors": ["smaucourt@gmail.com"],
   "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
+  "ignore": ["**/.*", "node_modules", "bower_components", "test", "tests"],
   "dependencies": {
     "angular": "^1.4.x",
     "bower-mqttws": "^1.0.x",
-    "ngtweet": "0.6.1",
     "ephemeris": "v.1.0.1"
   }
 }
