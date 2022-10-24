@@ -122,7 +122,7 @@
             break;
           case 'meanPerHour':
             switch (categories[2]) {
-              case 'euro':
+              case 'watt':
                 $scope.power_hour = (payload / 1000).toFixed(2);
                 break;
               default:
