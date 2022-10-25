@@ -97,7 +97,10 @@ func (d *Database) aggregation() {
 	var value float64
 	for _, kind := range []string{"sensors", "measures"} {
 		for _, sensorsOperation := range d.instances[kind].dailyOperations {
-			sql := fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s'", sensorsOperation.aggregate, sensorsOperation.from)
+			sql := fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s' AND unit='%s'",
+				sensorsOperation.aggregate,
+				sensorsOperation.from,
+				sensorsOperation.unit)
 			if err := d.instances[kind].db.QueryRow(sql + " AND ts>strftime('%s','now','start of day','-1 day') AND ts<strftime('%s','now','start of day')").Scan(&value); err != nil {
 				log.Println("aggregation", "select", kind, err)
 			} else {
