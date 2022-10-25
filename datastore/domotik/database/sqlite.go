@@ -39,7 +39,7 @@ type Instance struct {
 	volatile        bool
 }
 
-type Database struct {
+type SqliteClient struct {
 	databasePath string
 	parameters   Parameters
 	instances    map[string]*Instance
@@ -49,7 +49,7 @@ type Parameters struct {
 	CurrentIndex int
 }
 
-func NewDatabase(databasePath string) Database {
+func NewSqliteClient(databasePath string) Database {
 
 	parameters := Parameters{}
 	data, err := ioutil.ReadFile(databasePath + "/database.json")
@@ -74,16 +74,19 @@ func NewDatabase(databasePath string) Database {
 		db:       prepareDatabase(databasePath + "/history.db"),
 		volatile: false}
 
-	return Database{databasePath: databasePath, parameters: parameters, instances: instances}
+	return &SqliteClient{
+		databasePath: databasePath,
+		parameters:   parameters,
+		instances:    instances}
 }
 
-func (d *Database) Close() {
+func (d *SqliteClient) Close() {
 	for _, v := range d.instances {
 		v.db.Close()
 	}
 }
 
-func (d *Database) cleaning() {
+func (d *SqliteClient) cleaning() {
 	for _, v := range d.instances {
 		if v.volatile {
 			if _, err := v.db.Exec("DELETE FROM data where ts < strftime('%s','now', '-2 day')"); err != nil {
@@ -93,7 +96,7 @@ func (d *Database) cleaning() {
 	}
 }
 
-func (d *Database) aggregation() {
+func (d *SqliteClient) aggregation() {
 	var value float64
 	for _, kind := range []string{"sensors", "measures"} {
 		for _, sensorsOperation := range d.instances[kind].dailyOperations {
@@ -115,20 +118,20 @@ func (d *Database) aggregation() {
 	}
 }
 
-func (d *Database) synchronization() {
+func (d *SqliteClient) synchronization() {
 	p, _ := json.Marshal(d.parameters)
 	os.WriteFile(d.databasePath+"/database.json", p, 0644)
 }
 
-func (d *Database) AddSeries(
-	kind string,
+func (d *SqliteClient) AddSeries(
+	topic string,
 	name string,
 	unit string,
 	value float32) error {
 
 	t := time.Now()
 
-	db := d.instances[kind].db
+	db := d.instances[topic].db
 	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
 		t.Unix(),
 		name,
