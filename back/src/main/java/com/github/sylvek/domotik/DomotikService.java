@@ -31,6 +31,7 @@ public class DomotikService {
     this.client = Mqtt3Client.builder()
         .identifier(UUID.randomUUID().toString())
         .serverHost(host)
+        .automaticReconnectWithDefaultConfig()
         .buildBlocking();
   }
 
