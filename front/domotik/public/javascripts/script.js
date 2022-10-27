@@ -128,6 +128,7 @@
               default:
                 break;
             }
+            break;
           case 'sumPerDay':
             switch (categories[2]) {
               case 'watt':
