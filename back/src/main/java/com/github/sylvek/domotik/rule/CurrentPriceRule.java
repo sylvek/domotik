@@ -6,14 +6,15 @@ import org.jeasy.rules.annotation.Fact;
 import org.jeasy.rules.annotation.Rule;
 import org.jeasy.rules.api.Facts;
 
-import com.github.sylvek.domotik.Application;
 import com.github.sylvek.domotik.DomotikRulesEngine.Broadcaster;
 
 @Rule(name = "currentPrice", description = "calculate current daily price", priority = 4)
 public class CurrentPriceRule extends BroadcastableAction {
 
-  public static final double KWH_LOW_PRICE = 0.1457;
-  public static final double KWH_HIGH_PRICE = 0.1963;
+  public static final double KWH = 1_000.0;
+  public static final double MINUTES = 60.0;
+  public static final double WMIN_LOW_PRICE = 0.1457 / KWH / MINUTES;
+  public static final double WMIN_HIGH_PRICE = 0.1963 / KWH / MINUTES;
 
   public CurrentPriceRule(Broadcaster broadcaster) {
     super(broadcaster);
@@ -31,8 +32,8 @@ public class CurrentPriceRule extends BroadcastableAction {
     boolean lowPrice = facts.get("lowPrice");
 
     double currentSlotPrice = (lowPrice)
-        ? (currentConsumption * KWH_LOW_PRICE) / Application.TICK_IN_SECONDS * 1_000
-        : (currentConsumption * KWH_HIGH_PRICE) / Application.TICK_IN_SECONDS * 1_000;
+        ? currentConsumption * WMIN_LOW_PRICE
+        : currentConsumption * WMIN_HIGH_PRICE;
     double newCurrentPrice = currentPrice + currentSlotPrice;
     facts.put("currentPrice", newCurrentPrice);
     this.broadcaster.broadcast("sensors/sumPerDay/euro",
