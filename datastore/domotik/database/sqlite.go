@@ -24,6 +24,7 @@ const (
 	WATT  string = "watt"
 	TEMP  string = "temp"
 	LITER string = "liter"
+	RATE  string = "rate"
 )
 
 type Operation struct {
@@ -69,6 +70,7 @@ func NewSqliteClient(databasePath string) Database {
 		volatile: true,
 		dailyOperations: []Operation{
 			{aggregate: MAX, from: "sumPerDay", to: "daily_power_consumption", unit: WATT},
+			{aggregate: MAX, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE},
 			{aggregate: SUM, from: "waterPerDay", to: "daily_water_consumption", unit: LITER}}}
 	instances["history"] = &Instance{
 		db:       prepareDatabase(databasePath + "/history.db"),
