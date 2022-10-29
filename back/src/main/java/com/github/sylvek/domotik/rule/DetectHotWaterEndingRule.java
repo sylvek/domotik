@@ -29,12 +29,12 @@ public class DetectHotWaterEndingRule extends BroadcastableAction {
   public void then(Facts facts) {
     double startedAt = facts.get("hotWaterStartedAt");
     var delay = (System.currentTimeMillis() - startedAt) / 60_000;
-    this.broadcaster.broadcast("measures/tankHotWaterPerDay/min", Long.toString((long) delay), false);
+    this.broadcaster.broadcast("sensors/tankHotWaterPerDay/min", Long.toString((long) delay), false);
 
     var dt = 2.13 * delay * TEMP_MAX / 1_000;
     var temp = TEMP_MAX - dt;
     var consumed = ((TANK_CAPACITY * temp) - 12_000) / (TEMP_MIN - TEMP_MAX);
-    this.broadcaster.broadcast("measures/waterPerDay/liter",
+    this.broadcaster.broadcast("sensors/waterPerDay/liter",
         Double.toString(Math.round(consumed * 100) / 100.0), false);
 
     facts.put("hotWaterStartedAt", -1d);

@@ -57,5 +57,5 @@ func (c *MqttClient) Disconnect() {
 }
 
 func NewMQTTBrokerClient(host string, port int) BrokerClient {
-	return &MqttClient{mqttBroker: fmt.Sprintf("tcp://%s:%d", host, port), topics: []string{"sensors", "measures"}}
+	return &MqttClient{mqttBroker: fmt.Sprintf("tcp://%s:%d", host, port), topics: []string{"sensors"}}
 }

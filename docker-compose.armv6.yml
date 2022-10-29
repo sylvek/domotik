@@ -8,6 +8,8 @@ services:
     image: sylvek/domotik-datastore:arm32v6
     volumes:
       - /home/pi/domotik:/database
+    environment:
+      - TZ="Europe/Paris"
     depends_on:
       - mosquitto
   back:
