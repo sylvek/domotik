@@ -109,14 +109,14 @@ func (d *SqliteClient) aggregation() {
 					sensorsOperation.aggregate,
 					sensorsOperation.from,
 					sensorsOperation.unit)
-				sql += " AND ts>strftime('%s','now','start of day','-1 day', '" + offset + " hours') AND ts<strftime('%s','now','start of day', '" + offset + " hours')"
+				sql += " AND ts>strftime('%s','now','start of day','" + offset + " hours') AND ts<strftime('%s','now')"
 				if sensorsOperation.aggregate == LAST {
 					sql += " ORDER BY ts DESC LIMIT 1"
 				}
 				if err := v.db.QueryRow(sql).Scan(&value); err != nil {
 					log.Println("aggregation", "select", sensorsOperation, err)
 				} else {
-					if _, err := d.instances["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (strftime('%s','now','start of day','-1 day'), ?, ?, ?)",
+					if _, err := d.instances["history"].db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (strftime('%s','now','start of day'), ?, ?, ?)",
 						sensorsOperation.to,
 						sensorsOperation.unit,
 						value); err != nil {
@@ -142,17 +142,6 @@ func (d *SqliteClient) AddSeries(
 
 	t := time.Now()
 
-	db := d.instances[topic].db
-	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
-		// Grafana requires that data is stored in UTC
-		t.Unix(),
-		name,
-		unit,
-		value)
-	if err != nil {
-		return err
-	}
-
 	currentDayOfYear := t.YearDay()
 	if currentDayOfYear != d.parameters.CurrentIndex {
 		d.parameters.CurrentIndex = currentDayOfYear
@@ -164,6 +153,17 @@ func (d *SqliteClient) AddSeries(
 		d.cleaning()
 
 		log.Println("daily work is finished")
+	}
+
+	db := d.instances[topic].db
+	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
+		// Grafana requires that data is stored in UTC
+		t.Unix(),
+		name,
+		unit,
+		value)
+	if err != nil {
+		return err
 	}
 
 	return nil
