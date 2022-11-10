@@ -42,6 +42,7 @@ Basically, everything was running on a raspberry pi 0/1.
 ### On AMD64/ARM64
 
 ```
+> mkdir domotik
 > wget https://raw.githubusercontent.com/sylvek/domotik/master/docker-compose.yml
 > docker compose up
 
@@ -58,8 +59,8 @@ Basically, everything was running on a raspberry pi 0/1.
 
 ```
 > mkdir /home/pi/domotik
-> https://raw.githubusercontent.com/sylvek/domotik/master/docker-compose.armv6.yml
-> docker compose -f docker-compose.armv6 up
+> wget https://raw.githubusercontent.com/sylvek/domotik/master/docker-compose.armv6.yml
+> docker compose -f docker-compose.armv6.yml up
 ```
 
 ## Use it
