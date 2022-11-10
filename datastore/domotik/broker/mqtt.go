@@ -30,7 +30,7 @@ func (c *MqttClient) ConnectAndListen(logs chan Log) {
 	opts.OnConnect = func(client mqtt.Client) {
 		log.Println("status: connected")
 		for _, topic := range c.topics {
-			if token := client.Subscribe(topic+"/+/+", 1, nil); token.Wait() && token.Error() != nil {
+			if token := client.Subscribe(topic, 1, nil); token.Wait() && token.Error() != nil {
 				panic(token.Error())
 			}
 			log.Printf("topic [%s] subscribed", topic)
@@ -57,5 +57,5 @@ func (c *MqttClient) Disconnect() {
 }
 
 func NewMQTTBrokerClient(host string, port int) BrokerClient {
-	return &MqttClient{mqttBroker: fmt.Sprintf("tcp://%s:%d", host, port), topics: []string{"sensors"}}
+	return &MqttClient{mqttBroker: fmt.Sprintf("tcp://%s:%d", host, port), topics: []string{"sensors/+/+"}}
 }
