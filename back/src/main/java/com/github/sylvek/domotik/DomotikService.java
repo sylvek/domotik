@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.LongStream;
 
 public class DomotikService {
 
@@ -80,24 +81,37 @@ public class DomotikService {
         });
     // ---
     publishes
-        .filter(p -> p.getTopic().toString().equals("sensors/linky/watt"))
+        .filter(p -> p.getTopic().toString().equals("sensors/linky/indice"))
         .filter(p -> p.getPayload().isPresent())
         .buffer(Duration.ofSeconds(Application.TICK_IN_SECONDS))
-        .map(e -> e.stream().mapToInt(f -> Integer.parseInt(new String(f.getPayloadAsBytes()))))
-        .subscribe(e -> this.linkyListeners.forEach(action -> action.applyConsumption(e.average().orElse(0d))));
+        .map(e -> e.stream().mapToLong(f -> Long.parseLong(new String(f.getPayloadAsBytes()))))
+        .subscribe(
+            e -> this.linkyListeners.forEach(action -> action.applyConsumption(wattHourFromIndices(e))));
     publishes
         .filter(p -> p.getTopic().toString().equals("sensors/linky/state"))
         .filter(p -> p.getPayload().isPresent())
         .map(e -> Arrays.equals(e.getPayloadAsBytes(), "0".getBytes()))
         .subscribe(e -> this.linkyListeners.forEach(action -> action.applyState(e)));
     // ---
-    client.subscribeWith()
-        .addSubscription().topicFilter("sensors/linky/+").applySubscription()
+    if (client.subscribeWith()
+        .addSubscription().topicFilter("sensors/linky/indice").applySubscription()
+        .addSubscription().topicFilter("sensors/linky/state").applySubscription()
         .addSubscription().topicFilter("tele/+/SENSOR").applySubscription()
-        .send().getReturnCodes().forEach(s -> LOGGER.info("subscription: {}", s));
+        .send().getReturnCodes().stream().allMatch(s -> !s.isError())) {
+      LOGGER.info("listening is started");
+    } else {
+      throw new RuntimeException("unable to listen topics");
+    }
   }
 
   public void stop() {
     client.disconnect();
+  }
+
+  private static double wattHourFromIndices(LongStream values) {
+    // watt consumed in TICK_IN_SECONDS -> we have to convert it into wh
+    var elements = values.toArray();
+    Arrays.sort(elements);
+    return (elements[elements.length - 1] - elements[0]) * 3600.0 / Application.TICK_IN_SECONDS;
   }
 }
