@@ -28,7 +28,7 @@ public class SumPerDayRule extends BroadcastableAction {
     facts.put("currentSumPerDay", newCurrentSumPerDay);
     this.broadcaster.broadcast(
         "sensors/sumPerDay/watt",
-        Long.toString(Math.round(currentSumPerDay * Application.TICK_IN_SECONDS / 3_600.0)),
+        Long.toString(Math.round(newCurrentSumPerDay * Application.TICK_IN_SECONDS / 3_600.0)),
         true);
   }
 }
