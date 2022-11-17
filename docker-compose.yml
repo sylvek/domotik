@@ -8,7 +8,7 @@ services:
     volumes:
       - .:/domotik
   front:
-    build: ghcr.io/sylvek/domotik-front
+    image: ghcr.io/sylvek/domotik-front
     ports:
       - 3000:3000
     depends_on:
@@ -16,7 +16,7 @@ services:
     volumes:
       - .:/database
   datastore:
-    build: ghcr.io/sylvek/domotik-datastore
+    image: ghcr.io/sylvek/domotik-datastore
     depends_on:
       - mosquitto
     environment:
@@ -24,12 +24,12 @@ services:
     volumes:
       - .:/database
   mosquitto:
-    build: ghcr.io/sylvek/mosquitto
+    image: ghcr.io/sylvek/mosquitto
     ports:
       - 1883:1883
       - 9883:9883
   grafana:
-    build: ghcr.io/sylvek/domotik-grafana
+    image: ghcr.io/sylvek/domotik-grafana
     ports:
       - 3333:3000
     environment:
