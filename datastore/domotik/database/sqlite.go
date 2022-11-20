@@ -15,17 +15,19 @@ import (
 type Aggregation string
 
 const (
-	AVG  Aggregation = "AVG"
-	MAX  Aggregation = "MAX"
-	SUM  Aggregation = "SUM"
-	LAST Aggregation = ""
+	AVG   Aggregation = "AVG(value)"
+	MAX   Aggregation = "MAX(value)"
+	SUM   Aggregation = "SUM(value)"
+	LAST  Aggregation = "(value)"
+	DELTA Aggregation = "MAX(value) - MIN(value)"
 )
 
 const (
-	WATT  string = "watt"
-	TEMP  string = "temp"
-	LITER string = "liter"
-	RATE  string = "rate"
+	WATT   string = "watt"
+	TEMP   string = "temp"
+	LITER  string = "liter"
+	RATE   string = "rate"
+	INDICE string = "indice"
 )
 
 type Operation struct {
@@ -66,7 +68,7 @@ func NewSqliteClient(databasePath string) Database {
 		dailyOperations: []Operation{
 			{aggregate: AVG, from: "outside", to: "daily_temp_outside", unit: TEMP},
 			{aggregate: AVG, from: "living", to: "daily_temp_inside", unit: TEMP},
-			{aggregate: LAST, from: "sumPerDay", to: "daily_power_consumption", unit: WATT},
+			{aggregate: DELTA, from: "sumPerDay", to: "daily_power_consumption", unit: INDICE},
 			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE},
 			{aggregate: SUM, from: "waterPerDay", to: "daily_water_consumption", unit: LITER}}}
 	instances["history"] = &Instance{
@@ -105,7 +107,7 @@ func (d *SqliteClient) aggregation() {
 	for _, v := range d.instances {
 		if v.dailyOperations != nil {
 			for _, sensorsOperation := range v.dailyOperations {
-				sql := fmt.Sprintf("SELECT %s(value) FROM data WHERE name='%s' AND unit='%s'",
+				sql := fmt.Sprintf("SELECT %s FROM data WHERE name='%s' AND unit='%s'",
 					sensorsOperation.aggregate,
 					sensorsOperation.from,
 					sensorsOperation.unit)
