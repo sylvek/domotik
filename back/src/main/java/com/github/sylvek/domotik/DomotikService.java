@@ -65,19 +65,29 @@ public class DomotikService {
         .filter(p -> p.getPayload().isPresent())
         .subscribe(e -> {
           var device = e.getTopic().toString().split("/")[1];
-          var AM2301 = (Map) GSON.fromJson(new String(e.getPayloadAsBytes()), Map.class).get("AM2301");
-          client.publishWith()
-              .topic(prefix + "sensors/" + device + "/temp")
-              .payload(Double.toString((double) AM2301.get("Temperature")).getBytes())
-              .retain(true).send();
-          client.publishWith()
-              .topic(prefix + "sensors/" + device + "/humidity")
-              .payload(Double.toString((double) AM2301.get("Humidity")).getBytes())
-              .retain(true).send();
-          client.publishWith()
-              .topic(prefix + "sensors/" + device + "/dewpoint")
-              .payload(Double.toString((double) AM2301.get("DewPoint")).getBytes())
-              .retain(true).send();
+          var payload = (Map) GSON.fromJson(new String(e.getPayloadAsBytes()), Map.class);
+          var AM2301 = (Map) payload.get("AM2301");
+          if (AM2301 != null) {
+            client.publishWith()
+                .topic(prefix + "sensors/" + device + "/temp")
+                .payload(Double.toString((double) AM2301.get("Temperature")).getBytes())
+                .retain(true).send();
+            client.publishWith()
+                .topic(prefix + "sensors/" + device + "/humidity")
+                .payload(Double.toString((double) AM2301.get("Humidity")).getBytes())
+                .retain(true).send();
+            client.publishWith()
+                .topic(prefix + "sensors/" + device + "/dewpoint")
+                .payload(Double.toString((double) AM2301.get("DewPoint")).getBytes())
+                .retain(true).send();
+          }
+          var DS18B20 = (Map) payload.get("DS18B20");
+          if (DS18B20 != null) {
+            client.publishWith()
+                .topic(prefix + "sensors/" + device + "/temp")
+                .payload(Double.toString((double) DS18B20.get("Temperature")).getBytes())
+                .retain(true).send();
+          }
         });
     // ---
     publishes
