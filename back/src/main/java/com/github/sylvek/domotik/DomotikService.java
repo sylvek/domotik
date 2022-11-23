@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.hivemq.client.mqtt.MqttGlobalPublishFilter;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3BlockingClient;
 import com.hivemq.client.mqtt.mqtt3.Mqtt3Client;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import com.hivemq.client.mqtt.mqtt3.reactor.Mqtt3ReactorClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,32 +64,7 @@ public class DomotikService {
     publishes
         .filter(p -> p.getTopic().toString().startsWith("tele/"))
         .filter(p -> p.getPayload().isPresent())
-        .subscribe(e -> {
-          var device = e.getTopic().toString().split("/")[1];
-          var payload = (Map) GSON.fromJson(new String(e.getPayloadAsBytes()), Map.class);
-          var AM2301 = (Map) payload.get("AM2301");
-          if (AM2301 != null) {
-            client.publishWith()
-                .topic(prefix + "sensors/" + device + "/temp")
-                .payload(Double.toString((double) AM2301.get("Temperature")).getBytes())
-                .retain(true).send();
-            client.publishWith()
-                .topic(prefix + "sensors/" + device + "/humidity")
-                .payload(Double.toString((double) AM2301.get("Humidity")).getBytes())
-                .retain(true).send();
-            client.publishWith()
-                .topic(prefix + "sensors/" + device + "/dewpoint")
-                .payload(Double.toString((double) AM2301.get("DewPoint")).getBytes())
-                .retain(true).send();
-          }
-          var DS18B20 = (Map) payload.get("DS18B20");
-          if (DS18B20 != null) {
-            client.publishWith()
-                .topic(prefix + "sensors/" + device + "/temp")
-                .payload(Double.toString((double) DS18B20.get("Temperature")).getBytes())
-                .retain(true).send();
-          }
-        });
+        .subscribe(e -> translateTasmotaData(e));
     // ---
     publishes
         .filter(p -> p.getTopic().toString().equals("sensors/linky/indice"))
@@ -116,6 +92,33 @@ public class DomotikService {
 
   public void stop() {
     client.disconnect();
+  }
+
+  private void translateTasmotaData(Mqtt3Publish e) {
+    var device = e.getTopic().toString().split("/")[1];
+    var payload = (Map) GSON.fromJson(new String(e.getPayloadAsBytes()), Map.class);
+    var AM2301 = (Map) payload.get("AM2301");
+    if (AM2301 != null) {
+      client.publishWith()
+          .topic(prefix + "sensors/" + device + "/temp")
+          .payload(Double.toString((double) AM2301.get("Temperature")).getBytes())
+          .retain(true).send();
+      client.publishWith()
+          .topic(prefix + "sensors/" + device + "/humidity")
+          .payload(Double.toString((double) AM2301.get("Humidity")).getBytes())
+          .retain(true).send();
+      client.publishWith()
+          .topic(prefix + "sensors/" + device + "/dewpoint")
+          .payload(Double.toString((double) AM2301.get("DewPoint")).getBytes())
+          .retain(true).send();
+    }
+    var DS18B20 = (Map) payload.get("DS18B20");
+    if (DS18B20 != null) {
+      client.publishWith()
+          .topic(prefix + "sensors/" + device + "/temp")
+          .payload(Double.toString((double) DS18B20.get("Temperature")).getBytes())
+          .retain(true).send();
+    }
   }
 
   private static double wattHourFromIndices(LongStream values) {
