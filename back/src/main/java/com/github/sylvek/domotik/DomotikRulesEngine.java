@@ -79,7 +79,7 @@ public class DomotikRulesEngine {
       restore.forEach(facts::put);
     } catch (IOException e) {
       LOGGER.warn("unable to restore facts. default value loaded");
-      facts.put("consumption", 0);
+      facts.put("consumption", 0d);
       facts.put("lowPrice", false);
       facts.put("currentDay", 0d);
       facts.put("currentHour", 0d);
