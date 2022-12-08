@@ -20,9 +20,14 @@ public class DetectHotWaterEndingRule extends BroadcastableAction {
   }
 
   @Condition
-  public boolean when(@Fact("consumption") double mean,
+  public boolean when(
+      @Fact("consumption") double mean,
+      @Fact("currentSumPerHour") double currentSumPerHour,
+      @Fact("currentNumberOfStatementPerHour") double currentNumberOfStatementPerHour,
       @Fact("hotWaterStartedAt") double started) {
-    return started > 0d && mean < HOT_TANK_WATER_POWER;
+    return started > 0d
+        && ((currentSumPerHour / currentNumberOfStatementPerHour) - mean > HOT_TANK_WATER_POWER
+            || mean < HOT_TANK_WATER_POWER);
   }
 
   @Action
