@@ -16,6 +16,15 @@ a {
   width: 1920;
 }
 
+@media screen and (max-width:600px) {
+  #now {
+    display: none;
+  }
+  #left {
+    display: none;
+  }
+}
+
 #clock {
   font-size: 150%;
 }

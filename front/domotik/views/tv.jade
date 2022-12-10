@@ -42,10 +42,10 @@ html(ng-app='domotikApp')
               th salon
               td(class="stream") {{temp_living}} °c
             tr
-              th chambres
+              th chambre
               td(class="stream") {{temp_room}} °c
           table#consumption
-            tr
+            tr#now
               th actuellement
               td(class="stream") {{power_now}} kWh
             tr
