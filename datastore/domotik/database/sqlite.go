@@ -69,8 +69,7 @@ func NewSqliteClient(databasePath string) Database {
 			{aggregate: AVG, from: "outside", to: "daily_temp_outside", unit: TEMP},
 			{aggregate: AVG, from: "living", to: "daily_temp_inside", unit: TEMP},
 			{aggregate: DELTA, from: "linky", to: "daily_power_consumption", unit: INDICE},
-			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE},
-			{aggregate: SUM, from: "waterPerDay", to: "daily_water_consumption", unit: LITER}}}
+			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE}}}
 	instances["history"] = &Instance{
 		db:       prepareDatabase(databasePath + "/history.db"),
 		volatile: false}

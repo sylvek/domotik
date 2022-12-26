@@ -39,8 +39,6 @@ public class DomotikRulesEngine {
         new DetectNewHourRule(broadcaster),
         new SumPerDayRule(broadcaster),
         new MeanPerHourRule(broadcaster),
-        new DetectHotWaterStartingRule(broadcaster),
-        new DetectHotWaterEndingRule(broadcaster),
         new CurrentPriceRule(broadcaster),
         new RatioLowPriceConsumptionRule(broadcaster));
 
@@ -86,7 +84,6 @@ public class DomotikRulesEngine {
       facts.put("currentSumPerDay", 0d);
       facts.put("currentSumPerHour", 0d);
       facts.put("currentNumberOfStatementPerHour", 1d);
-      facts.put("hotWaterStartedAt", 0d);
       facts.put("currentPrice", 0d);
       facts.put("currentSumPerDayLowPrice", 0d);
     }
