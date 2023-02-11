@@ -1,11 +1,11 @@
-name: create docker back
+name: create docker tasmota-converter
 on:
   workflow_dispatch:
     branches:
       - master
 jobs:
-  create-docker-back:
-    name: create docker Domotik Back
+  create-tasmota-converter:
+    name: create docker Tasmota converter
     runs-on: ubuntu-latest
     steps:
       - uses: docker/setup-qemu-action@v2
@@ -17,7 +17,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v2
         with:
-          context: '{{defaultContext}}:back'
+          context: '{{defaultContext}}:tasmota-converter'
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/sylvek/domotik-back:latest
+          tags: ghcr.io/sylvek/tasmota-converter:latest

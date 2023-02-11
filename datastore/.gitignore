@@ -1,0 +1,8 @@
+domotik/database.json
+domotik/history.db
+domotik/history.db-shm
+domotik/history.db-wal
+domotik/sensors.db
+domotik/sensors.db-shm
+domotik/sensors.db-wal
+domotik/state.json

@@ -1,14 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
-	broker "github.com/sylvek/domotik/datastore/broker"
-	database "github.com/sylvek/domotik/datastore/database"
+	"github.com/sylvek/domotik/datastore/broker"
+	"github.com/sylvek/domotik/datastore/compute"
+	"github.com/sylvek/domotik/datastore/database"
 )
 
 func main() {
@@ -17,33 +18,21 @@ func main() {
 	log.Printf("starting - MQTT_HOST:%s - DB_PATH:%s", mqttHost, databasePath)
 
 	sqlite := database.NewSqliteClient(databasePath)
-	mqtt := broker.NewMQTTBrokerClient(mqttHost, 1883)
+	broker := broker.NewMQTTBrokerClient(fmt.Sprintf("tcp://%s:1883", mqttHost))
+	engine := compute.NewRuleEngineClient(databasePath)
 
-	logs := make(chan broker.Log, 10)
+	go broker.ConnectAndListen()
 
-	go mqtt.ConnectAndListen(logs)
-	go treatLogs(logs, sqlite)
+	go handleSensorLogs(engine, broker, sqlite)
 
 	defer func() {
+		engine.Stop()
 		sqlite.Close()
-		mqtt.Disconnect()
+		broker.Disconnect()
+		log.Println("ciao.")
 	}()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 	<-done
-
-	log.Println("ciao.")
-}
-
-func treatLogs(logs chan broker.Log, database database.Database) {
-	for {
-		l := <-logs
-		err := database.AddSeries(l.Topic, l.Name, l.Unit, l.Value)
-		if err != nil {
-			log.Printf(" - error - %s", err)
-			time.Sleep(time.Second)
-			logs <- l
-		}
-	}
 }

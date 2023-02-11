@@ -1,12 +1,4 @@
 services:
-  back:
-    build: back
-    depends_on:
-      - mosquitto
-    environment:
-      TZ: 'Europe/Paris'
-    volumes:
-      - .:/domotik
   front:
     build: front
     ports:

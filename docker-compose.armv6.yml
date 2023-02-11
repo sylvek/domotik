@@ -12,15 +12,6 @@ services:
       - TZ="Europe/Paris"
     depends_on:
       - mosquitto
-  back:
-    image: sylvek/domotik-back:arm32v6
-    volumes:
-      - /home/pi/domotik:/domotik
-    environment:
-      - MQTT_HOST=mosquitto
-      - TZ="Europe/Paris"
-    depends_on:
-      - mosquitto
   front:
     image: sylvek/domotik-front:arm32v6
     ports:

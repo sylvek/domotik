@@ -139,7 +139,7 @@ func (d *SqliteClient) AddSeries(
 	topic string,
 	name string,
 	unit string,
-	value float32) error {
+	value float64) error {
 
 	t := time.Now()
 

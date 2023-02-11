@@ -14,10 +14,28 @@ type MqttClient struct {
 	client     mqtt.Client
 	mqttBroker string
 	topics     []string
+	logs       chan Log
+}
+
+func (c *MqttClient) Logs() chan Log {
+	return c.logs
+}
+
+func (c *MqttClient) Publish(l Log) {
+	token := c.client.Publish(
+		fmt.Sprintf("%s/%s/%s", l.Topic, l.Name, l.Unit),
+		0,
+		true,
+		fmt.Sprintf("%.3f", l.Value))
+	_ = token.Wait()
+
+	if token.Error() != nil {
+		log.Println("unable to publish", l, token.Error())
+	}
 }
 
 // ConnectAndListen implements BrokerClient
-func (c *MqttClient) ConnectAndListen(logs chan Log) {
+func (c *MqttClient) ConnectAndListen() {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(c.mqttBroker)
 	opts.SetOrderMatters(false)
@@ -41,14 +59,15 @@ func (c *MqttClient) ConnectAndListen(logs chan Log) {
 	opts.DefaultPublishHandler = func(client mqtt.Client, msg mqtt.Message) {
 		payload := string(msg.Payload()[:])
 		elements := strings.Split(msg.Topic(), "/")
-		value, _ := strconv.ParseFloat(payload, 32)
-		logs <- Log{Topic: elements[0], Name: elements[1], Unit: elements[2], Value: float32(value)}
+		value, _ := strconv.ParseFloat(payload, 64)
+		c.logs <- Log{Topic: elements[0], Name: elements[1], Unit: elements[2], Value: value}
 	}
 
 	c.client = mqtt.NewClient(opts)
 	if token := c.client.Connect(); token.Wait() && token.Error() != nil {
 		panic(token.Error())
 	}
+
 }
 
 // Disconnect implements BrokerClient
@@ -56,6 +75,10 @@ func (c *MqttClient) Disconnect() {
 	c.client.Disconnect(250)
 }
 
-func NewMQTTBrokerClient(host string, port int) BrokerClient {
-	return &MqttClient{mqttBroker: fmt.Sprintf("tcp://%s:%d", host, port), topics: []string{"sensors/+/+"}}
+func NewMQTTBrokerClient(mqttBroker string) BrokerClient {
+	return &MqttClient{
+		mqttBroker: mqttBroker,
+		topics:     []string{"sensors/+/+"},
+		logs:       make(chan Log, 10),
+	}
 }

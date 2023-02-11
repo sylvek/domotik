@@ -1,12 +1,4 @@
 services:
-  back:
-    image: ghcr.io/sylvek/domotik-back
-    depends_on:
-      - mosquitto
-    environment:
-      TZ: 'Europe/Paris'
-    volumes:
-      - .:/domotik
   front:
     image: ghcr.io/sylvek/domotik-front
     ports:
