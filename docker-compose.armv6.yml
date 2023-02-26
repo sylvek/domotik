@@ -9,7 +9,7 @@ services:
     volumes:
       - /home/pi/domotik:/database
     environment:
-      - TZ="Europe/Paris"
+      TZ: Europe/Paris
     depends_on:
       - mosquitto
   front:
