@@ -35,7 +35,7 @@ Basically, everything was running on a raspberry pi 0/1.
 - In 2017, i switched on an x86 computer and Docker,
 - In 2020, i replaced my raspberry-pi "TV" by a [Kindle TV Stick + Fully Kiosk](https://www.fully-kiosk.com/en/#download-box),
 - In 2022, i gave up influxdb and built a dedicated datastore _(based on golang and sqlite)_.
-- In 2023, domotik should work on a raspberry pi 0/1
+- In 2023, domotik works on a raspberry pi 0/1
 
 ## Build / Run it
 
