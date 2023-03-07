@@ -67,17 +67,19 @@ Basically, everything was running on a raspberry pi 0/1.
 
 Basically i use 3 temperature sensors and a "watt meter".
 
-| name              | topic                | unit     | usage                          |
-| ----------------- | -------------------- | -------- | ------------------------------ |
-| outside           | sensors/outside/temp | xx.xx °c | a value every 10 min           |
-| living room       | sensors/living/temp  | xx.xx °c | a value every minute           |
-| room              | sensors/room/temp    | xx.xx °c | a value every minute           |
-| power consumption | sensors/linky/watt   | xxxxx    | a watt-hour value every second |
+| name              | topic                | unit     | usage                              |
+| ----------------- | -------------------- | -------- | ---------------------------------- |
+| outside           | sensors/outside/temp | xx.xx °c | a value every 10 min               |
+| living room       | sensors/living/temp  | xx.xx °c | a value every minute               |
+| room              | sensors/room/temp    | xx.xx °c | a value every minute               |
+| power consumption | sensors/linky/watt   | xxxxx    | a watt-hour value every second     |
+| power consumption | sensors/linky/indice | xxxxx    | watt consumed since the first day  |
+| power state       | sensors/linky/state  | 1 or 0   | state between high and low tariff  |
 
 | service      | link                |
 | ------------ | ------------------- |
-| tv dashboard | http://your_ip:3000 |
-| pc dashboard | http://your_ip:3333 |
+| tv dashboard | http://your_ip      |
+| pc dashboard | http://your_ip:3000 |
 | MQTT broker  | tcp://your_ip:1883  |
 
 I use Grafana _(plugged on SQLite)_ to display more dashboards. _(look extras/grafana-save folder)_
