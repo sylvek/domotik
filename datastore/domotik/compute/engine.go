@@ -7,18 +7,19 @@ import (
 )
 
 type input struct {
-	lowPrice bool
-	indice   int
+	lowTariff bool
+	indice    int64
 }
 
 type state struct {
-	LastIndice      int
+	LastIndice      int64
+	LastIndiceTS    int64
 	CurrentDay      int
 	CurrentHour     int
-	DailySumHigh    int
-	DailySumLow     int
-	HourlySum       int
-	HourlyNbIndices int
+	DailySumHigh    int64
+	DailySumLow     int64
+	HourlySum       int64
+	HourlyNbIndices int64
 }
 
 type RuleEngineClient struct {
@@ -47,7 +48,7 @@ func NewRuleEngineClient(path string) Rule {
 
 	instance := &RuleEngineClient{
 		path:   path,
-		input:  &input{lowPrice: false, indice: 0},
+		input:  &input{lowTariff: false, indice: 0},
 		ticker: time.NewTicker(time.Minute),
 		state:  state,
 		output: make(chan Output),
@@ -78,16 +79,26 @@ func (g *RuleEngineClient) synchronization() {
 
 func (g *RuleEngineClient) updateStateAndGenerateOutput() Output {
 	t := time.Now()
+	now := t.Unix()
 
 	lastIndice := g.state.LastIndice
+	lastEpoch := g.state.LastIndiceTS
 	newIndice := g.input.indice
 
 	// calculate watt consumed between 2 Ticks
-	wattConsumedDuringBuffering := 0
+	wattConsumedDuringBuffering := int64(0)
 	if lastIndice > 0 {
 		wattConsumedDuringBuffering = newIndice - lastIndice
 	}
 	g.state.LastIndice = newIndice
+
+	minutesSinceTheLastIndice := float64(1)
+	if wattConsumedDuringBuffering > 0 {
+		if lastEpoch > 0 {
+			minutesSinceTheLastIndice = float64(now-lastEpoch) / 60
+		}
+		g.state.LastIndiceTS = now
+	}
 
 	// if new day -> clear daily state
 	if t.Day() != g.state.CurrentDay {
@@ -108,23 +119,23 @@ func (g *RuleEngineClient) updateStateAndGenerateOutput() Output {
 	g.state.HourlyNbIndices += 1
 
 	// calculate ratio low/high and €
-	if g.input.lowPrice {
+	if g.input.lowTariff {
 		g.state.DailySumLow += wattConsumedDuringBuffering
 	} else {
 		g.state.DailySumHigh += wattConsumedDuringBuffering
 	}
 
-	ratioLowPriceToday := 1.0
+	ratioLowTariffToday := 1.0
 	if g.state.DailySumHigh > 0 {
-		ratioLowPriceToday = float64(g.state.DailySumLow) / float64(g.state.DailySumHigh+g.state.DailySumLow)
+		ratioLowTariffToday = float64(g.state.DailySumLow) / float64(g.state.DailySumHigh+g.state.DailySumLow)
 	}
 
 	return Output{
-		WattPerHourForLastMinute: wattConsumedDuringBuffering * 60,
+		WattPerHourForLastMinute: float64(wattConsumedDuringBuffering) * 60 / minutesSinceTheLastIndice,
 		WattPerHourForThisHour:   g.state.HourlySum * 60 / g.state.HourlyNbIndices,
 		WattConsumedToday:        g.state.DailySumHigh + g.state.DailySumLow,
 		EuroSpentToday:           float64(g.state.DailySumHigh)*0.0001963 + float64(g.state.DailySumLow)*0.0001457,
-		RatioLowPriceToday:       ratioLowPriceToday,
+		RatioLowTariffToday:      ratioLowTariffToday,
 	}
 }
 
@@ -138,10 +149,10 @@ func (g *RuleEngineClient) Stop() {
 	g.done <- true
 }
 
-func (g *RuleEngineClient) SetLowPriceState(state bool) {
-	g.input.lowPrice = state
+func (g *RuleEngineClient) SetLowTariffState(state bool) {
+	g.input.lowTariff = state
 }
 
-func (g *RuleEngineClient) SetIndice(indice int) {
+func (g *RuleEngineClient) SetIndice(indice int64) {
 	g.input.indice = indice
 }

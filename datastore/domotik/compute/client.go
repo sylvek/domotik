@@ -1,16 +1,16 @@
 package compute
 
 type Output struct {
-	WattPerHourForLastMinute int
-	WattPerHourForThisHour   int
-	WattConsumedToday        int
+	WattPerHourForLastMinute float64
+	WattPerHourForThisHour   int64
+	WattConsumedToday        int64
 	EuroSpentToday           float64
-	RatioLowPriceToday       float64
+	RatioLowTariffToday      float64
 }
 
 type Rule interface {
 	Tick() chan Output
 	Stop()
-	SetLowPriceState(state bool)
-	SetIndice(indice int)
+	SetLowTariffState(state bool)
+	SetIndice(indice int64)
 }
