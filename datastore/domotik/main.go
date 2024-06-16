@@ -1,38 +1,72 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	"strconv"
+	"strings"
 	"syscall"
+	"time"
 
-	"github.com/sylvek/domotik/datastore/broker"
-	"github.com/sylvek/domotik/datastore/compute"
-	"github.com/sylvek/domotik/datastore/database"
+	"github.com/sylvek/domotik/datastore/domain"
+	"github.com/sylvek/domotik/datastore/domain/model"
+	"github.com/sylvek/domotik/datastore/infrastructure"
 )
 
 func main() {
-	mqttHost := os.Getenv("MQTT_HOST")
-	databasePath := os.Getenv("DB_PATH")
-	log.Printf("starting - MQTT_HOST:%s - DB_PATH:%s", mqttHost, databasePath)
+	host := os.Getenv("MQTT_HOST")
+	path := os.Getenv("DB_PATH")
+	log.Printf("starting - MQTT_HOST:%s - DB_PATH:%s", host, path)
 
-	sqlite := database.NewSqliteClient(databasePath)
-	broker := broker.NewMQTTBrokerClient(fmt.Sprintf("tcp://%s:1883", mqttHost))
-	engine := compute.NewRuleEngineClient(databasePath)
+	ticker := time.NewTicker(time.Minute)
+	client := NewMQTTClient(host, []string{"sensors/+/+"})
 
-	go broker.ConnectAndListen()
-
-	go handleSensorLogs(engine, broker, sqlite)
+	localRepository := infrastructure.NewLocalClient(path)
+	mqttRepository := infrastructure.NewMQTTClient(client.GetClient())
+	sqliteRepository := infrastructure.NewSqliteDatabase(path)
 
 	defer func() {
-		engine.Stop()
-		sqlite.Close()
-		broker.Disconnect()
+		ticker.Stop()
+		mqttRepository.Close()
+		sqliteRepository.Close()
+		localRepository.Close()
 		log.Println("ciao.")
+	}()
+
+	application, err := domain.NewApplication(localRepository, sqliteRepository, mqttRepository)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	stop := make(chan os.Signal, 1)
+	go func() {
+		client.Start()
+		for {
+			select {
+			case <-ticker.C:
+				if err := application.Process(); err != nil {
+					log.Fatal(err)
+				}
+			case msg := <-client.Message():
+				payload := string(msg.Payload()[:])
+				elements := strings.Split(msg.Topic(), "/")
+				value, _ := strconv.ParseFloat(payload, 64)
+
+				err := application.AddLog(model.Log{Topic: elements[0], Name: elements[1], Unit: elements[2], Value: value})
+				if err != nil {
+					log.Printf(" - error - %s", err)
+					time.Sleep(time.Second)
+					client.Message() <- msg
+				}
+			case <-stop:
+				log.Println("stopping")
+				return
+			}
+		}
 	}()
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
-	<-done
+	stop <- <-done
 }

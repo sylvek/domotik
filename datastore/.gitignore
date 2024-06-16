@@ -6,3 +6,5 @@ domotik/sensors.db
 domotik/sensors.db-shm
 domotik/sensors.db-wal
 domotik/state.json
+
+datastore
