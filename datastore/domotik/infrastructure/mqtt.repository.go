@@ -5,7 +5,7 @@ import (
 	"log"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/sylvek/domotik/datastore/domain/model"
+	"github.com/sylvek/domotik/datastore/domain"
 	"github.com/sylvek/domotik/datastore/port"
 )
 
@@ -20,12 +20,12 @@ func (m *MqttClient) Close() {
 }
 
 // Notify implements port.NotificationRepository.
-func (m *MqttClient) Notify(output model.Output) error {
-	m.publish("sensors", "sumPerDay", output.EuroSpentToday, "euro")
-	m.publish("sensors", "sumPerDay", output.RatioLowTariffToday, "rate")
-	m.publish("sensors", "sumPerDay", float64(output.WattConsumedToday), "watt")
-	m.publish("sensors", "meanPerHour", float64(output.WattPerHourForThisHour), "watt")
-	m.publish("sensors", "meanPerMinute", float64(output.WattPerHourForLastMinute), "watt")
+func (m *MqttClient) Notify(output domain.Output) error {
+	m.publish("sensors", "sumPerDay", output.GetEuroSpentToday(), "euro")
+	m.publish("sensors", "sumPerDay", output.GetRatioLowTariffToday(), "rate")
+	m.publish("sensors", "sumPerDay", output.GetWattConsumedToday(), "watt")
+	m.publish("sensors", "meanPerHour", output.GetWattPerHourForThisHour(), "watt")
+	m.publish("sensors", "meanPerMinute", output.GetWattPerHourForLastMinute(), "watt")
 
 	return nil
 }

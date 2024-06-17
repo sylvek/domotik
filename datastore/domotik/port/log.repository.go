@@ -1,8 +1,8 @@
 package port
 
-import "github.com/sylvek/domotik/datastore/domain/model"
+import "github.com/sylvek/domotik/datastore/domain"
 
 type LogRepository interface {
 	Repository
-	Store(model.Log) error
+	Store(domain.Log) error
 }
