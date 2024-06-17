@@ -1,4 +1,4 @@
-package database
+package infrastructure
 
 import (
 	"database/sql"
@@ -8,6 +8,9 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/sylvek/domotik/datastore/domain/model"
+	"github.com/sylvek/domotik/datastore/port"
 
 	_ "github.com/glebarez/go-sqlite"
 )
@@ -43,47 +46,52 @@ type Instance struct {
 	volatile        bool
 }
 
-type SqliteClient struct {
-	databasePath string
-	parameters   Parameters
-	instances    map[string]*Instance
-}
-
 type Parameters struct {
 	CurrentIndex int
 }
 
-func NewSqliteClient(databasePath string) Database {
-
-	parameters := Parameters{}
-	data, err := os.ReadFile(databasePath + "/database.json")
-	if err == nil {
-		json.Unmarshal(data, &parameters)
-	}
-
-	instances := make(map[string]*Instance)
-	instances["sensors"] = &Instance{
-		db:       prepareDatabase(databasePath + "/sensors.db"),
-		volatile: true,
-		dailyOperations: []Operation{
-			{aggregate: AVG, from: "outside", to: "daily_temp_outside", unit: TEMP},
-			{aggregate: AVG, from: "living", to: "daily_temp_inside", unit: TEMP},
-			{aggregate: DELTA, from: "linky", to: "daily_power_consumption", unit: INDICE},
-			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE}}}
-	instances["history"] = &Instance{
-		db:       prepareDatabase(databasePath + "/history.db"),
-		volatile: false}
-
-	return &SqliteClient{
-		databasePath: databasePath,
-		parameters:   parameters,
-		instances:    instances}
+type SqliteClient struct {
+	path       string
+	parameters Parameters
+	instances  map[string]*Instance
 }
 
+// Close implements port.LogRepository.
 func (d *SqliteClient) Close() {
 	for _, v := range d.instances {
 		v.db.Close()
 	}
+}
+
+// Store implements port.LogRepository.
+func (d *SqliteClient) Store(l model.Log) error {
+	t := time.Now()
+
+	currentDayOfYear := t.YearDay()
+	if currentDayOfYear != d.parameters.CurrentIndex {
+		d.parameters.CurrentIndex = currentDayOfYear
+
+		log.Printf("daily work is starting (%d)\n", currentDayOfYear)
+
+		d.synchronization()
+		d.aggregation()
+		d.cleaning()
+
+		log.Println("daily work is finished")
+	}
+
+	db := d.instances[l.Topic].db
+	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
+		// Grafana requires that data is stored in UTC
+		t.Unix(),
+		l.Name,
+		l.Unit,
+		l.Value)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (d *SqliteClient) cleaning() {
@@ -132,42 +140,7 @@ func (d *SqliteClient) aggregation() {
 
 func (d *SqliteClient) synchronization() {
 	p, _ := json.Marshal(d.parameters)
-	os.WriteFile(d.databasePath+"/database.json", p, 0644)
-}
-
-func (d *SqliteClient) AddSeries(
-	topic string,
-	name string,
-	unit string,
-	value float64) error {
-
-	t := time.Now()
-
-	currentDayOfYear := t.YearDay()
-	if currentDayOfYear != d.parameters.CurrentIndex {
-		d.parameters.CurrentIndex = currentDayOfYear
-
-		log.Printf("daily work is starting (%d)\n", currentDayOfYear)
-
-		d.synchronization()
-		d.aggregation()
-		d.cleaning()
-
-		log.Println("daily work is finished")
-	}
-
-	db := d.instances[topic].db
-	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
-		// Grafana requires that data is stored in UTC
-		t.Unix(),
-		name,
-		unit,
-		value)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	os.WriteFile(d.path+"/database.json", p, 0644)
 }
 
 func prepareDatabase(entity string) (db *sql.DB) {
@@ -182,4 +155,30 @@ func prepareDatabase(entity string) (db *sql.DB) {
 	db.Exec("CREATE INDEX IF NOT EXISTS indx_data on data (ts);")
 
 	return db
+}
+
+func NewSqliteDatabase(path string) port.LogRepository {
+	parameters := Parameters{}
+	data, err := os.ReadFile(path + "/database.json")
+	if err == nil {
+		json.Unmarshal(data, &parameters)
+	}
+
+	instances := make(map[string]*Instance)
+	instances["sensors"] = &Instance{
+		db:       prepareDatabase(path + "/sensors.db"),
+		volatile: true,
+		dailyOperations: []Operation{
+			{aggregate: AVG, from: "outside", to: "daily_temp_outside", unit: TEMP},
+			{aggregate: AVG, from: "living", to: "daily_temp_inside", unit: TEMP},
+			{aggregate: DELTA, from: "linky", to: "daily_power_consumption", unit: INDICE},
+			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE}}}
+	instances["history"] = &Instance{
+		db:       prepareDatabase(path + "/history.db"),
+		volatile: false}
+
+	return &SqliteClient{
+		path:       path,
+		parameters: parameters,
+		instances:  instances}
 }
