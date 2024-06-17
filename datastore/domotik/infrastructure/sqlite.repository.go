@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sylvek/domotik/datastore/domain/model"
+	"github.com/sylvek/domotik/datastore/domain"
 	"github.com/sylvek/domotik/datastore/port"
 
 	_ "github.com/glebarez/go-sqlite"
@@ -64,7 +64,7 @@ func (d *SqliteClient) Close() {
 }
 
 // Store implements port.LogRepository.
-func (d *SqliteClient) Store(l model.Log) error {
+func (d *SqliteClient) Store(l domain.Log) error {
 	t := time.Now()
 
 	currentDayOfYear := t.YearDay()
@@ -80,13 +80,13 @@ func (d *SqliteClient) Store(l model.Log) error {
 		log.Println("daily work is finished")
 	}
 
-	db := d.instances[l.Topic].db
+	db := d.instances[l.GetTopic()].db
 	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
 		// Grafana requires that data is stored in UTC
 		t.Unix(),
-		l.Name,
-		l.Unit,
-		l.Value)
+		l.GetName(),
+		l.GetUnit(),
+		l.GetValue())
 	if err != nil {
 		return err
 	}

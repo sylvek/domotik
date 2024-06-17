@@ -1,8 +1,8 @@
 package port
 
-import "github.com/sylvek/domotik/datastore/domain/model"
+import "github.com/sylvek/domotik/datastore/domain"
 
 type NotificationRepository interface {
 	Repository
-	Notify(model.Output) error
+	Notify(domain.Output) error
 }

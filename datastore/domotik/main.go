@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/sylvek/domotik/datastore/domain"
-	"github.com/sylvek/domotik/datastore/domain/model"
 	"github.com/sylvek/domotik/datastore/infrastructure"
 )
 
@@ -34,7 +33,7 @@ func main() {
 		log.Println("ciao.")
 	}()
 
-	application, err := domain.NewApplication(localRepository, sqliteRepository, mqttRepository)
+	application, err := NewApplication(localRepository, sqliteRepository, mqttRepository)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,7 +52,7 @@ func main() {
 				elements := strings.Split(msg.Topic(), "/")
 				value, _ := strconv.ParseFloat(payload, 64)
 
-				err := application.AddLog(model.Log{Topic: elements[0], Name: elements[1], Unit: elements[2], Value: value})
+				err := application.AddLog(*domain.NewLog(elements, value))
 				if err != nil {
 					log.Printf(" - error - %s", err)
 					time.Sleep(time.Second)
