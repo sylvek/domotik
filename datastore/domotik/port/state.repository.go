@@ -1,9 +1,9 @@
 package port
 
-import "github.com/sylvek/domotik/datastore/domain/model"
+import "github.com/sylvek/domotik/datastore/domain"
 
 type StateRepository interface {
 	Repository
-	Store(model.State) error
-	Retrieve() (model.State, error)
+	Store(domain.State) error
+	Retrieve() (domain.State, error)
 }

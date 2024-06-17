@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/sylvek/domotik/datastore/domain/model"
+	"github.com/sylvek/domotik/datastore/domain"
 	"github.com/sylvek/domotik/datastore/port"
 )
 
@@ -15,23 +15,15 @@ type LocalClient struct {
 const FILE = "/state.json"
 
 // Retrieve implements port.StateRepository.
-func (l *LocalClient) Retrieve() (model.State, error) {
-	state := model.State{
-		LastIndice:      0,
-		CurrentDay:      0,
-		CurrentHour:     0,
-		DailySumHigh:    0,
-		DailySumLow:     0,
-		HourlySum:       0,
-		HourlyNbIndices: 0,
-	}
+func (l *LocalClient) Retrieve() (domain.State, error) {
+	state := domain.NewState()
 	data, err := os.ReadFile(l.path + FILE)
 	if err == nil {
 		json.Unmarshal(data, &state)
 	}
 
 	// if the file does not exist we return the empty state
-	return state, nil
+	return *state, nil
 }
 
 // Close implements port.StateRepository.
@@ -39,7 +31,7 @@ func (l *LocalClient) Close() {
 }
 
 // Store implements port.StateRepository.
-func (l *LocalClient) Store(state model.State) error {
+func (l *LocalClient) Store(state domain.State) error {
 	s, _ := json.Marshal(state)
 	return os.WriteFile(l.path+FILE, s, 0644)
 }
