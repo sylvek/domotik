@@ -83,11 +83,3 @@ func (s *State) IncDailyConsumption(wattConsumedDuringBuffering int64, lowTariff
 		s.DailySumHigh += wattConsumedDuringBuffering
 	}
 }
-
-func (s *State) GetLowTariffRate() float64 {
-	ratioLowTariffToday := 1.0
-	if s.DailySumHigh > 0 {
-		ratioLowTariffToday = float64(s.DailySumLow) / float64(s.DailySumHigh+s.DailySumLow)
-	}
-	return ratioLowTariffToday
-}

@@ -8,12 +8,21 @@ type Output struct {
 	ratioLowTariffToday      float64
 }
 
-func NewOutput(state State, consumptionSinceLastTime int64, minutesSinceTheLastIndice float64, ratioLowTariffToday float64) *Output {
+func NewOutput(state State, consumptionSinceLastTime int64, minutesSinceTheLastIndice float64) *Output {
+
+	HIGH_TARIFF_PRICE := 0.0001963
+	LOW_TARIFF_PRICE := 0.0001457
+
+	ratioLowTariffToday := 1.0
+	if state.DailySumHigh > 0 {
+		ratioLowTariffToday = float64(state.DailySumLow) / float64(state.DailySumHigh+state.DailySumLow)
+	}
+
 	return &Output{
 		wattPerHourForLastMinute: float64(consumptionSinceLastTime) * 60 / minutesSinceTheLastIndice,
 		wattPerHourForThisHour:   state.HourlySum * 60 / state.HourlyNbIndices,
 		wattConsumedToday:        state.DailySumHigh + state.DailySumLow,
-		euroSpentToday:           float64(state.DailySumHigh)*0.0001963 + float64(state.DailySumLow)*0.0001457,
+		euroSpentToday:           float64(state.DailySumHigh)*HIGH_TARIFF_PRICE + float64(state.DailySumLow)*LOW_TARIFF_PRICE,
 		ratioLowTariffToday:      ratioLowTariffToday,
 	}
 }

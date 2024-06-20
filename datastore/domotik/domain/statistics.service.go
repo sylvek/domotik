@@ -16,7 +16,5 @@ func GenerateStatistics(t time.Time, state State, input Input) (State, Output) {
 	newState.IncHourlyConsumption(consumptionSinceLastTime)
 	newState.IncDailyConsumption(consumptionSinceLastTime, input.lowTariff)
 
-	ratioLowTariffToday := newState.GetLowTariffRate()
-
-	return *newState, *NewOutput(*newState, consumptionSinceLastTime, minutesSinceTheLastIndice, ratioLowTariffToday)
+	return *newState, *NewOutput(*newState, consumptionSinceLastTime, minutesSinceTheLastIndice)
 }
