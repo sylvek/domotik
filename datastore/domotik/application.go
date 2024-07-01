@@ -27,9 +27,25 @@ func (a *Application) AddLog(l domain.Log) error {
 
 func (a *Application) Process() error {
 	if a.input.HasIndice() {
-		newState, output := domain.GenerateStatistics(time.Now(), a.state, a.input)
+		t := time.Now()
 
-		if err := a.stateRepository.Store(newState); err != nil {
+		consumptionSinceLastTime, minutesSinceTheLastIndice := a.state.GetConsumptionSinceLastTime(t.Unix(), a.input.GetIndice())
+
+		a.state.ProcessNewDay(t)
+		a.state.ProcessNewHour(t)
+
+		a.state.IncHourlyConsumption(consumptionSinceLastTime)
+		a.state.IncDailyConsumption(consumptionSinceLastTime, a.input.IsLowTariff())
+
+		output := *domain.NewOutput(
+			a.state.DailySumLow,
+			a.state.DailySumHigh,
+			a.state.HourlySum,
+			a.state.HourlyNbIndices,
+			consumptionSinceLastTime,
+			minutesSinceTheLastIndice)
+
+		if err := a.stateRepository.Store(a.state); err != nil {
 			return err
 		}
 		if err := a.notificationRepository.Notify(output); err != nil {
@@ -37,7 +53,6 @@ func (a *Application) Process() error {
 		}
 
 		a.input.ResetIndice()
-		a.state = newState
 	}
 
 	return nil

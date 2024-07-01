@@ -25,18 +25,6 @@ func NewState() *State {
 	}
 }
 
-func CopyState(state State) *State {
-	return &State{
-		LastIndice:      state.LastIndice,
-		CurrentDay:      state.CurrentDay,
-		CurrentHour:     state.CurrentHour,
-		DailySumHigh:    state.DailySumHigh,
-		DailySumLow:     state.DailySumLow,
-		HourlySum:       state.HourlySum,
-		HourlyNbIndices: state.HourlyNbIndices,
-	}
-}
-
 func (s *State) GetConsumptionSinceLastTime(now int64, newIndice int64) (int64, float64) {
 	consumptionSinceLastTime := int64(0)
 	if s.LastIndice > 0 {

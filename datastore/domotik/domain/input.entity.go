@@ -25,3 +25,11 @@ func (i *Input) ResetIndice() {
 func (i *Input) HasIndice() bool {
 	return i.indice > 0
 }
+
+func (i *Input) GetIndice() int64 {
+	return i.indice
+}
+
+func (i *Input) IsLowTariff() bool {
+	return i.lowTariff
+}
