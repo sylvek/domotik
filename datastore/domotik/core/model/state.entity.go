@@ -15,13 +15,15 @@ type State struct {
 
 func NewState() *State {
 	return &State{
-		LastIndice:      0,
-		CurrentDay:      0,
-		CurrentHour:     0,
-		DailySumHigh:    0,
-		DailySumLow:     0,
-		HourlySum:       0,
-		HourlyNbIndices: 0,
+		LastIndice:                0,
+		CurrentDay:                0,
+		CurrentHour:               0,
+		DailySumHigh:              0,
+		DailySumLow:               0,
+		HourlySum:                 0,
+		HourlyNbIndices:           0,
+		consumptionSinceLastTime:  0,
+		minutesSinceTheLastIndice: 0,
 	}
 }
 

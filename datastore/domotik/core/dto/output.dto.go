@@ -22,14 +22,24 @@ func NewOutputFromState(state model.State) *Output {
 	consumptionSinceLastTime := state.GetConsumptionSinceLastTime()
 	minutesSinceTheLastIndice := state.GetMinutesSinceTheLastIndice()
 
+	wattPerHourForLastMinute := 0.0
+	if minutesSinceTheLastIndice > 0 {
+		wattPerHourForLastMinute = float64(consumptionSinceLastTime) * 60 / minutesSinceTheLastIndice
+	}
+
+	wattPerHourForThisHour := int64(0)
+	if hourlyNbIndices > 0 {
+		wattPerHourForThisHour = hourlySum * 60 / hourlyNbIndices
+	}
+
 	ratioLowTariffToday := 1.0
 	if dailySumHigh > 0 {
 		ratioLowTariffToday = float64(dailySumLow) / float64(dailySumHigh+dailySumLow)
 	}
 
 	return &Output{
-		WattPerHourForLastMinute: float64(consumptionSinceLastTime) * 60 / minutesSinceTheLastIndice,
-		WattPerHourForThisHour:   hourlySum * 60 / hourlyNbIndices,
+		WattPerHourForLastMinute: wattPerHourForLastMinute,
+		WattPerHourForThisHour:   wattPerHourForThisHour,
 		WattConsumedToday:        dailySumHigh + dailySumLow,
 		EuroSpentToday:           float64(dailySumHigh)*HIGH_TARIFF_PRICE + float64(dailySumLow)*LOW_TARIFF_PRICE,
 		RatioLowTariffToday:      ratioLowTariffToday,
