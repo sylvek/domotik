@@ -1,6 +1,7 @@
-package main
+package infrastructure
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -41,12 +42,31 @@ func NewMQTTClient(broker string, topics []string) *MqttClient {
 	return &MqttClient{client: mqtt.NewClient(opts), messages: messages}
 }
 
-func (mqtt *MqttClient) GetClient() mqtt.Client {
-	return mqtt.client
-}
-
 func (mqtt *MqttClient) Message() chan mqtt.Message {
 	return mqtt.messages
+}
+
+func (m *MqttClient) Publish(topic string, name string, value float64, unit string) {
+	token := m.client.Publish(
+		fmt.Sprintf("%s/%s/%s", topic, name, unit),
+		0,
+		true,
+		fmt.Sprintf("%.3f", value))
+	_ = token.Wait()
+
+	if token.Error() != nil {
+		log.Println("unable to publish", topic, token.Error())
+	}
+}
+
+func (mqtt *MqttClient) Stop() error {
+	token := mqtt.client.Unsubscribe()
+	if token.Error() != nil {
+		return token.Error()
+	}
+	_ = token.Wait()
+	mqtt.client.Disconnect(250)
+	return nil
 }
 
 func (mqtt *MqttClient) Start() error {

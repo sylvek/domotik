@@ -1,4 +1,4 @@
-package domain
+package model
 
 import "time"
 
@@ -37,7 +37,6 @@ func (s *State) GetConsumptionSinceLastTime(now int64, newIndice int64) (int64, 
 		if s.LastIndiceTS > 0 {
 			minutesSinceTheLastIndice = float64(now-s.LastIndiceTS) / 60
 		}
-		s.LastIndiceTS = now
 	}
 
 	return consumptionSinceLastTime, minutesSinceTheLastIndice

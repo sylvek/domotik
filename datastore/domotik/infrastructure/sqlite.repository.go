@@ -9,8 +9,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/sylvek/domotik/datastore/domain"
-	"github.com/sylvek/domotik/datastore/port"
+	"github.com/sylvek/domotik/datastore/core/model"
+	"github.com/sylvek/domotik/datastore/core/port"
 
 	_ "github.com/glebarez/go-sqlite"
 )
@@ -50,21 +50,21 @@ type Parameters struct {
 	CurrentIndex int
 }
 
-type SqliteClient struct {
+type SqliteDatabase struct {
 	path       string
 	parameters Parameters
 	instances  map[string]*Instance
 }
 
 // Close implements port.LogRepository.
-func (d *SqliteClient) Close() {
+func (d *SqliteDatabase) Close() {
 	for _, v := range d.instances {
 		v.db.Close()
 	}
 }
 
 // Store implements port.LogRepository.
-func (d *SqliteClient) Store(l domain.Log) error {
+func (d *SqliteDatabase) Store(l model.Log) error {
 	t := time.Now()
 
 	currentDayOfYear := t.YearDay()
@@ -94,7 +94,7 @@ func (d *SqliteClient) Store(l domain.Log) error {
 	return nil
 }
 
-func (d *SqliteClient) cleaning() {
+func (d *SqliteDatabase) cleaning() {
 	for _, v := range d.instances {
 		if v.volatile {
 			if _, err := v.db.Exec("DELETE FROM data where ts < strftime('%s','now', '-2 day')"); err != nil {
@@ -104,7 +104,7 @@ func (d *SqliteClient) cleaning() {
 	}
 }
 
-func (d *SqliteClient) aggregation() {
+func (d *SqliteDatabase) aggregation() {
 	var value float64
 	// We calculate the current offset between localtime and utc0
 	// data is stored in utc0. We have to select a slot of data
@@ -138,7 +138,7 @@ func (d *SqliteClient) aggregation() {
 	}
 }
 
-func (d *SqliteClient) synchronization() {
+func (d *SqliteDatabase) synchronization() {
 	p, _ := json.Marshal(d.parameters)
 	os.WriteFile(d.path+"/database.json", p, 0644)
 }
@@ -177,7 +177,7 @@ func NewSqliteDatabase(path string) port.LogRepository {
 		db:       prepareDatabase(path + "/history.db"),
 		volatile: false}
 
-	return &SqliteClient{
+	return &SqliteDatabase{
 		path:       path,
 		parameters: parameters,
 		instances:  instances}
