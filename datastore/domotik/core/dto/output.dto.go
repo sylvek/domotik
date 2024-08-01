@@ -1,5 +1,7 @@
 package dto
 
+import "github.com/sylvek/domotik/datastore/core/model"
+
 type Output struct {
 	WattPerHourForLastMinute float64
 	WattPerHourForThisHour   int64
@@ -8,10 +10,17 @@ type Output struct {
 	RatioLowTariffToday      float64
 }
 
-func NewOutput(dailySumLow int64, dailySumHigh int64, hourlySum int64, hourlyNbIndices int64, consumptionSinceLastTime int64, minutesSinceTheLastIndice float64) *Output {
+func NewOutputFromState(state model.State) *Output {
 
 	HIGH_TARIFF_PRICE := 0.0001963
 	LOW_TARIFF_PRICE := 0.0001457
+
+	dailySumHigh := state.DailySumHigh
+	dailySumLow := state.DailySumLow
+	hourlySum := state.HourlySum
+	hourlyNbIndices := state.HourlyNbIndices
+	consumptionSinceLastTime := state.GetConsumptionSinceLastTime()
+	minutesSinceTheLastIndice := state.GetMinutesSinceTheLastIndice()
 
 	ratioLowTariffToday := 1.0
 	if dailySumHigh > 0 {

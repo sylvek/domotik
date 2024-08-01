@@ -21,7 +21,7 @@ func (a *Application) AddLog(elements []string, value float64) error {
 		return err
 	}
 
-	a.measure.UpdateFromLog(log)
+	a.measure.UpdateFromLog(log, time.Now().Unix())
 
 	return nil
 }
@@ -30,15 +30,18 @@ func (a *Application) Process(presenter port.SummarizePresenter) error {
 	if a.measure.HasNewIndex() {
 
 		t := time.Now()
-		a.state.ProcessNewDay(t)
-		a.state.ProcessNewHour(t)
 
-		output := a.summarizeSince(t.Unix())
-		if err := presenter.Present(output); err != nil {
+		a.state.ProcessNewDay(t.Day())
+		a.state.ProcessNewHour(t.Hour())
+		a.state.ProcessLastIndice(t.Unix(), a.measure)
+
+		if err := a.stateRepository.Store(a.state); err != nil {
 			return err
 		}
 
-		if err := a.stateRepository.Store(a.state); err != nil {
+		output := *dto.NewOutputFromState(a.state)
+
+		if err := presenter.Present(output); err != nil {
 			return err
 		}
 
@@ -49,7 +52,8 @@ func (a *Application) Process(presenter port.SummarizePresenter) error {
 }
 
 func (a *Application) GetSummarize(presenter port.SummarizePresenter) error {
-	output := a.summarizeSince(a.state.LastIndiceTS)
+	output := *dto.NewOutputFromState(a.state)
+
 	if err := presenter.Present(output); err != nil {
 		return err
 	}
@@ -74,25 +78,4 @@ func NewApplication(
 		stateRepository: stateRepository,
 		logRepository:   logRepository,
 	}, nil
-}
-
-func (a *Application) summarizeSince(timestamp int64) dto.Output {
-
-	doChanges := a.state.LastIndiceTS < timestamp
-
-	consumptionSinceLastTime, minutesSinceTheLastIndice := a.state.GetConsumptionSinceLastTime(timestamp, a.measure.GetLastIndex())
-
-	if doChanges {
-		a.state.LastIndiceTS = timestamp
-		a.state.IncHourlyConsumption(consumptionSinceLastTime)
-		a.state.IncDailyConsumption(consumptionSinceLastTime, a.measure.IsLowTariff())
-	}
-
-	return *dto.NewOutput(
-		a.state.DailySumLow,
-		a.state.DailySumHigh,
-		a.state.HourlySum,
-		a.state.HourlyNbIndices,
-		consumptionSinceLastTime,
-		minutesSinceTheLastIndice)
 }
