@@ -31,11 +31,12 @@ This dashboard was firstly displayed thanks to an original Raspberry Pi 1 and re
 Server side, i've written several small scripts in Python using Mosquitto and Mongodb.
 Basically, everything was running on a raspberry pi 0/1.
 
-- In 2015, i start the project on raspberry pi,
-- In 2017, i switched on an x86 computer and Docker,
+- In 2015, i started the project on a raspberry pi,
+- In 2017, i switched to a x86 computer and Docker,
 - In 2020, i replaced my raspberry-pi "TV" by a [Kindle TV Stick + Fully Kiosk](https://www.fully-kiosk.com/en/#download-box),
-- In 2022, i gave up influxdb and built a dedicated datastore _(based on golang and sqlite)_.
+- In 2022, i gave up influxdb and built a dedicated datastore
 - In 2023, domotik works on a raspberry pi 0/1
+- In 2024, nothing more…
 
 ## Build / Run it
 
