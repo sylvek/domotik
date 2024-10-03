@@ -31,6 +31,7 @@ const (
 	LITER  string = "liter"
 	RATE   string = "rate"
 	INDICE string = "indice"
+	EURO   string = "euro"
 )
 
 type Operation struct {
@@ -172,7 +173,8 @@ func NewSqliteDatabase(path string) port.LogRepository {
 			{aggregate: AVG, from: "outside", to: "daily_temp_outside", unit: TEMP},
 			{aggregate: AVG, from: "living", to: "daily_temp_inside", unit: TEMP},
 			{aggregate: DELTA, from: "linky", to: "daily_power_consumption", unit: INDICE},
-			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE}}}
+			{aggregate: LAST, from: "sumPerDay", to: "daily_rate_consumption", unit: RATE},
+			{aggregate: LAST, from: "sumPerDay", to: "daily_cost_consumption", unit: EURO}}}
 	instances["history"] = &Instance{
 		db:       prepareDatabase(path + "/history.db"),
 		volatile: false}
