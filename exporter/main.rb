@@ -17,5 +17,5 @@ db.execute("SELECT ts,value,unit FROM data WHERE name='#{name}' and ts=strftime(
     
     response = HTTParty.get("#{entrypoint}?title=#{title}&timestamp=#{timestamp}")
     
-    puts "#{Time.at(timestamp).utc.to_datetime} - #{response.body}"
+    puts "#{Time.at(timestamp).utc} - #{response.body}"
 end
