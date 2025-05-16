@@ -12,8 +12,8 @@ type Output struct {
 
 func NewOutputFromState(state model.State) *Output {
 
-	HIGH_TARIFF_PRICE := 0.0002210
-	LOW_TARIFF_PRICE := 0.0001704
+	HIGH_TARIFF_PRICE := 0.000197148
+	LOW_TARIFF_PRICE := 0.000156648
 
 	dailySumHigh := state.DailySumHigh
 	dailySumLow := state.DailySumLow
