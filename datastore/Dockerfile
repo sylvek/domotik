@@ -1,4 +1,4 @@
-FROM golang:1.18-alpine AS builder
+FROM golang:1.25-alpine AS builder
 COPY domotik /domotik
 WORKDIR /domotik
 RUN CGO_ENABLED=0 go build -o datastore .
