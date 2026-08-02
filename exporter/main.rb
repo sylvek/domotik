@@ -11,9 +11,9 @@ db.execute("SELECT ts,value,unit FROM data WHERE name='#{name}' and ts=strftime(
     value = row[1]
     unit = row[2]
     
-    title = "#{value.to_i/1000.0} kW.h" if unit == "indice"
-    title = "#{sprintf('%.2f', value)} C" if unit == "temp"
-    title = "#{value} L" if unit == "liter"
+    title = "💡 Consommation: #{value.to_i/1000.0} kWh" if unit == "indice"
+    title = "🌡️ Température: #{sprintf('%.2f', value)} C" if unit == "temp"
+    title = "💧 Consommation: #{value} L" if unit == "liter"
     
     response = HTTParty.get("#{entrypoint}?title=#{title}&timestamp=#{timestamp}")
     
