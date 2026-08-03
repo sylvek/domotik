@@ -15,7 +15,7 @@ db.execute("SELECT ts,value,unit FROM data WHERE name='#{name}' and ts=strftime(
     title = "🌡️ Température: #{sprintf('%.2f', value)} C" if unit == "temp"
     title = "💧 Consommation: #{value} L" if unit == "liter"
     
-    response = HTTParty.get("#{entrypoint}?title=#{title}&timestamp=#{timestamp}")
+    response = HTTParty.get(entrypoint, query: { title: titre, timestamp: timestamp })
     
     puts "#{Time.at(timestamp).utc} - #{response.body}"
 end
