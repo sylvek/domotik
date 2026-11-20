@@ -34,8 +34,13 @@ type Reading struct {
 	Value float64 `json:"value"`
 }
 
-// Today describes the current day, from midnight to midnight (local time).
+// Today describes a day, from midnight to midnight (local time): the current one or the day before.
 type Today struct {
+	// DaysAgo is 0 for the current day, 1 for the day before.
+	DaysAgo          int   `json:"daysAgo"`
+	AvailableDaysAgo []int `json:"availableDaysAgo"`
+	// Live is true for the current day: instant values are given and the day is not finished.
+	Live                bool     `json:"live"`
 	From                int64    `json:"from"`
 	To                  int64    `json:"to"`
 	LowTariff           *bool    `json:"lowTariff"`

@@ -101,7 +101,12 @@ func startHttpListener(
 		httpPresenter := infrastructure.NewHttpPresenter(w)
 		application.GetSummarize(httpPresenter)
 	})
-	mux.HandleFunc("/api/today", dashboard(application.GetToday))
+	mux.HandleFunc("/api/today", func(w http.ResponseWriter, r *http.Request) {
+		daysAgo, _ := strconv.Atoi(r.URL.Query().Get("daysAgo"))
+		dashboard(func(presenter port.DashboardPresenter) error {
+			return application.GetToday(daysAgo, presenter)
+		})(w, r)
+	})
 	mux.HandleFunc("/api/quarter", func(w http.ResponseWriter, r *http.Request) {
 		days, _ := strconv.Atoi(r.URL.Query().Get("days"))
 		dashboard(func(presenter port.DashboardPresenter) error {
