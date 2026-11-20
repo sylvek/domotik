@@ -5,6 +5,7 @@ import "github.com/sylvek/domotik/datastore/core/model"
 // MeasureRepository reads the stored measures.
 // Timestamps are unix timestamps in seconds, `from` is included, `to` is excluded.
 type MeasureRepository interface {
+	Repository
 	// Last returns the most recent raw measure of a sensor.
 	Last(name string, unit string, from int64, to int64) (*model.Point, error)
 	// Series returns the raw measures by sensor name. An empty name means every sensor.
