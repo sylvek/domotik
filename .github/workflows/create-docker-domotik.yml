@@ -1,11 +1,11 @@
-name: create docker datastore
+name: create docker domotik
 on:
   workflow_dispatch:
     branches:
       - master
 jobs:
-  create-docker-bridge:
-    name: create docker Domotik Datastore
+  create-docker-domotik:
+    name: create docker Domotik
     runs-on: ubuntu-latest
     steps:
       - uses: docker/setup-qemu-action@v3
