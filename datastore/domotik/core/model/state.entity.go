@@ -47,8 +47,12 @@ func (s *State) setConsumptionSinceLastTime(now int64, newIndice int64) {
 	s.LastIndiceTS = now
 }
 
+func (s *State) IsNewDay(currentDay int) bool {
+	return currentDay != s.CurrentDay
+}
+
 func (s *State) ProcessNewDay(currentDay int) {
-	if currentDay != s.CurrentDay {
+	if s.IsNewDay(currentDay) {
 		s.CurrentDay = currentDay
 		s.DailySumHigh = 0
 		s.DailySumLow = 0

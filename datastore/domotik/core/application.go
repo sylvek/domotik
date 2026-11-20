@@ -44,13 +44,22 @@ func (a *Application) ConvertTasmota(telemetry model.TasmotaTelemetry, publisher
 	return nil
 }
 
-func (a *Application) Process(presenter port.SummarizePresenter) error {
+func (a *Application) Process(presenter port.SummarizePresenter, dayEndedPresenter port.DayEndedPresenter) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
 
 	if a.measure.HasNewIndex() {
 
 		t := time.Now()
+
+		// the day that ends is presented before its counters are reset
+		if a.state.IsNewDay(t.Day()) {
+			if dayEnded := dto.NewDayEndedFromState(a.state); dayEnded != nil {
+				if err := dayEndedPresenter.Present(*dayEnded); err != nil {
+					return err
+				}
+			}
+		}
 
 		a.state.ProcessNewDay(t.Day())
 		a.state.ProcessNewHour(t.Hour())

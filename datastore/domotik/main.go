@@ -20,6 +20,7 @@ func main() {
 	basePath := strings.Trim(os.Getenv("BASE_PATH"), "/")
 	mqttPort := getenv("MQTT_PORT", "1883")
 	dbPath := os.Getenv("DB_PATH")
+	dayEndedWebhookUrl := os.Getenv("DAY_ENDED_WEBHOOK_URL")
 	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")))
 
 	log.Println("domotik starting...")
@@ -44,7 +45,8 @@ func main() {
 	log.Printf("MQTT broker started (tcp: %s)", mqttPort)
 
 	mqttPresenter := infrastructure.NewMqttPresenter(broker)
-	go startSensorsListener(sensors, application, mqttPresenter)
+	webhookPresenter := infrastructure.NewWebhookPresenter(dayEndedWebhookUrl)
+	go startSensorsListener(sensors, application, mqttPresenter, webhookPresenter)
 	go startTasmotaListener(tasmota, application, mqttPresenter)
 	go startHttpListener(serverPort, basePath, application)
 
@@ -142,7 +144,8 @@ func startTasmotaListener(
 func startSensorsListener(
 	messages chan infrastructure.Message,
 	application *core.Application,
-	presenter port.SummarizePresenter) {
+	presenter port.SummarizePresenter,
+	dayEndedPresenter port.DayEndedPresenter) {
 
 	ticker := time.NewTicker(time.Minute)
 
@@ -151,7 +154,7 @@ func startSensorsListener(
 	for {
 		select {
 		case <-ticker.C:
-			if err := application.Process(presenter); err != nil {
+			if err := application.Process(presenter, dayEndedPresenter); err != nil {
 				log.Fatal(err)
 			}
 		case msg := <-messages:
