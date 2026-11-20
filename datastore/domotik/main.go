@@ -45,8 +45,8 @@ func main() {
 	log.Printf("MQTT broker started (tcp: %s)", mqttPort)
 
 	mqttPresenter := infrastructure.NewMqttPresenter(broker)
-	notifier := infrastructure.NewWebhookNotifier(dayEndedWebhookUrl)
-	go startSensorsListener(sensors, application, mqttPresenter, notifier)
+	webhookPresenter := infrastructure.NewWebhookPresenter(dayEndedWebhookUrl)
+	go startSensorsListener(sensors, application, mqttPresenter, webhookPresenter)
 	go startTasmotaListener(tasmota, application, mqttPresenter)
 	go startHttpListener(serverPort, basePath, application)
 
@@ -145,7 +145,7 @@ func startSensorsListener(
 	messages chan infrastructure.Message,
 	application *core.Application,
 	presenter port.SummarizePresenter,
-	notifier port.DayEndedNotifier) {
+	dayEndedPresenter port.DayEndedPresenter) {
 
 	ticker := time.NewTicker(time.Minute)
 
@@ -154,7 +154,7 @@ func startSensorsListener(
 	for {
 		select {
 		case <-ticker.C:
-			if err := application.Process(presenter, notifier); err != nil {
+			if err := application.Process(presenter, dayEndedPresenter); err != nil {
 				log.Fatal(err)
 			}
 		case msg := <-messages:

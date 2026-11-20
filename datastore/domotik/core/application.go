@@ -18,23 +18,16 @@ type Application struct {
 	measureRepository port.MeasureRepository
 	settings          Settings
 	mutex             sync.RWMutex
-
-	// day (midnight UTC) that has just ended and is not notified yet, 0 if none.
-	endedDay int64
 }
 
 func (a *Application) AddLog(elements []string, value float64) error {
 	log := *model.NewLog(elements, value)
-	dayEnded := a.logRepository.CloseDay()
 	if err := a.logRepository.Store(log); err != nil {
 		return err
 	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
-	if dayEnded {
-		a.endedDay = time.Now().UTC().Truncate(24 * time.Hour).Unix()
-	}
 	a.measure.UpdateFromLog(log, time.Now().Unix())
 
 	return nil
@@ -51,17 +44,22 @@ func (a *Application) ConvertTasmota(telemetry model.TasmotaTelemetry, publisher
 	return nil
 }
 
-func (a *Application) Process(presenter port.SummarizePresenter, notifier port.DayEndedNotifier) error {
+func (a *Application) Process(presenter port.SummarizePresenter, dayEndedPresenter port.DayEndedPresenter) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
-
-	if err := a.notifyDayEnded(notifier); err != nil {
-		return err
-	}
 
 	if a.measure.HasNewIndex() {
 
 		t := time.Now()
+
+		// the day that ends is presented before its counters are reset
+		if a.state.IsNewDay(t.Day()) {
+			if dayEnded := dto.NewDayEndedFromState(a.state); dayEnded != nil {
+				if err := dayEndedPresenter.Present(*dayEnded); err != nil {
+					return err
+				}
+			}
+		}
 
 		a.state.ProcessNewDay(t.Day())
 		a.state.ProcessNewHour(t.Hour())

@@ -9,7 +9,7 @@ import (
 	"github.com/sylvek/domotik/datastore/core/dto"
 )
 
-func TestWebhookNotifier(t *testing.T) {
+func TestWebhookPresenter(t *testing.T) {
 	calls := make(chan *http.Request, 10)
 	failures := 1
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -22,9 +22,9 @@ func TestWebhookNotifier(t *testing.T) {
 	}))
 	defer server.Close()
 
-	notifier := NewWebhookNotifier(server.URL + "/exec?key=secret").(*WebhookNotifier)
-	notifier.delay = time.Millisecond
-	if err := notifier.Notify(dto.DayEnded{Timestamp: 1795132800, WattConsumed: 12345}); err != nil {
+	presenter := NewWebhookPresenter(server.URL + "/exec?key=secret").(*WebhookPresenter)
+	presenter.delay = time.Millisecond
+	if err := presenter.Present(dto.DayEnded{Timestamp: 1795132800, WattConsumed: 12345}); err != nil {
 		t.Fatal(err)
 	}
 
@@ -46,7 +46,7 @@ func TestWebhookNotifier(t *testing.T) {
 
 	// without url, nothing is called
 	for _, disabled := range []string{"", "not an url", "://"} {
-		if err := NewWebhookNotifier(disabled).Notify(dto.DayEnded{}); err != nil {
+		if err := NewWebhookPresenter(disabled).Present(dto.DayEnded{}); err != nil {
 			t.Error(err)
 		}
 	}

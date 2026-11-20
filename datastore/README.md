@@ -34,8 +34,7 @@ $> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -e TZ=Europe/Paris -
 
 ## day ended webhook
 
-When a new day starts, the measures of the day that has just ended are aggregated into `history.db`.
-If `DAY_ENDED_WEBHOOK_URL` is set, the URL is then called (GET) with the electricity consumed during that day, as two query parameters:
+When a new day starts, the day that has just ended is presented: if `DAY_ENDED_WEBHOOK_URL` is set, the URL is called (GET) with the electricity consumed during that day (the same counter as the "today" dashboard), as two query parameters:
 
 | parameter | example                       | usage                                   |
 | --------- | ----------------------------- | --------------------------------------- |

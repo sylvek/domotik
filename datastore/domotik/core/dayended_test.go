@@ -1,23 +1,22 @@
 package core
 
 import (
-	"errors"
 	"testing"
+	"time"
 
 	"github.com/sylvek/domotik/datastore/core/dto"
 	"github.com/sylvek/domotik/datastore/core/model"
 )
 
 type fakeRepository struct {
-	closeDay bool
-	values   map[string]float64
+	state model.State
 }
 
-func (f *fakeRepository) Close()                {}
-func (f *fakeRepository) Store(model.Log) error { return nil }
-func (f *fakeRepository) CloseDay() bool        { return f.closeDay }
-func (f *fakeRepository) Retrieve() (model.State, error) {
-	return *model.NewState(), nil
+func (f *fakeRepository) Close()                                            {}
+func (f *fakeRepository) Retrieve() (model.State, error)                    { return f.state, nil }
+func (f *fakeRepository) Daily(string, int64, int64) ([]model.Point, error) { return nil, nil }
+func (f *fakeRepository) DailySum(string, int64, int64) ([]model.Point, error) {
+	return nil, nil
 }
 func (f *fakeRepository) Last(string, string, int64, int64) (*model.Point, error) {
 	return nil, nil
@@ -25,76 +24,81 @@ func (f *fakeRepository) Last(string, string, int64, int64) (*model.Point, error
 func (f *fakeRepository) Series(string, string, int64, int64) (map[string][]model.Point, error) {
 	return nil, nil
 }
-func (f *fakeRepository) Daily(name string, from int64, to int64) ([]model.Point, error) {
-	if value, ok := f.values[name]; ok {
-		return []model.Point{{TS: from, Value: value}}, nil
-	}
-	return nil, nil
+
+type fakeStateRepository struct{ *fakeRepository }
+
+func (f fakeStateRepository) Store(model.State) error { return nil }
+
+type fakeLogRepository struct{ *fakeRepository }
+
+func (f fakeLogRepository) Store(model.Log) error { return nil }
+
+type fakePresenter struct {
+	days []dto.DayEnded
 }
-func (f *fakeRepository) DailySum(string, int64, int64) ([]model.Point, error) { return nil, nil }
-
-type fakeState struct{ fakeRepository }
-
-func (f *fakeState) Store(model.State) error { return nil }
-
-type fakeNotifier struct {
-	events []dto.DayEnded
-	err    error
-}
-
-func (f *fakeNotifier) Notify(event dto.DayEnded) error {
-	if f.err != nil {
-		return f.err
-	}
-	f.events = append(f.events, event)
-	return nil
-}
-
-type fakePresenter struct{}
 
 func (f *fakePresenter) Present(dto.Output) error { return nil }
 
-func TestProcessNotifiesDayEnded(t *testing.T) {
-	repository := &fakeRepository{values: map[string]float64{DAILY_POWER: 12345}}
-	application, _ := NewApplication(&fakeState{}, repository, repository, NewSettings(nil))
-	notifier := &fakeNotifier{}
+type fakeDayEndedPresenter struct{ *fakePresenter }
+
+func (f fakeDayEndedPresenter) Present(day dto.DayEnded) error {
+	f.days = append(f.days, day)
+	return nil
+}
+
+func TestProcessPresentsTheEndedDay(t *testing.T) {
+	now := time.Now()
+	yesterday := now.AddDate(0, 0, -1)
+
+	// yesterday, 12 kWh were consumed
+	state := *model.NewState()
+	state.CurrentDay = yesterday.Day()
+	state.CurrentHour = yesterday.Hour()
+	state.LastIndice = 100000
+	state.LastIndiceTS = yesterday.Unix()
+	state.DailySumHigh = 2700
+	state.DailySumLow = 9300
+
+	repository := &fakeRepository{state: state}
+	application, _ := NewApplication(fakeStateRepository{repository}, fakeLogRepository{repository}, repository, NewSettings(nil))
 	presenter := &fakePresenter{}
 
-	// nothing to notify while the day is running
-	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
-	if err := application.Process(presenter, notifier); err != nil || len(notifier.events) != 0 {
-		t.Fatalf("unexpected notification %+v %v", notifier.events, err)
+	// without any new index, nothing happens
+	application.Process(presenter, fakeDayEndedPresenter{presenter})
+	if len(presenter.days) != 0 {
+		t.Fatalf("unexpected day %+v", presenter.days)
 	}
 
-	// the day ends: it is notified once
-	repository.closeDay = true
-	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
-	repository.closeDay = false
-	application.Process(presenter, notifier)
-	application.Process(presenter, notifier)
-	if len(notifier.events) != 1 {
-		t.Fatalf("expected one notification, got %+v", notifier.events)
+	// the first index of the new day ends the previous one
+	application.AddLog([]string{"sensors", "linky", "indice"}, 100500)
+	application.Process(presenter, fakeDayEndedPresenter{presenter})
+	if len(presenter.days) != 1 {
+		t.Fatalf("expected one day, got %+v", presenter.days)
 	}
-	event := notifier.events[0]
-	if event.WattConsumed != 12345 || event.Timestamp == 0 || event.Timestamp%86400 != 0 {
-		t.Errorf("unexpected event %+v", event)
+	expected := time.Date(yesterday.Year(), yesterday.Month(), yesterday.Day(), 0, 0, 0, 0, time.UTC).Unix()
+	if presenter.days[0].WattConsumed != 12000 || presenter.days[0].Timestamp != expected {
+		t.Errorf("unexpected day %+v", presenter.days[0])
 	}
-
-	// a day without any consumption is not notified
-	delete(repository.values, DAILY_POWER)
-	repository.closeDay = true
-	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
-	repository.closeDay = false
-	if err := application.Process(presenter, notifier); err != nil || len(notifier.events) != 1 {
-		t.Fatalf("unexpected notification %+v %v", notifier.events, err)
+	if summarize := application.summarize(); summarize.WattConsumedToday != 500 {
+		t.Errorf("the new day should start with the last consumption, got %d", summarize.WattConsumedToday)
 	}
 
-	// a notifier failure is reported
-	repository.values[DAILY_POWER] = 1
-	repository.closeDay = true
-	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
-	notifier.err = errors.New("failure")
-	if err := application.Process(presenter, notifier); err == nil {
-		t.Error("an error was expected")
+	// the day is presented once
+	application.AddLog([]string{"sensors", "linky", "indice"}, 100600)
+	application.Process(presenter, fakeDayEndedPresenter{presenter})
+	if len(presenter.days) != 1 {
+		t.Errorf("expected one day, got %+v", presenter.days)
+	}
+}
+
+func TestProcessDoesNotPresentAnEmptyDay(t *testing.T) {
+	repository := &fakeRepository{state: *model.NewState()}
+	application, _ := NewApplication(fakeStateRepository{repository}, fakeLogRepository{repository}, repository, NewSettings(nil))
+	presenter := &fakePresenter{}
+
+	application.AddLog([]string{"sensors", "linky", "indice"}, 100500)
+	application.Process(presenter, fakeDayEndedPresenter{presenter})
+	if len(presenter.days) != 0 {
+		t.Errorf("unexpected day %+v", presenter.days)
 	}
 }

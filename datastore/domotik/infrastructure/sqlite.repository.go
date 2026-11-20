@@ -67,28 +67,22 @@ func (d *SqliteDatabase) Close() {
 	}
 }
 
-// CloseDay implements port.LogRepository.
-func (d *SqliteDatabase) CloseDay() bool {
-	currentDayOfYear := time.Now().YearDay()
-	if currentDayOfYear == d.parameters.CurrentIndex {
-		return false
-	}
-	d.parameters.CurrentIndex = currentDayOfYear
-
-	log.Printf("daily work is starting (%d)\n", currentDayOfYear)
-
-	d.synchronization()
-	d.aggregation()
-	d.cleaning()
-
-	log.Println("daily work is finished")
-
-	return true
-}
-
 // Store implements port.LogRepository.
 func (d *SqliteDatabase) Store(l model.Log) error {
 	t := time.Now()
+
+	currentDayOfYear := t.YearDay()
+	if currentDayOfYear != d.parameters.CurrentIndex {
+		d.parameters.CurrentIndex = currentDayOfYear
+
+		log.Printf("daily work is starting (%d)\n", currentDayOfYear)
+
+		d.synchronization()
+		d.aggregation()
+		d.cleaning()
+
+		log.Println("daily work is finished")
+	}
 
 	db := d.instances[l.GetTopic()].db
 	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",

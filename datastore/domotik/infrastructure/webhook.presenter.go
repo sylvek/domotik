@@ -18,9 +18,9 @@ const (
 	WEBHOOK_TIMEOUT  = 30 * time.Second
 )
 
-// WebhookNotifier calls an URL (GET) with `title` and `timestamp` query parameters.
+// WebhookPresenter calls an URL (GET) with `title` and `timestamp` query parameters.
 // Nothing is called when the URL is empty.
-type WebhookNotifier struct {
+type WebhookPresenter struct {
 	url    *url.URL
 	delay  time.Duration
 	client *http.Client
@@ -30,9 +30,9 @@ func title(event dto.DayEnded) string {
 	return fmt.Sprintf("💡 Consommation: %s kWh", strconv.FormatFloat(float64(event.WattConsumed)/1000, 'f', -1, 64))
 }
 
-// Notify implements port.DayEndedNotifier.
+// Present implements port.DayEndedPresenter.
 // The call is done in background: a slow or unreachable endpoint never blocks the caller.
-func (w *WebhookNotifier) Notify(event dto.DayEnded) error {
+func (w *WebhookPresenter) Present(event dto.DayEnded) error {
 	if w.url == nil {
 		return nil
 	}
@@ -60,7 +60,7 @@ func (w *WebhookNotifier) Notify(event dto.DayEnded) error {
 	return nil
 }
 
-func (w *WebhookNotifier) call(target string) (string, error) {
+func (w *WebhookPresenter) call(target string) (string, error) {
 	response, err := w.client.Get(target)
 	if err != nil {
 		// the url is a secret, it must not be logged
@@ -78,19 +78,19 @@ func (w *WebhookNotifier) call(target string) (string, error) {
 	return string(body), nil
 }
 
-func NewWebhookNotifier(rawUrl string) port.DayEndedNotifier {
-	notifier := &WebhookNotifier{delay: time.Minute, client: &http.Client{Timeout: WEBHOOK_TIMEOUT}}
+func NewWebhookPresenter(rawUrl string) port.DayEndedPresenter {
+	presenter := &WebhookPresenter{delay: time.Minute, client: &http.Client{Timeout: WEBHOOK_TIMEOUT}}
 	if rawUrl == "" {
-		return notifier
+		return presenter
 	}
 
 	target, err := url.Parse(rawUrl)
 	if err != nil || target.Host == "" {
 		// the url is a secret, it must not be logged
 		log.Println("webhook: invalid url, the webhook is disabled")
-		return notifier
+		return presenter
 	}
-	notifier.url = target
+	presenter.url = target
 	log.Println("webhook: enabled")
-	return notifier
+	return presenter
 }
