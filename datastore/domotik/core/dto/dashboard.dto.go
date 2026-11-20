@@ -34,8 +34,26 @@ type Reading struct {
 	Value float64 `json:"value"`
 }
 
-// Today describes the current day, from midnight to midnight (local time).
+// DayComparison compares a day with a reference day: the day before, or the same day of the week a year before.
+type DayComparison struct {
+	// Kind is "dayBefore" or "yearBefore".
+	Kind string `json:"kind"`
+	// Day is the reference day, at midnight UTC.
+	Day int64 `json:"day"`
+	// WholeDay is true when the reference covers a whole day while the compared day is still running:
+	// values are given as a reference but cannot be compared.
+	WholeDay    bool   `json:"wholeDay"`
+	Consumption *Trend `json:"consumption"`
+	Temperature *Trend `json:"temperature"`
+}
+
+// Today describes a day, from midnight to midnight (local time): the current one or the day before.
 type Today struct {
+	// DaysAgo is 0 for the current day, 1 for the day before.
+	DaysAgo          int   `json:"daysAgo"`
+	AvailableDaysAgo []int `json:"availableDaysAgo"`
+	// Live is true for the current day: instant values are given and the day is not finished.
+	Live                bool     `json:"live"`
 	From                int64    `json:"from"`
 	To                  int64    `json:"to"`
 	LowTariff           *bool    `json:"lowTariff"`
@@ -47,11 +65,12 @@ type Today struct {
 	TypicalDay      string `json:"typicalDay"`
 	TypicalDayLevel string `json:"typicalDayLevel"`
 	// TypicalDayMaxWatt is the consumption (Wh) of the highest reference day.
-	TypicalDayMaxWatt int64     `json:"typicalDayMaxWatt"`
-	Inside            []Reading `json:"inside"`
-	Outside           []Reading `json:"outside"`
-	Temperatures      []Series  `json:"temperatures"`
-	Power             []Series  `json:"power"`
+	TypicalDayMaxWatt int64           `json:"typicalDayMaxWatt"`
+	Comparisons       []DayComparison `json:"comparisons"`
+	Inside            []Reading       `json:"inside"`
+	Outside           []Reading       `json:"outside"`
+	Temperatures      []Series        `json:"temperatures"`
+	Power             []Series        `json:"power"`
 }
 
 // Quarter describes the last 90 or 180 days.

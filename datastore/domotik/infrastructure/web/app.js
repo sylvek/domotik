@@ -431,6 +431,31 @@ const TEMPERATURES = [
 ];
 const temperatureColor = (v) => `var(--temp-${TEMPERATURES.find((t) => v < t.below).name})`;
 
+// a day compared to a reference day: electricity and outside temperature
+function comparisonTile(c, live) {
+  const date = new Date(c.day * 1000).toLocaleDateString('fr-FR', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const title = c.kind === 'dayBefore'
+    ? `compared to the day before${live ? ', at the same time' : ''}`
+    : `compared to a year before${c.wholeDay ? ' (whole day)' : ''}`;
+  const row = (label, trend, unit, upIs) => {
+    if (!trend) return h('div', { class: 'hint' }, `${label}: no data`);
+    const change = c.wholeDay ? null : trendChange(trend, upIs);
+    if (change && unit === 'temp') {
+      const delta = trend.value - trend.previous;
+      change.text = `${delta > 0 ? '+' : ''}${fmt.temp(delta)}`;
+    }
+    return h('div', { class: 'compare' },
+      h('span', { class: 'label' }, label),
+      h('span', { class: 'value' }, fmt[unit](trend.previous)),
+      change ? h('span', { class: 'hint' }, change.arrow, ` ${change.text}`) : null);
+  };
+  return h('div', { class: 'tile' },
+    h('div', { class: 'label' }, title),
+    h('div', { class: 'hint' }, date),
+    row('electricity', c.consumption, 'wattHour'),
+    row('outside temperature', c.temperature, 'temp', 'neutral'));
+}
+
 function readings(title, list) {
   return h('div', { class: 'tile' },
     h('p', { class: 'group-title' }, title),
@@ -447,11 +472,18 @@ const LEVELS = { good: 'low', warning: 'moderate', serious: 'high', critical: 'v
 
 const dashboards = {
   today(d) {
+    const DAYS = ['today', 'yesterday'];
+    const day = DAYS[d.daysAgo];
+    const period = h('div', { class: 'switch', role: 'group', 'aria-label': 'day' }, d.availableDaysAgo.map((daysAgo) =>
+      h('a', { href: daysAgo ? `#today-${daysAgo}` : '#today', ...(daysAgo === d.daysAgo ? { 'aria-current': 'true' } : {}) }, DAYS[daysAgo])));
     const tiles = h('div', { class: 'tiles' });
-    const tariff = d.lowTariff == null ? '—' : d.lowTariff ? 'low' : 'high';
-    tiles.append(tile('tariff', tariff, null, {
-      hint: d.lowTariff == null ? 'no data' : h('span', {}, h('span', { class: 'dot', style: `background:var(--${d.lowTariff ? 'good' : 'warning'})` }), d.lowTariff ? ' heures creuses' : ' heures pleines'),
-    }));
+    // the tariff and the instant power only exist for the current day
+    if (d.live) {
+      const tariff = d.lowTariff == null ? '—' : d.lowTariff ? 'low' : 'high';
+      tiles.append(tile('tariff', tariff, null, {
+        hint: d.lowTariff == null ? 'no data' : h('span', {}, h('span', { class: 'dot', style: `background:var(--${d.lowTariff ? 'good' : 'warning'})` }), d.lowTariff ? ' heures creuses' : ' heures pleines'),
+      }));
+    }
     if (d.wattNow != null) {
       tiles.append(tile('now', ...fmt.watt(d.wattNow).split(/ (?=\S+$)/), {
         raw: d.wattNow, max: 10000, hint: (st) => LEVELS[st],
@@ -460,7 +492,7 @@ const dashboards = {
     }
     // the consumption of the day is qualified by the server, by comparison with typical days
     const level = Object.keys(LEVELS).find((st) => LEVELS[st] === d.typicalDayLevel) || 'good';
-    tiles.append(tile('today', round(d.wattConsumedToday / 1000, 1), 'kWh', {
+    tiles.append(tile(day, round(d.wattConsumedToday / 1000, 1), 'kWh', {
       raw: d.wattConsumedToday, max: d.typicalDayMaxWatt, hint: () => `like ${d.typicalDay}`,
       thresholds: [[-Infinity, level]],
     }));
@@ -479,8 +511,10 @@ const dashboards = {
     if (d.outside.length) temps.append(readings('outside', d.outside));
 
     return [
+      period,
       tiles,
-      temps,
+      h('div', { class: 'columns' }, d.comparisons.map((c) => comparisonTile(c, d.live))),
+      temps.children.length ? temps : null,
       timeChart('Temperature', { series: d.temperatures, from: d.from, to: d.to, unit: 'temp', height: 320 }),
       timeChart('Electricity consumption', { series: d.power, from: d.from, to: d.to, unit: 'watt', kinds: ['area', 'line'], zero: true, height: 260 }),
     ];
@@ -542,7 +576,9 @@ async function load() {
   // #quarter-180 displays the quarter dashboard over 180 days
   const [hash, param] = location.hash.slice(1).split('-');
   const name = dashboards[hash] ? hash : 'today';
-  const query = name === 'quarter' && param ? `?days=${encodeURIComponent(param)}` : '';
+  // #today-1 displays the day before
+  const key = { quarter: 'days', today: 'daysAgo' }[name];
+  const query = key && param ? `?${key}=${encodeURIComponent(param)}` : '';
   document.title = `domotik / ${name}`;
   for (const a of document.querySelectorAll('nav a')) {
     if (a.getAttribute('href') === '#' + name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -555,14 +591,14 @@ async function load() {
     const data = await response.json();
     hideTooltip();
     charts.length = 0;
-    main.replaceChildren(...dashboards[name](data));
+    main.replaceChildren(...dashboards[name](data).filter(Boolean));
     charts.forEach((draw) => draw());
     const now = new Date();
     status.textContent = `updated at ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   } catch (error) {
     status.textContent = `unable to load: ${error.message}`;
   }
-  if (name === 'today') timer = setTimeout(load, 60000);
+  if (name === 'today' && !query) timer = setTimeout(load, 60000);
 }
 
 let resizing = null;

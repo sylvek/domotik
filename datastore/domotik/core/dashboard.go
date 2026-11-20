@@ -24,6 +24,9 @@ const (
 	UNIT_STATE           = "state"
 	HISTORY_YEARS        = 10
 	LOW_TARIFF_STATE     = 0.0
+	SUM_PER_DAY          = "sumPerDay"
+	UNIT_EURO            = "euro"
+	UNIT_RATIO           = "rate"
 	LINKY                = "linky"
 	MEAN_PER_HOUR        = "meanPerHour"
 	MEAN_PER_MINUTE      = "meanPerMinute"
@@ -38,43 +41,69 @@ const (
 // QUARTER_DAYS are the periods the quarter dashboard can display, the first one is the default.
 var QUARTER_DAYS = []int{90, 180}
 
-func (a *Application) GetToday(presenter port.DashboardPresenter) error {
+// TODAY_DAYS_AGO are the days the today dashboard can display: the current one (0) and the day before (1).
+// Raw measures are kept two days.
+var TODAY_DAYS_AGO = []int{0, 1}
+
+// GetToday presents a whole day, from midnight to midnight: the current one, or the day before.
+// An unexpected number of days falls back to the current day.
+func (a *Application) GetToday(daysAgo int, presenter port.DashboardPresenter) error {
+	if !slices.Contains(TODAY_DAYS_AGO, daysAgo) {
+		daysAgo = TODAY_DAYS_AGO[0]
+	}
+	live := daysAgo == 0
+
 	now := time.Now()
-	from := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	from := time.Date(now.Year(), now.Month(), now.Day()-daysAgo, 0, 0, 0, 0, now.Location())
 	to := from.AddDate(0, 0, 1)
 
+	// the current day is summarized by the state, a past one by its last published summary
 	summarize := a.summarize()
+	if !live {
+		past, err := a.summarizePast(from.Unix(), to.Unix())
+		if err != nil {
+			return err
+		}
+		summarize = past
+	}
 	typicalDay := a.settings.typicalDay(summarize.WattConsumedToday)
 	today := dto.Today{
 		From:                from.Unix(),
 		To:                  to.Unix(),
+		DaysAgo:             daysAgo,
+		AvailableDaysAgo:    TODAY_DAYS_AGO,
+		Live:                live,
 		WattConsumedToday:   summarize.WattConsumedToday,
 		EuroSpentToday:      summarize.EuroSpentToday,
 		RatioLowTariffToday: summarize.RatioLowTariffToday,
 		TypicalDay:          typicalDay.Label,
 		TypicalDayLevel:     typicalDay.Level,
 		TypicalDayMaxWatt:   a.settings.TypicalDays[len(a.settings.TypicalDays)-1].Watt,
+		Comparisons:         []dto.DayComparison{},
 		Inside:              []dto.Reading{},
 		Outside:             []dto.Reading{},
 		Temperatures:        []dto.Series{},
 		Power:               []dto.Series{},
 	}
 
-	state, err := a.measureRepository.Last(LINKY, UNIT_STATE, today.From, today.To)
-	if err != nil {
-		return err
-	}
-	if state != nil {
-		lowTariff := state.Value == LOW_TARIFF_STATE
-		today.LowTariff = &lowTariff
-	}
+	// instant values only make sense for the current day
+	if live {
+		state, err := a.measureRepository.Last(LINKY, UNIT_STATE, today.From, today.To)
+		if err != nil {
+			return err
+		}
+		if state != nil {
+			lowTariff := state.Value == LOW_TARIFF_STATE
+			today.LowTariff = &lowTariff
+		}
 
-	watt, err := a.measureRepository.Last(LINKY, UNIT_WATT, today.From, today.To)
-	if err != nil {
-		return err
-	}
-	if watt != nil {
-		today.WattNow = &watt.Value
+		watt, err := a.measureRepository.Last(LINKY, UNIT_WATT, today.From, today.To)
+		if err != nil {
+			return err
+		}
+		if watt != nil {
+			today.WattNow = &watt.Value
+		}
 	}
 
 	temperatures, err := a.measureRepository.Series("", UNIT_TEMP, today.From, today.To)
@@ -84,10 +113,11 @@ func (a *Application) GetToday(presenter port.DashboardPresenter) error {
 	for _, name := range a.sortedSensors(temperatures) {
 		points := temperatures[name]
 		last := dto.Reading{Label: a.settings.label(name), Value: points[len(points)-1].Value}
-		if name == a.settings.OutsideSensor {
+		// no instant reading for a past day
+		if live && name == a.settings.OutsideSensor {
 			last.Label = OUTSIDE_NOW_LABEL
 			today.Outside = append(today.Outside, last)
-		} else {
+		} else if live {
 			today.Inside = append(today.Inside, last)
 		}
 		today.Temperatures = append(today.Temperatures,
@@ -98,7 +128,7 @@ func (a *Application) GetToday(presenter port.DashboardPresenter) error {
 	if err != nil {
 		return err
 	}
-	if dew != nil {
+	if dew != nil && live {
 		today.Outside = append(today.Outside, dto.Reading{Label: OUTSIDE_DEW_LABEL, Value: dew.Value})
 	}
 
@@ -112,7 +142,113 @@ func (a *Application) GetToday(presenter port.DashboardPresenter) error {
 		today.Power = append(today.Power, dto.NewSeries(s.label, series[s.name]))
 	}
 
+	comparisons, err := a.compareDay(from, now, live, summarize.WattConsumedToday, temperatures[a.settings.OutsideSensor])
+	if err != nil {
+		return err
+	}
+	today.Comparisons = comparisons
+
 	return presenter.PresentToday(today)
+}
+
+// compareDay compares the consumption and the outside temperature of a day with:
+//   - the day before: at the same time of the day while the day is running, over the whole day otherwise,
+//   - the same day of the week a year before (ie. the 3rd saturday of november), over the whole day.
+func (a *Application) compareDay(from time.Time, now time.Time, live bool, wattConsumed int64, outside []model.Point) ([]dto.DayComparison, error) {
+	// daily measures are stamped at midnight UTC of their day
+	stamp := func(t time.Time) int64 {
+		return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC).Unix()
+	}
+	trend := func(value float64, known bool, previous *float64) *dto.Trend {
+		if !known || previous == nil {
+			return nil
+		}
+		return dto.NewTrend(&model.Trend{Value: value, Previous: previous})
+	}
+	wholeDay := func(day time.Time) (*float64, *float64, error) {
+		var consumption, temperature *float64
+		for name, value := range map[string]**float64{DAILY_POWER: &consumption, DAILY_TEMP_OUTSIDE: &temperature} {
+			points, err := a.measureRepository.Daily(name, stamp(day), stamp(day)+1)
+			if err != nil {
+				return nil, nil, err
+			}
+			if len(points) > 0 {
+				*value = &points[len(points)-1].Value
+			}
+		}
+		return consumption, temperature, nil
+	}
+
+	temperature := model.Mean(outside)
+	comparisons := []dto.DayComparison{}
+
+	dayBefore := from.AddDate(0, 0, -1)
+	var consumption, meanTemperature *float64
+	if live {
+		// raw measures of the day before, until the same time of the day
+		until := dayBefore.Unix() + now.Unix() - from.Unix()
+		last, err := a.measureRepository.Last(SUM_PER_DAY, UNIT_WATT, dayBefore.Unix(), until)
+		if err != nil {
+			return nil, err
+		}
+		if last != nil {
+			consumption = &last.Value
+		}
+		series, err := a.measureRepository.Series(a.settings.OutsideSensor, UNIT_TEMP, dayBefore.Unix(), until)
+		if err != nil {
+			return nil, err
+		}
+		if points := series[a.settings.OutsideSensor]; len(points) > 0 {
+			mean := model.Mean(points)
+			meanTemperature = &mean
+		}
+	} else {
+		var err error
+		if consumption, meanTemperature, err = wholeDay(dayBefore); err != nil {
+			return nil, err
+		}
+	}
+	comparisons = append(comparisons, dto.DayComparison{
+		Kind:        "dayBefore",
+		Day:         stamp(dayBefore),
+		Consumption: trend(float64(wattConsumed), true, consumption),
+		Temperature: trend(temperature, len(outside) > 0, meanTemperature),
+	})
+
+	// 52 weeks before: the same day of the week
+	yearBefore := from.AddDate(0, 0, -52*7)
+	consumption, meanTemperature, err := wholeDay(yearBefore)
+	if err != nil {
+		return nil, err
+	}
+	comparisons = append(comparisons, dto.DayComparison{
+		Kind:        "yearBefore",
+		Day:         stamp(yearBefore),
+		WholeDay:    live,
+		Consumption: trend(float64(wattConsumed), true, consumption),
+		Temperature: trend(temperature, len(outside) > 0, meanTemperature),
+	})
+
+	return comparisons, nil
+}
+
+// summarizePast rebuilds the summary of a past day from the last values published during that day.
+func (a *Application) summarizePast(from int64, to int64) (dto.Output, error) {
+	output := dto.Output{}
+	for unit, set := range map[string]func(float64){
+		UNIT_WATT:  func(v float64) { output.WattConsumedToday = int64(v) },
+		UNIT_EURO:  func(v float64) { output.EuroSpentToday = v },
+		UNIT_RATIO: func(v float64) { output.RatioLowTariffToday = v },
+	} {
+		last, err := a.measureRepository.Last(SUM_PER_DAY, unit, from, to)
+		if err != nil {
+			return output, err
+		}
+		if last != nil {
+			set(last.Value)
+		}
+	}
+	return output, nil
 }
 
 // GetQuarter presents the last `days` days. An unexpected number of days falls back to the default one.

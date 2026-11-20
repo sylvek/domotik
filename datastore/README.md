@@ -36,7 +36,7 @@ $> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -e TZ=Europe/Paris -
 
 | dashboard | content                                                                                             |
 | --------- | --------------------------------------------------------------------------------------------------- |
-| today     | live values, temperatures and electricity consumption of the day                                    |
+| today     | live values, temperatures and electricity consumption of the day, or of the day before              |
 | quarter   | last 90 or 180 days, with the trend compared to the same period a year before                       |
 | history   | last 10 years, colored by season, with the trend compared to the year before (hover a month)        |
 
