@@ -37,6 +37,8 @@ func Downsample(points []Point, seconds int64) []Point {
 
 // Bucket is an aggregation of points sharing the same label (a week, a month, a year…)
 type Bucket struct {
+	// TS is the time of the first point of the bucket.
+	TS    int64
 	Label string
 	Value float64
 }
@@ -69,7 +71,7 @@ func GroupSum(points []Point, by func(Point) (string, string)) []Bucket {
 	for _, p := range points {
 		key, label := by(p)
 		if key != current || len(buckets) == 0 {
-			buckets = append(buckets, Bucket{Label: label})
+			buckets = append(buckets, Bucket{TS: p.TS, Label: label})
 			current = key
 		}
 		buckets[len(buckets)-1].Value += p.Value

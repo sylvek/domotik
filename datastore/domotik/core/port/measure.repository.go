@@ -12,6 +12,6 @@ type MeasureRepository interface {
 	Series(name string, unit string, from int64, to int64) (map[string][]model.Point, error)
 	// Daily returns the daily aggregated measures of a sensor.
 	Daily(name string, from int64, to int64) ([]model.Point, error)
-	// DailySum returns, day by day, the sum of every aggregated measure having the given unit.
-	DailySum(unit string, from int64, to int64) ([]model.Point, error)
+	// DailyWater returns the water consumed day by day, in liters. Days are stamped at midnight UTC.
+	DailyWater(from int64, to int64) ([]model.Point, error)
 }

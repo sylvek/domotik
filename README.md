@@ -87,4 +87,4 @@ Basically i use 3 temperature sensors and a "watt meter".
 The MQTT broker and the dashboards _(today, quarter, history)_ are embedded in the datastore. _(look at [datastore/README.md](datastore/README.md) to configure it or to serve it behind nginx)_
 
 ![quarter](extras/dashboard_quarter.png)
-![over 5y](extras/dashboard_history.png)
+![over 10y](extras/dashboard_history.png)

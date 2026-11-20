@@ -5,7 +5,7 @@ One single binary that:
 - embeds a MQTT broker (TCP), no need to run mosquitto,
 - stores every `sensors/+/+` message into SQLite,
 - converts Tasmota telemetry (`tele/{device}/SENSOR`) into `sensors/{device}/temp|humidity|dewpoint`,
-- serves the dashboards (today / quarter / history),
+- serves the dashboards (today / quarter over 90 or 180 days / history over 10 years),
 - calls a webhook when a day ends (optional).
 
 ## build it
@@ -31,6 +31,17 @@ $> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -e TZ=Europe/Paris -
 | SENSOR_LABELS       |              | names displayed on dashboards, ie. `living=séjour,room=chambre`        |
 | DAY_ENDED_WEBHOOK_URL      |       | URL called when a day ends, disabled when empty                 |
 | TZ                  |              | timezone used to split days, ie. `Europe/Paris`                        |
+
+## dashboards
+
+| dashboard | content                                                                                             |
+| --------- | --------------------------------------------------------------------------------------------------- |
+| today     | live values, temperatures and electricity consumption of the day                                    |
+| quarter   | last 90 or 180 days, with the trend compared to the same period a year before                       |
+| history   | last 10 years, colored by season, with the trend compared to the year before (hover a month)        |
+
+The water consumption is read from `water.db`, when this file exists next to the other databases.
+It is written by [mail-veolia-wrapper](https://github.com/sylvek/mail-veolia-wrapper) (`daily_water_consumption`, in liters) and only read by the datastore.
 
 ## day ended webhook
 
