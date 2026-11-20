@@ -1,15 +1,15 @@
-name: ci datastore
+name: ci domotik
 on:
   pull_request:
     paths:
       - 'datastore/**'
-      - '.github/workflows/ci-datastore.yml'
+      - '.github/workflows/ci-domotik.yml'
   push:
     branches:
       - master
     paths:
       - 'datastore/**'
-      - '.github/workflows/ci-datastore.yml'
+      - '.github/workflows/ci-domotik.yml'
 permissions:
   contents: read
 jobs:
