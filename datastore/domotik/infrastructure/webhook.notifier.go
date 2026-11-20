@@ -20,15 +20,7 @@ type WebhookNotifier struct {
 }
 
 func title(event dto.DayEnded) string {
-	switch event.Unit {
-	case INDICE:
-		return fmt.Sprintf("💡 Consommation: %s kWh", strconv.FormatFloat(float64(int64(event.Value))/1000, 'f', -1, 64))
-	case TEMP:
-		return fmt.Sprintf("🌡️ Température: %.2f C", event.Value)
-	case LITER:
-		return fmt.Sprintf("💧 Consommation: %s L", strconv.FormatFloat(event.Value, 'f', -1, 64))
-	}
-	return fmt.Sprintf("%s: %s %s", event.Name, strconv.FormatFloat(event.Value, 'f', -1, 64), event.Unit)
+	return fmt.Sprintf("💡 Consommation: %s kWh", strconv.FormatFloat(float64(event.WattConsumed)/1000, 'f', -1, 64))
 }
 
 // Notify implements port.DayEndedNotifier.
@@ -57,7 +49,7 @@ func (w *WebhookNotifier) Notify(event dto.DayEnded) error {
 		return fmt.Errorf("webhook: unexpected status %d", response.StatusCode)
 	}
 
-	log.Printf("webhook: %s (%s) notified - %s", event.Name, time.Unix(event.Timestamp, 0).UTC().Format("2006-01-02"), body)
+	log.Printf("webhook: %s notified - %s", time.Unix(event.Timestamp, 0).UTC().Format("2006-01-02"), body)
 	return nil
 }
 

@@ -11,14 +11,6 @@ type Point struct {
 	Value float64
 }
 
-// DailyValue is the aggregation of a measure over a day, stamped at midnight UTC of that day.
-type DailyValue struct {
-	TS    int64
-	Name  string
-	Unit  string
-	Value float64
-}
-
 // Downsample averages points by slots of `seconds` seconds.
 // Points must be sorted by time.
 func Downsample(points []Point, seconds int64) []Point {

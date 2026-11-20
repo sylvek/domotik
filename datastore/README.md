@@ -30,17 +30,16 @@ $> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -e TZ=Europe/Paris -
 | DB_PATH             | /database/   | where `sensors.db`, `history.db` and `state.json` are stored           |
 | SENSOR_LABELS       |              | names displayed on dashboards, ie. `living=séjour,room=chambre`        |
 | DAY_ENDED_WEBHOOK_URL      |       | URL called when a day ends, disabled when empty                 |
-| DAY_ENDED_WEBHOOK_MEASURES | daily_power_consumption | daily measures to notify, separated by commas |
 | TZ                  |              | timezone used to split days, ie. `Europe/Paris`                        |
 
 ## day ended webhook
 
 When a new day starts, the measures of the day that has just ended are aggregated into `history.db`.
-If `DAY_ENDED_WEBHOOK_URL` is set, the URL is then called (GET), once by measure listed in `DAY_ENDED_WEBHOOK_MEASURES`, with two query parameters:
+If `DAY_ENDED_WEBHOOK_URL` is set, the URL is then called (GET) with the electricity consumed during that day, as two query parameters:
 
 | parameter | example                       | usage                                   |
 | --------- | ----------------------------- | --------------------------------------- |
-| title     | `💡 Consommation: 12.345 kWh` | a text describing the value of the day  |
+| title     | `💡 Consommation: 12.345 kWh` | the consumption of the day, in kWh      |
 | timestamp | `1795132800`                  | the ended day, at midnight UTC, seconds |
 
 A failed call is retried twice, one minute apart. The URL is a secret: it is given by the environment only and is never logged.

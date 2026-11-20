@@ -21,8 +21,7 @@ func main() {
 	mqttPort := getenv("MQTT_PORT", "1883")
 	dbPath := os.Getenv("DB_PATH")
 	dayEndedWebhookUrl := os.Getenv("DAY_ENDED_WEBHOOK_URL")
-	dayEndedMeasures := strings.Fields(strings.ReplaceAll(getenv("DAY_ENDED_WEBHOOK_MEASURES", "daily_power_consumption"), ",", " "))
-	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")), dayEndedMeasures)
+	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")))
 
 	log.Println("domotik starting...")
 

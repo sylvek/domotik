@@ -10,7 +10,7 @@ import (
 
 type fakeRepository struct {
 	closeDay bool
-	values   map[string]*model.DailyValue
+	values   map[string]float64
 }
 
 func (f *fakeRepository) Close()                {}
@@ -25,16 +25,13 @@ func (f *fakeRepository) Last(string, string, int64, int64) (*model.Point, error
 func (f *fakeRepository) Series(string, string, int64, int64) (map[string][]model.Point, error) {
 	return nil, nil
 }
-func (f *fakeRepository) Daily(string, int64, int64) ([]model.Point, error)    { return nil, nil }
-func (f *fakeRepository) DailySum(string, int64, int64) ([]model.Point, error) { return nil, nil }
-func (f *fakeRepository) DailyValue(name string, day int64) (*model.DailyValue, error) {
+func (f *fakeRepository) Daily(name string, from int64, to int64) ([]model.Point, error) {
 	if value, ok := f.values[name]; ok {
-		copy := *value
-		copy.TS = day
-		return &copy, nil
+		return []model.Point{{TS: from, Value: value}}, nil
 	}
 	return nil, nil
 }
+func (f *fakeRepository) DailySum(string, int64, int64) ([]model.Point, error) { return nil, nil }
 
 type fakeState struct{ fakeRepository }
 
@@ -54,11 +51,8 @@ func (f *fakeNotifier) Notify(event dto.DayEnded) error {
 }
 
 func TestNotifyDayEnded(t *testing.T) {
-	repository := &fakeRepository{values: map[string]*model.DailyValue{
-		"daily_power_consumption": {Name: "daily_power_consumption", Unit: "indice", Value: 12345},
-	}}
-	application, _ := NewApplication(&fakeState{}, repository, repository,
-		NewSettings(nil, []string{"daily_power_consumption", "unknown"}))
+	repository := &fakeRepository{values: map[string]float64{DAILY_POWER: 12345}}
+	application, _ := NewApplication(&fakeState{}, repository, repository, NewSettings(nil))
 	notifier := &fakeNotifier{}
 
 	// nothing to notify while the day is running
@@ -83,7 +77,7 @@ func TestNotifyDayEnded(t *testing.T) {
 		t.Fatalf("expected one notification, got %+v", notifier.events)
 	}
 	event := notifier.events[0]
-	if event.Name != "daily_power_consumption" || event.Unit != "indice" || event.Value != 12345 || event.Timestamp%86400 != 0 {
+	if event.WattConsumed != 12345 || event.Timestamp == 0 || event.Timestamp%86400 != 0 {
 		t.Errorf("unexpected event %+v", event)
 	}
 

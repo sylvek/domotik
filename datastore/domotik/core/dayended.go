@@ -7,7 +7,7 @@ import (
 
 const DAY_ENDED_MAX_ATTEMPTS = 3
 
-// NotifyDayEnded notifies the measures of the day that has just ended.
+// NotifyDayEnded notifies the electricity consumption of the day that has just ended.
 // It does nothing while no day is waiting for its notification.
 func (a *Application) NotifyDayEnded(notifier port.DayEndedNotifier) error {
 	a.mutex.Lock()
@@ -21,21 +21,31 @@ func (a *Application) NotifyDayEnded(notifier port.DayEndedNotifier) error {
 	attempts := a.endedDayAttempts
 	a.mutex.Unlock()
 
-	for _, name := range a.settings.DayEndedMeasures {
-		value, err := a.measureRepository.DailyValue(name, day)
-		if err == nil && value != nil {
-			err = notifier.Notify(dto.DayEnded{Timestamp: value.TS, Name: value.Name, Unit: value.Unit, Value: value.Value})
+	err := a.notifyDayEnded(day, notifier)
+	if err != nil {
+		// the day is notified again later
+		a.mutex.Lock()
+		if a.endedDay == 0 && attempts < DAY_ENDED_MAX_ATTEMPTS {
+			a.endedDay = day
 		}
-		if err != nil {
-			// the whole day is notified again later
-			a.mutex.Lock()
-			if a.endedDay == 0 && attempts < DAY_ENDED_MAX_ATTEMPTS {
-				a.endedDay = day
-			}
-			a.mutex.Unlock()
-			return err
-		}
+		a.mutex.Unlock()
 	}
 
-	return nil
+	return err
+}
+
+func (a *Application) notifyDayEnded(day int64, notifier port.DayEndedNotifier) error {
+	consumption, err := a.measureRepository.Daily(DAILY_POWER, day, day+1)
+	if err != nil {
+		return err
+	}
+	// nothing was measured during this day
+	if len(consumption) == 0 {
+		return nil
+	}
+
+	return notifier.Notify(dto.DayEnded{
+		Timestamp:    day,
+		WattConsumed: int64(consumption[len(consumption)-1].Value),
+	})
 }

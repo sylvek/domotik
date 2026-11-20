@@ -211,21 +211,6 @@ func (d *SqliteDatabase) Daily(name string, from int64, to int64) ([]model.Point
 		name, from, to)
 }
 
-// DailyValue implements port.MeasureRepository.
-func (d *SqliteDatabase) DailyValue(name string, day int64) (*model.DailyValue, error) {
-	value := model.DailyValue{Name: name}
-	err := d.instances["history"].db.QueryRow(
-		"SELECT ts, unit, value FROM data WHERE name=? AND ts=? AND value IS NOT NULL ORDER BY id DESC LIMIT 1",
-		name, day).Scan(&value.TS, &value.Unit, &value.Value)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-	return &value, nil
-}
-
 // DailySum implements port.MeasureRepository.
 func (d *SqliteDatabase) DailySum(unit string, from int64, to int64) ([]model.Point, error) {
 	return d.daily("SELECT ts - ts % 86400 AS day, SUM(value) FROM data WHERE unit=? AND ts>=? AND ts<? AND value IS NOT NULL GROUP BY day ORDER BY day",
