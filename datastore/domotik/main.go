@@ -45,12 +45,10 @@ func main() {
 	log.Printf("MQTT broker started (tcp: %s)", mqttPort)
 
 	mqttPresenter := infrastructure.NewMqttPresenter(broker)
-	go startSensorsListener(sensors, application, mqttPresenter)
+	notifier := infrastructure.NewWebhookNotifier(dayEndedWebhookUrl)
+	go startSensorsListener(sensors, application, mqttPresenter, notifier)
 	go startTasmotaListener(tasmota, application, mqttPresenter)
 	go startHttpListener(serverPort, basePath, application)
-	if dayEndedWebhookUrl != "" {
-		go startDayEndedNotifier(application, infrastructure.NewWebhookNotifier(dayEndedWebhookUrl))
-	}
 
 	log.Println("domotik started")
 
@@ -124,19 +122,6 @@ func startHttpListener(
 	}
 }
 
-func startDayEndedNotifier(
-	application *core.Application,
-	notifier port.DayEndedNotifier) {
-
-	log.Println("day ended webhook enabled")
-
-	for range time.Tick(time.Minute) {
-		if err := application.NotifyDayEnded(notifier); err != nil {
-			log.Printf(" - error - %s", err)
-		}
-	}
-}
-
 func startTasmotaListener(
 	messages chan infrastructure.Message,
 	application *core.Application,
@@ -159,7 +144,8 @@ func startTasmotaListener(
 func startSensorsListener(
 	messages chan infrastructure.Message,
 	application *core.Application,
-	presenter port.SummarizePresenter) {
+	presenter port.SummarizePresenter,
+	notifier port.DayEndedNotifier) {
 
 	ticker := time.NewTicker(time.Minute)
 
@@ -168,7 +154,7 @@ func startSensorsListener(
 	for {
 		select {
 		case <-ticker.C:
-			if err := application.Process(presenter); err != nil {
+			if err := application.Process(presenter, notifier); err != nil {
 				log.Fatal(err)
 			}
 		case msg := <-messages:

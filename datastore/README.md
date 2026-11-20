@@ -42,7 +42,7 @@ If `DAY_ENDED_WEBHOOK_URL` is set, the URL is then called (GET) with the electri
 | title     | `💡 Consommation: 12.345 kWh` | the consumption of the day, in kWh      |
 | timestamp | `1795132800`                  | the ended day, at midnight UTC, seconds |
 
-A failed call is retried twice, one minute apart. The URL is a secret: it is given by the environment only and is never logged.
+The call is done in background; a failed call is retried twice, one minute apart. The URL is a secret: it is given by the environment only and is never logged.
 
 ```
 $> docker run -d --name datastore -e DAY_ENDED_WEBHOOK_URL=https://script.google.com/macros/s/xxx/exec …

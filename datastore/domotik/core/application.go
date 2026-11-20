@@ -20,8 +20,7 @@ type Application struct {
 	mutex             sync.RWMutex
 
 	// day (midnight UTC) that has just ended and is not notified yet, 0 if none.
-	endedDay         int64
-	endedDayAttempts int
+	endedDay int64
 }
 
 func (a *Application) AddLog(elements []string, value float64) error {
@@ -35,7 +34,6 @@ func (a *Application) AddLog(elements []string, value float64) error {
 	defer a.mutex.Unlock()
 	if dayEnded {
 		a.endedDay = time.Now().UTC().Truncate(24 * time.Hour).Unix()
-		a.endedDayAttempts = 0
 	}
 	a.measure.UpdateFromLog(log, time.Now().Unix())
 
@@ -53,9 +51,13 @@ func (a *Application) ConvertTasmota(telemetry model.TasmotaTelemetry, publisher
 	return nil
 }
 
-func (a *Application) Process(presenter port.SummarizePresenter) error {
+func (a *Application) Process(presenter port.SummarizePresenter, notifier port.DayEndedNotifier) error {
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+
+	if err := a.notifyDayEnded(notifier); err != nil {
+		return err
+	}
 
 	if a.measure.HasNewIndex() {
 

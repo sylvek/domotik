@@ -50,29 +50,28 @@ func (f *fakeNotifier) Notify(event dto.DayEnded) error {
 	return nil
 }
 
-func TestNotifyDayEnded(t *testing.T) {
+type fakePresenter struct{}
+
+func (f *fakePresenter) Present(dto.Output) error { return nil }
+
+func TestProcessNotifiesDayEnded(t *testing.T) {
 	repository := &fakeRepository{values: map[string]float64{DAILY_POWER: 12345}}
 	application, _ := NewApplication(&fakeState{}, repository, repository, NewSettings(nil))
 	notifier := &fakeNotifier{}
+	presenter := &fakePresenter{}
 
 	// nothing to notify while the day is running
 	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
-	if err := application.NotifyDayEnded(notifier); err != nil || len(notifier.events) != 0 {
+	if err := application.Process(presenter, notifier); err != nil || len(notifier.events) != 0 {
 		t.Fatalf("unexpected notification %+v %v", notifier.events, err)
 	}
 
-	// the day ends: a failure is retried, a success is notified once
+	// the day ends: it is notified once
 	repository.closeDay = true
 	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
 	repository.closeDay = false
-
-	notifier.err = errors.New("unreachable")
-	if err := application.NotifyDayEnded(notifier); err == nil {
-		t.Fatal("an error was expected")
-	}
-	notifier.err = nil
-	application.NotifyDayEnded(notifier)
-	application.NotifyDayEnded(notifier)
+	application.Process(presenter, notifier)
+	application.Process(presenter, notifier)
 	if len(notifier.events) != 1 {
 		t.Fatalf("expected one notification, got %+v", notifier.events)
 	}
@@ -81,17 +80,21 @@ func TestNotifyDayEnded(t *testing.T) {
 		t.Errorf("unexpected event %+v", event)
 	}
 
-	// after too many failures, the notification is given up
+	// a day without any consumption is not notified
+	delete(repository.values, DAILY_POWER)
 	repository.closeDay = true
 	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
 	repository.closeDay = false
-	notifier.err = errors.New("unreachable")
-	for i := 0; i < DAY_ENDED_MAX_ATTEMPTS; i++ {
-		if err := application.NotifyDayEnded(notifier); err == nil {
-			t.Fatal("an error was expected")
-		}
+	if err := application.Process(presenter, notifier); err != nil || len(notifier.events) != 1 {
+		t.Fatalf("unexpected notification %+v %v", notifier.events, err)
 	}
-	if err := application.NotifyDayEnded(notifier); err != nil {
-		t.Errorf("no more attempt was expected: %v", err)
+
+	// a notifier failure is reported
+	repository.values[DAILY_POWER] = 1
+	repository.closeDay = true
+	application.AddLog([]string{"sensors", "linky", "watt"}, 1)
+	notifier.err = errors.New("failure")
+	if err := application.Process(presenter, notifier); err == nil {
+		t.Error("an error was expected")
 	}
 }
