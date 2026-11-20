@@ -2,7 +2,7 @@
 
 One single binary that:
 
-- embeds a MQTT broker (TCP + websocket), no need to run mosquitto,
+- embeds a MQTT broker (TCP), no need to run mosquitto,
 - stores every `sensors/+/+` message into SQLite,
 - converts Tasmota telemetry (`tele/{device}/SENSOR`) into `sensors/{device}/temp|humidity|dewpoint`,
 - serves the dashboards (today / quarter / history).
@@ -16,7 +16,7 @@ $> docker build -t domotik-datastore .
 ## run it
 
 ```
-$> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -p 9883:9883 -e TZ=Europe/Paris -v /path/to/database:/database domotik-datastore
+$> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -e TZ=Europe/Paris -v /path/to/database:/database domotik-datastore
 ```
 
 ## configure it
@@ -26,7 +26,6 @@ $> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -p 9883:9883 -e TZ=E
 | SERVER_PORT         | 3333         | HTTP port (dashboards, `/api/*`, `/summarize`)                         |
 | BASE_PATH           |              | path prefix when the reverse proxy does not strip it (ie. `/domotik`)  |
 | MQTT_PORT           | 1883         | MQTT broker port                                                       |
-| MQTT_WEBSOCKET_PORT | 9883         | MQTT over websocket port                                               |
 | DB_PATH             | /database/   | where `sensors.db`, `history.db` and `state.json` are stored           |
 | SENSOR_LABELS       |              | names displayed on dashboards, ie. `living=séjour,room=chambre`        |
 | TZ                  |              | timezone used to split days, ie. `Europe/Paris`                        |

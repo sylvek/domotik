@@ -22,7 +22,7 @@ type outgoing struct {
 	payload []byte
 }
 
-// MqttBroker is an embedded MQTT broker (TCP + websocket listeners).
+// MqttBroker is an embedded MQTT broker (TCP listener).
 // The application talks to it in-process: no external broker is required.
 type MqttBroker struct {
 	server   *mqtt.Server
@@ -31,7 +31,7 @@ type MqttBroker struct {
 	done     chan struct{}
 }
 
-func NewMQTTBroker(tcpAddress string, websocketAddress string) (*MqttBroker, error) {
+func NewMQTTBroker(address string) (*MqttBroker, error) {
 	server := mqtt.New(&mqtt.Options{
 		InlineClient: true,
 		Logger:       slog.New(slog.NewTextHandler(io.Discard, nil)),
@@ -40,15 +40,8 @@ func NewMQTTBroker(tcpAddress string, websocketAddress string) (*MqttBroker, err
 	if err := server.AddHook(new(auth.AllowHook), nil); err != nil {
 		return nil, err
 	}
-	if tcpAddress != "" {
-		if err := server.AddListener(listeners.NewTCP(listeners.Config{ID: "tcp", Address: tcpAddress})); err != nil {
-			return nil, err
-		}
-	}
-	if websocketAddress != "" {
-		if err := server.AddListener(listeners.NewWebsocket(listeners.Config{ID: "ws", Address: websocketAddress})); err != nil {
-			return nil, err
-		}
+	if err := server.AddListener(listeners.NewTCP(listeners.Config{ID: "tcp", Address: address})); err != nil {
+		return nil, err
 	}
 
 	return &MqttBroker{

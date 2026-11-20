@@ -1,18 +1,9 @@
 services:
-  front:
-    image: ghcr.io/sylvek/domotik-front
-    ports:
-      - 3000:3000
-    depends_on:
-      - datastore
-    volumes:
-      - .:/database
   datastore:
     image: ghcr.io/sylvek/domotik-datastore
     ports:
       - 3333:3333 # dashboards
       - 1883:1883 # MQTT
-      - 9883:9883 # MQTT over websocket
     environment:
       TZ: 'Europe/Paris'
       # SENSOR_LABELS: 'living=séjour,room=chambre'

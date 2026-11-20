@@ -2,18 +2,9 @@ services:
   datastore:
     image: sylvek/domotik-datastore:arm32v6
     ports:
-      - 3000:3333 # dashboards
+      - 3333:3333 # dashboards
       - 1883:1883 # MQTT
-      - 9883:9883 # MQTT over websocket
     volumes:
       - /home/pi/domotik:/database
     environment:
       TZ: Europe/Paris
-  front:
-    image: sylvek/domotik-front:arm32v6
-    ports:
-      - 80:3000
-    volumes:
-      - /home/pi/domotik:/database
-    depends_on:
-      - datastore

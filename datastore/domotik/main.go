@@ -19,13 +19,12 @@ func main() {
 	serverPort := getenv("SERVER_PORT", "3333")
 	basePath := strings.Trim(os.Getenv("BASE_PATH"), "/")
 	mqttPort := getenv("MQTT_PORT", "1883")
-	mqttWebsocketPort := getenv("MQTT_WEBSOCKET_PORT", "9883")
 	dbPath := os.Getenv("DB_PATH")
 	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")))
 
 	log.Println("domotik starting...")
 
-	broker, err := infrastructure.NewMQTTBroker(":"+mqttPort, ":"+mqttWebsocketPort)
+	broker, err := infrastructure.NewMQTTBroker(":" + mqttPort)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,7 +41,7 @@ func main() {
 	if err := broker.Start(); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("MQTT broker started (tcp: %s, websocket: %s)", mqttPort, mqttWebsocketPort)
+	log.Printf("MQTT broker started (tcp: %s)", mqttPort)
 
 	mqttPresenter := infrastructure.NewMqttPresenter(broker)
 	go startSensorsListener(sensors, application, mqttPresenter)
