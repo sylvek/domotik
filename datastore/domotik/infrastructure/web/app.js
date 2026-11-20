@@ -431,6 +431,31 @@ const TEMPERATURES = [
 ];
 const temperatureColor = (v) => `var(--temp-${TEMPERATURES.find((t) => v < t.below).name})`;
 
+// a day compared to a reference day: electricity and outside temperature
+function comparisonTile(c, live) {
+  const date = new Date(c.day * 1000).toLocaleDateString('fr-FR', { timeZone: 'UTC', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const title = c.kind === 'dayBefore'
+    ? `compared to the day before${live ? ', at the same time' : ''}`
+    : `compared to a year before${c.wholeDay ? ' (whole day)' : ''}`;
+  const row = (label, trend, unit, upIs) => {
+    if (!trend) return h('div', { class: 'hint' }, `${label}: no data`);
+    const change = c.wholeDay ? null : trendChange(trend, upIs);
+    if (change && unit === 'temp') {
+      const delta = trend.value - trend.previous;
+      change.text = `${delta > 0 ? '+' : ''}${fmt.temp(delta)}`;
+    }
+    return h('div', { class: 'compare' },
+      h('span', { class: 'label' }, label),
+      h('span', { class: 'value' }, fmt[unit](trend.previous)),
+      change ? h('span', { class: 'hint' }, change.arrow, ` ${change.text}`) : null);
+  };
+  return h('div', { class: 'tile' },
+    h('div', { class: 'label' }, title),
+    h('div', { class: 'hint' }, date),
+    row('electricity', c.consumption, 'wattHour'),
+    row('outside temperature', c.temperature, 'temp', 'neutral'));
+}
+
 function readings(title, list) {
   return h('div', { class: 'tile' },
     h('p', { class: 'group-title' }, title),
@@ -488,6 +513,7 @@ const dashboards = {
     return [
       period,
       tiles,
+      h('div', { class: 'columns' }, d.comparisons.map((c) => comparisonTile(c, d.live))),
       temps.children.length ? temps : null,
       timeChart('Temperature', { series: d.temperatures, from: d.from, to: d.to, unit: 'temp', height: 320 }),
       timeChart('Electricity consumption', { series: d.power, from: d.from, to: d.to, unit: 'watt', kinds: ['area', 'line'], zero: true, height: 260 }),

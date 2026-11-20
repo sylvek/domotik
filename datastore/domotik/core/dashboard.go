@@ -79,6 +79,7 @@ func (a *Application) GetToday(daysAgo int, presenter port.DashboardPresenter) e
 		TypicalDay:          typicalDay.Label,
 		TypicalDayLevel:     typicalDay.Level,
 		TypicalDayMaxWatt:   a.settings.TypicalDays[len(a.settings.TypicalDays)-1].Watt,
+		Comparisons:         []dto.DayComparison{},
 		Inside:              []dto.Reading{},
 		Outside:             []dto.Reading{},
 		Temperatures:        []dto.Series{},
@@ -141,7 +142,94 @@ func (a *Application) GetToday(daysAgo int, presenter port.DashboardPresenter) e
 		today.Power = append(today.Power, dto.NewSeries(s.label, series[s.name]))
 	}
 
+	comparisons, err := a.compareDay(from, now, live, summarize.WattConsumedToday, temperatures[a.settings.OutsideSensor])
+	if err != nil {
+		return err
+	}
+	today.Comparisons = comparisons
+
 	return presenter.PresentToday(today)
+}
+
+// compareDay compares the consumption and the outside temperature of a day with:
+//   - the day before: at the same time of the day while the day is running, over the whole day otherwise,
+//   - the same day of the week a year before (ie. the 3rd saturday of november), over the whole day.
+func (a *Application) compareDay(from time.Time, now time.Time, live bool, wattConsumed int64, outside []model.Point) ([]dto.DayComparison, error) {
+	// daily measures are stamped at midnight UTC of their day
+	stamp := func(t time.Time) int64 {
+		return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC).Unix()
+	}
+	trend := func(value float64, known bool, previous *float64) *dto.Trend {
+		if !known || previous == nil {
+			return nil
+		}
+		return dto.NewTrend(&model.Trend{Value: value, Previous: previous})
+	}
+	wholeDay := func(day time.Time) (*float64, *float64, error) {
+		var consumption, temperature *float64
+		for name, value := range map[string]**float64{DAILY_POWER: &consumption, DAILY_TEMP_OUTSIDE: &temperature} {
+			points, err := a.measureRepository.Daily(name, stamp(day), stamp(day)+1)
+			if err != nil {
+				return nil, nil, err
+			}
+			if len(points) > 0 {
+				*value = &points[len(points)-1].Value
+			}
+		}
+		return consumption, temperature, nil
+	}
+
+	temperature := model.Mean(outside)
+	comparisons := []dto.DayComparison{}
+
+	dayBefore := from.AddDate(0, 0, -1)
+	var consumption, meanTemperature *float64
+	if live {
+		// raw measures of the day before, until the same time of the day
+		until := dayBefore.Unix() + now.Unix() - from.Unix()
+		last, err := a.measureRepository.Last(SUM_PER_DAY, UNIT_WATT, dayBefore.Unix(), until)
+		if err != nil {
+			return nil, err
+		}
+		if last != nil {
+			consumption = &last.Value
+		}
+		series, err := a.measureRepository.Series(a.settings.OutsideSensor, UNIT_TEMP, dayBefore.Unix(), until)
+		if err != nil {
+			return nil, err
+		}
+		if points := series[a.settings.OutsideSensor]; len(points) > 0 {
+			mean := model.Mean(points)
+			meanTemperature = &mean
+		}
+	} else {
+		var err error
+		if consumption, meanTemperature, err = wholeDay(dayBefore); err != nil {
+			return nil, err
+		}
+	}
+	comparisons = append(comparisons, dto.DayComparison{
+		Kind:        "dayBefore",
+		Day:         stamp(dayBefore),
+		Consumption: trend(float64(wattConsumed), true, consumption),
+		Temperature: trend(temperature, len(outside) > 0, meanTemperature),
+	})
+
+	// 52 weeks before: the same day of the week
+	yearBefore := from.AddDate(0, 0, -52*7)
+	consumption, meanTemperature, err := wholeDay(yearBefore)
+	if err != nil {
+		return nil, err
+	}
+	comparisons = append(comparisons, dto.DayComparison{
+		Kind:        "yearBefore",
+		Day:         stamp(yearBefore),
+		WholeDay:    live,
+		Consumption: trend(float64(wattConsumed), true, consumption),
+		Temperature: trend(temperature, len(outside) > 0, meanTemperature),
+	})
+
+	return comparisons, nil
 }
 
 // summarizePast rebuilds the summary of a past day from the last values published during that day.
