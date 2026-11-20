@@ -103,6 +103,38 @@ function formatWhen(t, utc, withTime) {
   return withTime ? `${pad(d.getHours())}:${pad(d.getMinutes())}` : d.toLocaleDateString('fr-FR');
 }
 
+/* ---------- seasons & trends ---------- */
+
+const SEASONS = ['winter', 'spring', 'summer', 'autumn'];
+const seasonColor = (season) => `var(--season-${season})`;
+
+// one series by season, so that every season has its color and its statistics
+function bySeason(serie) {
+  return SEASONS.map((season) => ({
+    label: season,
+    color: seasonColor(season),
+    points: serie.points.filter((p) => p.s === season),
+  }));
+}
+
+function seasonLegend() {
+  return h('div', { class: 'keys' }, SEASONS.map((season) => h('span', {},
+    h('span', { class: 'dot', style: `background:${seasonColor(season)}` }), season)));
+}
+
+// direction of a trend: an arrow and a signed percentage. `upIs` tells if a rise is good, bad or neutral.
+function trendChange(trend, upIs = 'bad') {
+  if (!trend || trend.change == null) return null;
+  const percent = trend.change * 100;
+  const flat = Math.abs(percent) < 0.05;
+  const up = percent > 0;
+  const status = flat || upIs === 'neutral' ? 'text-muted' : (up === (upIs === 'good') ? 'good' : 'serious');
+  return {
+    arrow: h('span', { class: 'arrow', style: `color:var(--${status})` }, flat ? '=' : up ? '▲' : '▼'),
+    text: `${up && !flat ? '+' : ''}${round(percent, 1)} %`,
+  };
+}
+
 /* ---------- tooltip ---------- */
 
 const tooltip = document.getElementById('tooltip');
@@ -160,7 +192,7 @@ function legend(series, unit) {
 function timeChart(title, options, subtitle) {
   const { el, body } = panel(title, subtitle);
   const series = options.series
-    .map((serie, i) => ({ ...serie, color: color(i), kind: (options.kinds || [])[i] || options.kind || 'line' }))
+    .map((serie, i) => ({ ...serie, color: serie.color || color(i), kind: (options.kinds || [])[i] || options.kind || 'line' }))
     .filter((serie) => serie.points && serie.points.length > 0);
 
   if (series.length === 0) {
@@ -308,6 +340,7 @@ function barChart(title, options, subtitle) {
   const margin = { top: 18, right: 12, bottom: 22, left: 58 };
   const svg = s('svg', { height, role: 'img', 'aria-label': title });
   body.append(svg);
+  if (buckets.some((b) => b.season)) body.append(seasonLegend());
 
   const ticks = niceTicks(0, Math.max(1, ...buckets.map((b) => b.value)), Math.max(2, Math.floor(height / 50)));
   const step = ticks[1] - ticks[0];
@@ -333,11 +366,20 @@ function barChart(title, options, subtitle) {
       const cx = margin.left + band * (i + 0.5);
       const top = y(b.value), base = y(0), r = Math.min(4, bw / 2, base - top);
       const left = cx - bw / 2;
-      svg.append(s('path', { d: `M${left},${base}V${top + r}q0,${-r} ${r},${-r}h${bw - 2 * r}q${r},0 ${r},${r}V${base}Z`, fill: color(0) }));
+      const fill = b.season ? seasonColor(b.season) : color(0);
+      svg.append(s('path', { d: `M${left},${base}V${top + r}q0,${-r} ${r},${-r}h${bw - 2 * r}q${r},0 ${r},${r}V${base}Z`, fill }));
       if (direct) svg.append(s('text', { x: cx, y: top - 5, 'text-anchor': 'middle', style: 'fill:var(--text-secondary)' }, fmt[options.unit](b.value)));
       if (i % every === 0) svg.append(s('text', { x: cx, y: height - 6, 'text-anchor': 'middle' }, b.label));
       const hit = s('rect', { x: cx - band / 2, y: margin.top, width: band, height: hh, fill: 'transparent' });
-      hit.addEventListener('pointermove', (event) => showTooltip(event, b.label, [{ color: color(0), label: title, value: fmt[options.unit](b.value) }]));
+      hit.addEventListener('pointermove', (event) => {
+        const rows = [{ color: fill, label: b.season || title, value: fmt[options.unit](b.value) }];
+        const change = trendChange(b.trend);
+        if (change) {
+          rows.push({ label: 'a year before', value: fmt[options.unit](b.trend.previous) });
+          rows.push({ label: h('span', {}, change.arrow, ' trend'), value: change.text });
+        }
+        showTooltip(event, b.label, rows);
+      });
       hit.addEventListener('pointerleave', hideTooltip);
       svg.append(hit);
     });
@@ -364,12 +406,39 @@ function tile(label, value, unit, options = {}) {
   return h('div', { class: 'tile' }, parts);
 }
 
+// a value compared to the same period, a year before
+function trendTile(label, trend, unit, upIs) {
+  if (!trend) return tile(label, '—', null, { hint: 'no data' });
+  const [value, suffix] = fmt[unit](trend.value).split(/ (?=\S+$)/);
+  const change = trendChange(trend, upIs);
+  // a percentage of a temperature means nothing: the difference is displayed in degrees
+  if (change && unit === 'temp') {
+    const delta = trend.value - trend.previous;
+    change.text = `${delta > 0 ? '+' : ''}${fmt.temp(delta)}`;
+  }
+  const hint = change
+    ? h('span', {}, change.arrow, ` ${change.text} vs a year before (${fmt[unit](trend.previous)})`)
+    : 'no comparable data a year before';
+  return tile(label, value, suffix, { hint });
+}
+
+// temperatures go from blue (cold) to red (hot)
+const TEMPERATURES = [
+  { below: 5, name: 'cold', label: '< 5 °C' },
+  { below: 15, name: 'cool', label: '< 15 °C' },
+  { below: 25, name: 'mild', label: '< 25 °C' },
+  { below: Infinity, name: 'hot', label: '≥ 25 °C' },
+];
+const temperatureColor = (v) => `var(--temp-${TEMPERATURES.find((t) => v < t.below).name})`;
+
 function readings(title, list) {
   return h('div', { class: 'tile' },
     h('p', { class: 'group-title' }, title),
-    h('div', { class: 'group' }, list.map((r) => h('div', { class: 'reading' },
+    h('div', { class: 'group' }, list.map((r) => h('div', { class: 'reading', style: `border-left-color:${temperatureColor(r.value)}` },
       h('div', { class: 'label' }, r.label),
-      h('div', { class: 'value' }, fmt.temp(r.value))))));
+      h('div', { class: 'value' }, fmt.temp(r.value))))),
+    h('div', { class: 'keys' }, TEMPERATURES.map((t) => h('span', {},
+      h('span', { class: 'dot', style: `background:var(--temp-${t.name})` }), t.label))));
 }
 
 const LEVELS = { good: 'low', warning: 'moderate', serious: 'high', critical: 'very high' };
@@ -389,9 +458,11 @@ const dashboards = {
         thresholds: [[-Infinity, 'good'], [500, 'warning'], [3000, 'serious'], [6000, 'critical']],
       }));
     }
+    // the consumption of the day is qualified by the server, by comparison with typical days
+    const level = Object.keys(LEVELS).find((st) => LEVELS[st] === d.typicalDayLevel) || 'good';
     tiles.append(tile('today', round(d.wattConsumedToday / 1000, 1), 'kWh', {
-      raw: d.wattConsumedToday, max: 80000, hint: (st) => LEVELS[st],
-      thresholds: [[-Infinity, 'good'], [20000, 'warning'], [35000, 'serious'], [50000, 'critical']],
+      raw: d.wattConsumedToday, max: d.typicalDayMaxWatt, hint: () => `like ${d.typicalDay}`,
+      thresholds: [[-Infinity, level]],
     }));
     tiles.append(tile('cost', round(d.euroSpentToday, 2), '€', {
       raw: d.euroSpentToday, max: 8, hint: (st) => LEVELS[st],
@@ -418,7 +489,15 @@ const dashboards = {
   quarter(d) {
     // daily values are stamped at midnight UTC
     const range = { from: d.from - d.from % 86400 - 43200, to: d.to - d.to % 86400 + 43200, utc: true };
+    const period = h('div', { class: 'switch', role: 'group', 'aria-label': 'period' }, d.availableDays.map((days) =>
+      h('a', { href: `#quarter-${days}`, ...(days === d.days ? { 'aria-current': 'true' } : {}) }, `${days} days`)));
     return [
+      period,
+      h('div', { class: 'tiles' },
+        trendTile('electricity', d.consumptionTrend, 'wattHour'),
+        trendTile('electricity cost', d.costTrend, 'euro'),
+        trendTile('water', d.waterTrend, 'liter'),
+        trendTile('outside temperature', d.temperatureTrend, 'temp', 'neutral')),
       timeChart('Daily temperature', { ...range, series: d.temperatures, unit: 'temp' }),
       timeChart('Daily electricity consumption', { ...range, series: [d.consumption], unit: 'wattHour', kind: 'area', zero: true }),
       timeChart('Daily water consumption', { ...range, series: [d.water], unit: 'liter', kind: 'bars' }),
@@ -434,9 +513,13 @@ const dashboards = {
   history(d) {
     const range = { from: d.from, to: d.to, utc: true };
     return [
-      timeChart('Daily consumption', { ...range, series: [d.consumption], unit: 'wattHour', kind: 'dots', zero: true }),
-      timeChart('Daily temperature', { ...range, series: [d.temperature], unit: 'temp', kind: 'dots' }),
-      barChart('Monthly consumption', { buckets: d.monthlyConsumption, unit: 'wattHour' }),
+      h('div', { class: 'tiles' },
+        trendTile('electricity since january', d.yearToDateTrend, 'wattHour'),
+        trendTile('electricity over the last 12 months', d.twelveMonthsTrend, 'wattHour')),
+      timeChart('Daily consumption', { ...range, series: bySeason(d.consumption), unit: 'wattHour', kind: 'dots', zero: true }),
+      timeChart('Daily temperature', { ...range, series: bySeason(d.temperature), unit: 'temp', kind: 'dots' }),
+      barChart('Monthly consumption', { buckets: d.monthlyConsumption, unit: 'wattHour' },
+        'hover a month to compare it with the same month, a year before'),
       barChart('Yearly consumption', { buckets: d.yearlyConsumption, unit: 'wattHour' }),
       h('div', { class: 'columns' },
         barChart('High consumption during cold days', { buckets: d.highConsumptionOnCold, unit: 'count' },
@@ -456,7 +539,10 @@ const status = document.getElementById('status');
 let timer = null;
 
 async function load() {
-  const name = dashboards[location.hash.slice(1)] ? location.hash.slice(1) : 'today';
+  // #quarter-180 displays the quarter dashboard over 180 days
+  const [hash, param] = location.hash.slice(1).split('-');
+  const name = dashboards[hash] ? hash : 'today';
+  const query = name === 'quarter' && param ? `?days=${encodeURIComponent(param)}` : '';
   document.title = `domotik / ${name}`;
   for (const a of document.querySelectorAll('nav a')) {
     if (a.getAttribute('href') === '#' + name) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
@@ -464,7 +550,7 @@ async function load() {
 
   clearTimeout(timer);
   try {
-    const response = await fetch(`${base}api/${name}`);
+    const response = await fetch(`${base}api/${name}${query}`);
     if (!response.ok) throw new Error(await response.text());
     const data = await response.json();
     hideTooltip();

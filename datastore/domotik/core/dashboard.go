@@ -1,6 +1,7 @@
 package core
 
 import (
+	"slices"
 	"sort"
 	"time"
 
@@ -21,9 +22,7 @@ const (
 	UNIT_DEWPOINT        = "dewpoint"
 	UNIT_WATT            = "watt"
 	UNIT_STATE           = "state"
-	UNIT_LITER           = "liter"
-	QUARTER_DAYS         = 90
-	HISTORY_YEARS        = 5
+	HISTORY_YEARS        = 10
 	LOW_TARIFF_STATE     = 0.0
 	LINKY                = "linky"
 	MEAN_PER_HOUR        = "meanPerHour"
@@ -36,18 +35,25 @@ const (
 	INSIDE_SERIES_LABEL  = "inside"
 )
 
+// QUARTER_DAYS are the periods the quarter dashboard can display, the first one is the default.
+var QUARTER_DAYS = []int{90, 180}
+
 func (a *Application) GetToday(presenter port.DashboardPresenter) error {
 	now := time.Now()
 	from := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
 	to := from.AddDate(0, 0, 1)
 
 	summarize := a.summarize()
+	typicalDay := a.settings.typicalDay(summarize.WattConsumedToday)
 	today := dto.Today{
 		From:                from.Unix(),
 		To:                  to.Unix(),
 		WattConsumedToday:   summarize.WattConsumedToday,
 		EuroSpentToday:      summarize.EuroSpentToday,
 		RatioLowTariffToday: summarize.RatioLowTariffToday,
+		TypicalDay:          typicalDay.Label,
+		TypicalDayLevel:     typicalDay.Level,
+		TypicalDayMaxWatt:   a.settings.TypicalDays[len(a.settings.TypicalDays)-1].Watt,
 		Inside:              []dto.Reading{},
 		Outside:             []dto.Reading{},
 		Temperatures:        []dto.Series{},
@@ -109,22 +115,32 @@ func (a *Application) GetToday(presenter port.DashboardPresenter) error {
 	return presenter.PresentToday(today)
 }
 
-func (a *Application) GetQuarter(presenter port.DashboardPresenter) error {
+// GetQuarter presents the last `days` days. An unexpected number of days falls back to the default one.
+func (a *Application) GetQuarter(days int, presenter port.DashboardPresenter) error {
+	if !slices.Contains(QUARTER_DAYS, days) {
+		days = QUARTER_DAYS[0]
+	}
+
 	now := time.Now()
-	from, to := now.AddDate(0, 0, -QUARTER_DAYS).Unix(), now.Unix()
+	from, to := now.AddDate(0, 0, -days), now
+	// the same period, a year before
+	previousFrom, previousTo := from.AddDate(-1, 0, 0).Unix(), to.AddDate(-1, 0, 0).Unix()
 
 	daily := map[string][]model.Point{}
+	previous := map[string][]model.Point{}
 	for _, name := range []string{DAILY_TEMP_OUTSIDE, DAILY_TEMP_INSIDE, DAILY_POWER, DAILY_RATE, DAILY_COST} {
-		points, err := a.measureRepository.Daily(name, from, to)
+		points, err := a.measureRepository.Daily(name, previousFrom, to.Unix())
 		if err != nil {
 			return err
 		}
-		daily[name] = points
+		daily[name] = model.Between(points, from.Unix(), to.Unix())
+		previous[name] = model.Between(points, previousFrom, previousTo)
 	}
-	water, err := a.measureRepository.DailySum(UNIT_LITER, from, to)
+	allWater, err := a.measureRepository.DailyWater(previousFrom, to.Unix())
 	if err != nil {
 		return err
 	}
+	water := model.Between(allWater, from.Unix(), to.Unix())
 
 	rate := make([]model.Point, len(daily[DAILY_RATE]))
 	for i, p := range daily[DAILY_RATE] {
@@ -136,8 +152,14 @@ func (a *Application) GetQuarter(presenter port.DashboardPresenter) error {
 	}
 
 	return presenter.PresentQuarter(dto.Quarter{
-		From: from,
-		To:   to,
+		From:             from.Unix(),
+		To:               to.Unix(),
+		Days:             days,
+		AvailableDays:    QUARTER_DAYS,
+		ConsumptionTrend: dto.NewTrend(model.NewTrend(daily[DAILY_POWER], previous[DAILY_POWER], model.Sum)),
+		CostTrend:        dto.NewTrend(model.NewTrend(daily[DAILY_COST], previous[DAILY_COST], model.Sum)),
+		WaterTrend:       dto.NewTrend(model.NewTrend(water, model.Between(allWater, previousFrom, previousTo), model.Sum)),
+		TemperatureTrend: dto.NewTrend(model.NewTrend(daily[DAILY_TEMP_OUTSIDE], previous[DAILY_TEMP_OUTSIDE], model.Mean)),
 		Temperatures: []dto.Series{
 			dto.NewSeries(OUTSIDE_SERIES_LABEL, daily[DAILY_TEMP_OUTSIDE]),
 			dto.NewSeries(INSIDE_SERIES_LABEL, daily[DAILY_TEMP_INSIDE])},
@@ -154,7 +176,7 @@ func (a *Application) GetHistory(presenter port.DashboardPresenter) error {
 	now := time.Now()
 	from, to := now.AddDate(-HISTORY_YEARS, 0, 0).Unix(), now.Unix()
 
-	// yearly counters are computed on the whole history
+	// yearly counters and trends are computed on the whole history
 	allConsumption, err := a.measureRepository.Daily(DAILY_POWER, 0, to)
 	if err != nil {
 		return err
@@ -177,12 +199,25 @@ func (a *Application) GetHistory(presenter port.DashboardPresenter) error {
 
 	consumption := since(allConsumption, from)
 
+	// since the 1st of january, compared to last year at the same date
+	newYear := time.Date(now.UTC().Year(), 1, 1, 0, 0, 0, 0, time.UTC)
+	yearToDate := model.NewTrend(
+		model.Between(allConsumption, newYear.Unix(), to),
+		model.Between(allConsumption, newYear.AddDate(-1, 0, 0).Unix(), now.AddDate(-1, 0, 0).Unix()),
+		model.Sum)
+	twelveMonths := model.NewTrend(
+		model.Between(allConsumption, now.AddDate(-1, 0, 0).Unix(), to),
+		model.Between(allConsumption, now.AddDate(-2, 0, 0).Unix(), now.AddDate(-1, 0, 0).Unix()),
+		model.Sum)
+
 	return presenter.PresentHistory(dto.History{
 		From:                  from,
 		To:                    to,
-		Consumption:           dto.NewSeries("consumption", consumption),
-		Temperature:           dto.NewSeries(OUTSIDE_SERIES_LABEL, since(allTemperature, from)),
-		MonthlyConsumption:    dto.NewBuckets(model.GroupSum(consumption, model.ByMonth)),
+		YearToDateTrend:       dto.NewTrend(yearToDate),
+		TwelveMonthsTrend:     dto.NewTrend(twelveMonths),
+		Consumption:           dto.NewSeasonalSeries("consumption", consumption),
+		Temperature:           dto.NewSeasonalSeries(OUTSIDE_SERIES_LABEL, since(allTemperature, from)),
+		MonthlyConsumption:    monthlyBuckets(model.GroupSum(allConsumption, model.ByMonth), from, now),
 		YearlyConsumption:     dto.NewBuckets(model.GroupSum(consumption, model.ByYear)),
 		HighConsumptionOnCold: dto.NewBuckets(highConsumptionOnCold),
 		HotDays:               dto.NewBuckets(hotDays),
@@ -190,6 +225,32 @@ func (a *Application) GetHistory(presenter port.DashboardPresenter) error {
 		HighConsumptionWatt:   a.settings.HighConsumptionWatt,
 		HotDayTemperature:     a.settings.HotDayTemperature,
 	})
+}
+
+// monthlyBuckets gives to every month of the period its season and its trend compared to the same month, a year before.
+// The current month is not compared: it is not finished yet.
+func monthlyBuckets(months []model.Bucket, from int64, now time.Time) []dto.Bucket {
+	month := func(ts int64) time.Time {
+		t := time.Unix(ts, 0).UTC()
+		return time.Date(t.Year(), t.Month(), 1, 0, 0, 0, 0, time.UTC)
+	}
+	values := map[time.Time]float64{}
+	for _, b := range months {
+		values[month(b.TS)] = b.Value
+	}
+
+	buckets := []dto.Bucket{}
+	for _, b := range months {
+		if month(b.TS).Before(month(from)) {
+			continue
+		}
+		bucket := dto.Bucket{Label: b.Label, Value: b.Value, Season: string(model.SeasonOf(b.TS))}
+		if previous, ok := values[month(b.TS).AddDate(-1, 0, 0)]; ok && month(b.TS) != month(now.Unix()) {
+			bucket.Trend = dto.NewTrend(&model.Trend{Value: b.Value, Previous: &previous})
+		}
+		buckets = append(buckets, bucket)
+	}
+	return buckets
 }
 
 // sortedSensors returns the outside sensor first, then the others sorted by label.

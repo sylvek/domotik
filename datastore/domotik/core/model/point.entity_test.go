@@ -24,11 +24,11 @@ func TestGroupSum(t *testing.T) {
 	}
 
 	weeks := GroupSum(points, ByWeek)
-	if len(weeks) != 2 || weeks[0] != (Bucket{"week 52", 1}) || weeks[1] != (Bucket{"week 01", 5}) {
+	if len(weeks) != 2 || weeks[0] != (Bucket{TS: points[0].TS, Label: "week 52", Value: 1}) || weeks[1] != (Bucket{TS: points[1].TS, Label: "week 01", Value: 5}) {
 		t.Errorf("unexpected weeks %+v", weeks)
 	}
 	months := GroupSum(points, ByMonth)
-	if len(months) != 2 || months[0] != (Bucket{"2025-12", 3}) || months[1] != (Bucket{"2026-01", 3}) {
+	if len(months) != 2 || months[0] != (Bucket{TS: points[0].TS, Label: "2025-12", Value: 3}) || months[1] != (Bucket{TS: points[2].TS, Label: "2026-01", Value: 3}) {
 		t.Errorf("unexpected months %+v", months)
 	}
 }
@@ -36,7 +36,7 @@ func TestGroupSum(t *testing.T) {
 func TestGroupCount(t *testing.T) {
 	points := []Point{{TS: ts(2024, 7, 1), Value: 20}, {TS: ts(2025, 7, 1), Value: 30}, {TS: ts(2025, 7, 2), Value: 31}}
 	years := GroupCount(points, ByYear, func(p Point) bool { return p.Value > 25 })
-	if len(years) != 2 || years[0] != (Bucket{"year 2024", 0}) || years[1] != (Bucket{"year 2025", 2}) {
+	if len(years) != 2 || years[0] != (Bucket{TS: points[0].TS, Label: "year 2024", Value: 0}) || years[1] != (Bucket{TS: points[1].TS, Label: "year 2025", Value: 2}) {
 		t.Errorf("unexpected years %+v", years)
 	}
 }

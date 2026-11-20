@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/sylvek/domotik/datastore/core/model"
@@ -58,12 +59,18 @@ type SqliteDatabase struct {
 	path       string
 	parameters Parameters
 	instances  map[string]*Instance
+
+	water      *sql.DB
+	waterMutex sync.Mutex
 }
 
 // Close implements port.LogRepository.
 func (d *SqliteDatabase) Close() {
 	for _, v := range d.instances {
 		v.db.Close()
+	}
+	if d.water != nil {
+		d.water.Close()
 	}
 }
 
@@ -205,14 +212,42 @@ func (d *SqliteDatabase) Daily(name string, from int64, to int64) ([]model.Point
 		name, from, to)
 }
 
-// DailySum implements port.MeasureRepository.
-func (d *SqliteDatabase) DailySum(unit string, from int64, to int64) ([]model.Point, error) {
-	return d.daily("SELECT ts - ts % 86400 AS day, SUM(value) FROM data WHERE unit=? AND ts>=? AND ts<? AND value IS NOT NULL GROUP BY day ORDER BY day",
-		unit, from, to)
+// DailyWater implements port.MeasureRepository.
+// The water database is fed by another service (mail-veolia-wrapper): it is only read, when it exists.
+func (d *SqliteDatabase) DailyWater(from int64, to int64) ([]model.Point, error) {
+	db, err := d.waterDatabase()
+	if db == nil || err != nil {
+		return []model.Point{}, err
+	}
+	// a day is stamped at midnight, in the timezone of the service which wrote it: it is rounded to midnight UTC.
+	return query(db, "SELECT (ts + 43200) / 86400 * 86400 AS day, SUM(value) FROM data WHERE name='daily_water_consumption' AND day>=? AND day<? AND value IS NOT NULL GROUP BY day ORDER BY day",
+		from, to)
 }
 
-func (d *SqliteDatabase) daily(query string, args ...any) ([]model.Point, error) {
-	rows, err := d.instances["history"].db.Query(query, args...)
+func (d *SqliteDatabase) waterDatabase() (*sql.DB, error) {
+	d.waterMutex.Lock()
+	defer d.waterMutex.Unlock()
+
+	if d.water == nil {
+		file := d.path + "/water.db"
+		if _, err := os.Stat(file); err != nil {
+			return nil, nil
+		}
+		db, err := sql.Open("sqlite", "file:"+file+"?mode=ro&_pragma=busy_timeout(5000)")
+		if err != nil {
+			return nil, err
+		}
+		d.water = db
+	}
+	return d.water, nil
+}
+
+func (d *SqliteDatabase) daily(query_ string, args ...any) ([]model.Point, error) {
+	return query(d.instances["history"].db, query_, args...)
+}
+
+func query(db *sql.DB, query string, args ...any) ([]model.Point, error) {
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}

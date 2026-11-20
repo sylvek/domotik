@@ -15,7 +15,7 @@ type fakeRepository struct {
 func (f *fakeRepository) Close()                                            {}
 func (f *fakeRepository) Retrieve() (model.State, error)                    { return f.state, nil }
 func (f *fakeRepository) Daily(string, int64, int64) ([]model.Point, error) { return nil, nil }
-func (f *fakeRepository) DailySum(string, int64, int64) ([]model.Point, error) {
+func (f *fakeRepository) DailyWater(int64, int64) ([]model.Point, error) {
 	return nil, nil
 }
 func (f *fakeRepository) Last(string, string, int64, int64) (*model.Point, error) {
