@@ -1,1 +1,0 @@
-var images = {"dev": {"title": "dev", "file": "dev.jpg"}}

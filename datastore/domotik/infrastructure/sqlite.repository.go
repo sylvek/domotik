@@ -15,6 +15,9 @@ import (
 	_ "github.com/glebarez/go-sqlite"
 )
 
+var _ port.LogRepository = (*SqliteDatabase)(nil)
+var _ port.MeasureRepository = (*SqliteDatabase)(nil)
+
 type Aggregation string
 
 const (
@@ -83,7 +86,7 @@ func (d *SqliteDatabase) Store(l model.Log) error {
 
 	db := d.instances[l.GetTopic()].db
 	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
-		// Grafana requires that data is stored in UTC
+		// data is stored in UTC
 		t.Unix(),
 		l.GetName(),
 		l.GetUnit(),
@@ -154,11 +157,79 @@ func prepareDatabase(entity string) (db *sql.DB) {
 
 	db.Exec("CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTOINCREMENT, ts INTEGER, name TEXT, unit TEXT, value REAL);")
 	db.Exec("CREATE INDEX IF NOT EXISTS indx_data on data (ts);")
+	db.Exec("CREATE INDEX IF NOT EXISTS indx_data_series on data (name, unit, ts);")
 
 	return db
 }
 
-func NewSqliteDatabase(path string) port.LogRepository {
+// Last implements port.MeasureRepository.
+func (d *SqliteDatabase) Last(name string, unit string, from int64, to int64) (*model.Point, error) {
+	point := model.Point{}
+	err := d.instances["sensors"].db.QueryRow(
+		"SELECT ts, value FROM data WHERE name=? AND unit=? AND ts>=? AND ts<? ORDER BY ts DESC LIMIT 1",
+		name, unit, from, to).Scan(&point.TS, &point.Value)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &point, nil
+}
+
+// Series implements port.MeasureRepository.
+func (d *SqliteDatabase) Series(name string, unit string, from int64, to int64) (map[string][]model.Point, error) {
+	rows, err := d.instances["sensors"].db.Query(
+		"SELECT name, ts, value FROM data WHERE (name=? OR ?='') AND unit=? AND ts>=? AND ts<? ORDER BY ts",
+		name, name, unit, from, to)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	series := map[string][]model.Point{}
+	for rows.Next() {
+		var sensor string
+		point := model.Point{}
+		if err := rows.Scan(&sensor, &point.TS, &point.Value); err != nil {
+			return nil, err
+		}
+		series[sensor] = append(series[sensor], point)
+	}
+	return series, rows.Err()
+}
+
+// Daily implements port.MeasureRepository.
+func (d *SqliteDatabase) Daily(name string, from int64, to int64) ([]model.Point, error) {
+	return d.daily("SELECT ts, value FROM data WHERE name=? AND ts>=? AND ts<? AND value IS NOT NULL ORDER BY ts",
+		name, from, to)
+}
+
+// DailySum implements port.MeasureRepository.
+func (d *SqliteDatabase) DailySum(unit string, from int64, to int64) ([]model.Point, error) {
+	return d.daily("SELECT ts - ts % 86400 AS day, SUM(value) FROM data WHERE unit=? AND ts>=? AND ts<? AND value IS NOT NULL GROUP BY day ORDER BY day",
+		unit, from, to)
+}
+
+func (d *SqliteDatabase) daily(query string, args ...any) ([]model.Point, error) {
+	rows, err := d.instances["history"].db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	points := []model.Point{}
+	for rows.Next() {
+		point := model.Point{}
+		if err := rows.Scan(&point.TS, &point.Value); err != nil {
+			return nil, err
+		}
+		points = append(points, point)
+	}
+	return points, rows.Err()
+}
+
+func NewSqliteDatabase(path string) *SqliteDatabase {
 	parameters := Parameters{}
 	data, err := os.ReadFile(path + "/database.json")
 	if err == nil {

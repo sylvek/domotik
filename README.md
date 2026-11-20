@@ -1,6 +1,6 @@
 # Domotik
 
-![tv](extras/tv.png)
+![today](extras/dashboard_today.png)
 
 Domotik is a very simple home-automation software.
 
@@ -37,6 +37,7 @@ Basically, everything was running on a raspberry pi 0/1.
 - In 2022, i gave up influxdb and built a dedicated datastore
 - In 2023, domotik works on a raspberry pi 0/1
 - In 2024, nothing more…
+- In 2026, Grafana, Mosquitto, the Tasmota converter and the TV dashboard are replaced by the datastore itself: one container to deploy
 
 ## Build / Run it
 
@@ -47,8 +48,7 @@ Basically, everything was running on a raspberry pi 0/1.
 > wget https://raw.githubusercontent.com/sylvek/domotik/master/docker-compose.yml
 > docker compose up
 
-> #open http://localhost:3000 for the TV show
-> #open http://localhost:3333 to display Grafana
+> #open http://localhost:3333 to display dashboards
 
 > #You can simulate data by using [`mosquitto_pub`](https://mosquitto.org/man/mosquitto_pub-1.html).
 
@@ -77,13 +77,14 @@ Basically i use 3 temperature sensors and a "watt meter".
 | power consumption | sensors/linky/indice | xxxxx    | watt consumed since the first day  |
 | power state       | sensors/linky/state  | 1 or 0   | state between high and low tariff  |
 
-| service      | link                |
-| ------------ | ------------------- |
-| tv dashboard | http://your_ip      |
-| pc dashboard | http://your_ip:3000 |
-| MQTT broker  | tcp://your_ip:1883  |
+[Tasmota](https://tasmota.github.io) devices are supported out of the box: `tele/{device}/SENSOR` messages (DS18B20, AM2301) are converted into `sensors/{device}/temp`, `humidity` and `dewpoint`.
 
-I use Grafana _(plugged on SQLite)_ to display more dashboards. _(look extras/grafana-save folder)_
+| service     | link                |
+| ----------- | ------------------- |
+| dashboards  | http://your_ip:3333 |
+| MQTT broker | tcp://your_ip:1883  |
 
-![today](extras/grafana_1.png)
-![over 5y](extras/grafana_2.png)
+The MQTT broker and the dashboards _(today, quarter, history)_ are embedded in the datastore. _(look at [datastore/README.md](datastore/README.md) to configure it or to serve it behind nginx)_
+
+![quarter](extras/dashboard_quarter.png)
+![over 5y](extras/dashboard_history.png)

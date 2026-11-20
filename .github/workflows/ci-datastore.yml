@@ -1,0 +1,40 @@
+name: ci datastore
+on:
+  pull_request:
+    paths:
+      - 'datastore/**'
+      - '.github/workflows/ci-datastore.yml'
+  push:
+    branches:
+      - master
+    paths:
+      - 'datastore/**'
+      - '.github/workflows/ci-datastore.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    name: go test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: datastore/domotik
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: datastore/domotik/go.mod
+          cache-dependency-path: datastore/domotik/go.sum
+      - run: go vet ./...
+      - run: go test ./...
+  docker:
+    name: docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: datastore
+          push: false
+          tags: domotik-datastore:ci

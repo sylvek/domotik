@@ -1,32 +1,11 @@
 services:
-  front:
-    image: ghcr.io/sylvek/domotik-front
-    ports:
-      - 3000:3000
-    depends_on:
-      - mosquitto
-    volumes:
-      - .:/database
   datastore:
     image: ghcr.io/sylvek/domotik-datastore
-    depends_on:
-      - mosquitto
+    ports:
+      - 3333:3333 # dashboards
+      - 1883:1883 # MQTT
     environment:
       TZ: 'Europe/Paris'
-    volumes:
-      - .:/database
-  mosquitto:
-    image: ghcr.io/sylvek/mosquitto
-    ports:
-      - 1883:1883
-      - 9883:9883
-  grafana:
-    image: ghcr.io/sylvek/domotik-grafana
-    ports:
-      - 3333:3000
-    environment:
-      GF_AUTH_ANONYMOUS_ENABLED: true
-    depends_on:
-      - datastore
+      # SENSOR_LABELS: 'living=séjour,room=chambre'
     volumes:
       - .:/database

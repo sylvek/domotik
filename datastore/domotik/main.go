@@ -11,35 +11,50 @@ import (
 	"time"
 
 	"github.com/sylvek/domotik/datastore/core"
+	"github.com/sylvek/domotik/datastore/core/port"
 	"github.com/sylvek/domotik/datastore/infrastructure"
 )
 
 func main() {
-	serverPort := os.Getenv("SERVER_PORT")
-	mqttHost := os.Getenv("MQTT_HOST")
+	serverPort := getenv("SERVER_PORT", "3333")
+	basePath := strings.Trim(os.Getenv("BASE_PATH"), "/")
+	mqttPort := getenv("MQTT_PORT", "1883")
 	dbPath := os.Getenv("DB_PATH")
+	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")))
 
-	log.Println("datastore starting...")
+	log.Println("domotik starting...")
 
-	client := infrastructure.NewMQTTClient(mqttHost, []string{"sensors/+/+"})
+	broker, err := infrastructure.NewMQTTBroker(":" + mqttPort)
+	if err != nil {
+		log.Fatal(err)
+	}
 	localRepository := infrastructure.NewLocalStore(dbPath)
 	sqliteRepository := infrastructure.NewSqliteDatabase(dbPath)
 
-	application, err := core.NewApplication(localRepository, sqliteRepository)
+	application, err := core.NewApplication(localRepository, sqliteRepository, sqliteRepository, settings)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	go startMqttListener(client, application)
-	go startHttpListener(serverPort, application)
+	sensors := broker.Messages("sensors/+/+")
+	tasmota := broker.Messages("tele/+/SENSOR")
+	if err := broker.Start(); err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("MQTT broker started (tcp: %s)", mqttPort)
 
-	log.Println("datastore started")
+	mqttPresenter := infrastructure.NewMqttPresenter(broker)
+	go startSensorsListener(sensors, application, mqttPresenter)
+	go startTasmotaListener(tasmota, application, mqttPresenter)
+	go startHttpListener(serverPort, basePath, application)
+
+	log.Println("domotik started")
 
 	defer func() {
-		client.Stop()
+		broker.Stop()
 		sqliteRepository.Close()
 		localRepository.Close()
-		log.Println("datastore stopped")
+		log.Println("domotik stopped")
 	}()
 
 	done := make(chan os.Signal, 1)
@@ -47,49 +62,109 @@ func main() {
 	<-done
 }
 
+func getenv(key string, fallback string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return fallback
+}
+
+// parseLabels reads a list like "living=séjour,room=chambre"
+func parseLabels(value string) map[string]string {
+	labels := map[string]string{}
+	for _, pair := range strings.Split(value, ",") {
+		if name, label, ok := strings.Cut(pair, "="); ok {
+			labels[strings.TrimSpace(name)] = strings.TrimSpace(label)
+		}
+	}
+	return labels
+}
+
 func startHttpListener(
 	serverPort string,
+	basePath string,
 	application *core.Application) {
-	http.HandleFunc("/summarize", func(w http.ResponseWriter, r *http.Request) {
+
+	dashboard := func(get func(port.DashboardPresenter) error) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			if err := get(infrastructure.NewHttpDashboardPresenter(w)); err != nil {
+				log.Printf(" - error - %s", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		}
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/summarize", func(w http.ResponseWriter, r *http.Request) {
 		httpPresenter := infrastructure.NewHttpPresenter(w)
 		application.GetSummarize(httpPresenter)
 	})
+	mux.HandleFunc("/api/today", dashboard(application.GetToday))
+	mux.HandleFunc("/api/quarter", dashboard(application.GetQuarter))
+	mux.HandleFunc("/api/history", dashboard(application.GetHistory))
+	mux.Handle("/", infrastructure.NewDashboardHandler())
+
+	// the application can be served behind a reverse proxy, with or without a path prefix
+	var handler http.Handler = mux
+	if basePath != "" {
+		handler = http.NewServeMux()
+		handler.(*http.ServeMux).Handle("/"+basePath+"/", http.StripPrefix("/"+basePath, mux))
+		handler.(*http.ServeMux).Handle("/", mux)
+	}
 
 	log.Println("HTTP server started")
 
-	err := http.ListenAndServe(":"+serverPort, nil)
+	err := http.ListenAndServe(":"+serverPort, handler)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func startMqttListener(
-	client *infrastructure.MqttClient,
-	application *core.Application) {
+func startTasmotaListener(
+	messages chan infrastructure.Message,
+	application *core.Application,
+	publisher port.LogPublisher) {
+
+	log.Println("tasmota converter started")
+
+	for msg := range messages {
+		telemetry, err := infrastructure.DecodeTasmota(msg)
+		if err != nil {
+			log.Printf(" - error - %s", err)
+			continue
+		}
+		if err := application.ConvertTasmota(telemetry, publisher); err != nil {
+			log.Printf(" - error - %s", err)
+		}
+	}
+}
+
+func startSensorsListener(
+	messages chan infrastructure.Message,
+	application *core.Application,
+	presenter port.SummarizePresenter) {
 
 	ticker := time.NewTicker(time.Minute)
-	mqttPresenter := infrastructure.NewMqttPresenter(client)
 
-	client.Start()
-
-	log.Println("MQTT listener started")
+	log.Println("sensors listener started")
 
 	for {
 		select {
 		case <-ticker.C:
-			if err := application.Process(mqttPresenter); err != nil {
+			if err := application.Process(presenter); err != nil {
 				log.Fatal(err)
 			}
-		case msg := <-client.Message():
-			payload := string(msg.Payload()[:])
-			elements := strings.Split(msg.Topic(), "/")
-			value, _ := strconv.ParseFloat(payload, 64)
+		case msg := <-messages:
+			elements := strings.Split(msg.Topic, "/")
+			value, _ := strconv.ParseFloat(string(msg.Payload), 64)
 
-			err := application.AddLog(elements, value)
-			if err != nil {
+			for {
+				err := application.AddLog(elements, value)
+				if err == nil {
+					break
+				}
 				log.Printf(" - error - %s", err)
 				time.Sleep(time.Second)
-				client.Message() <- msg
 			}
 		}
 	}
