@@ -20,7 +20,9 @@ func main() {
 	basePath := strings.Trim(os.Getenv("BASE_PATH"), "/")
 	mqttPort := getenv("MQTT_PORT", "1883")
 	dbPath := os.Getenv("DB_PATH")
-	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")))
+	dayEndedWebhookUrl := os.Getenv("DAY_ENDED_WEBHOOK_URL")
+	dayEndedMeasures := strings.Fields(strings.ReplaceAll(getenv("DAY_ENDED_WEBHOOK_MEASURES", "daily_power_consumption"), ",", " "))
+	settings := core.NewSettings(parseLabels(os.Getenv("SENSOR_LABELS")), dayEndedMeasures)
 
 	log.Println("domotik starting...")
 
@@ -47,6 +49,9 @@ func main() {
 	go startSensorsListener(sensors, application, mqttPresenter)
 	go startTasmotaListener(tasmota, application, mqttPresenter)
 	go startHttpListener(serverPort, basePath, application)
+	if dayEndedWebhookUrl != "" {
+		go startDayEndedNotifier(application, infrastructure.NewWebhookNotifier(dayEndedWebhookUrl))
+	}
 
 	log.Println("domotik started")
 
@@ -117,6 +122,19 @@ func startHttpListener(
 	err := http.ListenAndServe(":"+serverPort, handler)
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+func startDayEndedNotifier(
+	application *core.Application,
+	notifier port.DayEndedNotifier) {
+
+	log.Println("day ended webhook enabled")
+
+	for range time.Tick(time.Minute) {
+		if err := application.NotifyDayEnded(notifier); err != nil {
+			log.Printf(" - error - %s", err)
+		}
 	}
 }
 

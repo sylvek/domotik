@@ -8,6 +8,8 @@ type Settings struct {
 	OutsideSensor string
 	// WaterEuroByLiter is the price of one liter of water.
 	WaterEuroByLiter float64
+	// DayEndedMeasures are the daily measures notified when a day ends.
+	DayEndedMeasures []string
 	// A "cold day" is a day where the average outside temperature is below ColdDayTemperature (°C)
 	ColdDayTemperature float64
 	// A "high consumption" day is a day where more than HighConsumptionWatt (Wh) were consumed.
@@ -16,10 +18,11 @@ type Settings struct {
 	HotDayTemperature float64
 }
 
-func NewSettings(labels map[string]string) Settings {
+func NewSettings(labels map[string]string, dayEndedMeasures []string) Settings {
 	return Settings{
 		Labels:              labels,
 		OutsideSensor:       "outside",
+		DayEndedMeasures:    dayEndedMeasures,
 		WaterEuroByLiter:    0.004,
 		ColdDayTemperature:  5,
 		HighConsumptionWatt: 40000,

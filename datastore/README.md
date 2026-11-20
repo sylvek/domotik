@@ -5,7 +5,8 @@ One single binary that:
 - embeds a MQTT broker (TCP), no need to run mosquitto,
 - stores every `sensors/+/+` message into SQLite,
 - converts Tasmota telemetry (`tele/{device}/SENSOR`) into `sensors/{device}/temp|humidity|dewpoint`,
-- serves the dashboards (today / quarter / history).
+- serves the dashboards (today / quarter / history),
+- calls a webhook when a day ends (optional).
 
 ## build it
 
@@ -28,7 +29,25 @@ $> docker run -d --name datastore -p 3333:3333 -p 1883:1883 -e TZ=Europe/Paris -
 | MQTT_PORT           | 1883         | MQTT broker port                                                       |
 | DB_PATH             | /database/   | where `sensors.db`, `history.db` and `state.json` are stored           |
 | SENSOR_LABELS       |              | names displayed on dashboards, ie. `living=séjour,room=chambre`        |
+| DAY_ENDED_WEBHOOK_URL      |       | URL called when a day ends, disabled when empty                 |
+| DAY_ENDED_WEBHOOK_MEASURES | daily_power_consumption | daily measures to notify, separated by commas |
 | TZ                  |              | timezone used to split days, ie. `Europe/Paris`                        |
+
+## day ended webhook
+
+When a new day starts, the measures of the day that has just ended are aggregated into `history.db`.
+If `DAY_ENDED_WEBHOOK_URL` is set, the URL is then called (GET), once by measure listed in `DAY_ENDED_WEBHOOK_MEASURES`, with two query parameters:
+
+| parameter | example                       | usage                                   |
+| --------- | ----------------------------- | --------------------------------------- |
+| title     | `💡 Consommation: 12.345 kWh` | a text describing the value of the day  |
+| timestamp | `1795132800`                  | the ended day, at midnight UTC, seconds |
+
+A failed call is retried twice, one minute apart. The URL is a secret: it is given by the environment only and is never logged.
+
+```
+$> docker run -d --name datastore -e DAY_ENDED_WEBHOOK_URL=https://script.google.com/macros/s/xxx/exec …
+```
 
 ## behind nginx
 
@@ -49,6 +68,6 @@ core/                 business rules, no dependency
   dto/                data given to presenters
   application.go      use cases: store logs, summarize, convert tasmota
   dashboard.go        use cases: today, quarter, history
-infrastructure/       adapters (sqlite, embedded mqtt broker, http, web pages)
+infrastructure/       adapters (sqlite, embedded mqtt broker, http, web pages, webhook)
 main.go               wiring
 ```

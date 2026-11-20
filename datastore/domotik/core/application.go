@@ -18,16 +18,25 @@ type Application struct {
 	measureRepository port.MeasureRepository
 	settings          Settings
 	mutex             sync.RWMutex
+
+	// day (midnight UTC) that has just ended and is not notified yet, 0 if none.
+	endedDay         int64
+	endedDayAttempts int
 }
 
 func (a *Application) AddLog(elements []string, value float64) error {
 	log := *model.NewLog(elements, value)
+	dayEnded := a.logRepository.CloseDay()
 	if err := a.logRepository.Store(log); err != nil {
 		return err
 	}
 
 	a.mutex.Lock()
 	defer a.mutex.Unlock()
+	if dayEnded {
+		a.endedDay = time.Now().UTC().Truncate(24 * time.Hour).Unix()
+		a.endedDayAttempts = 0
+	}
 	a.measure.UpdateFromLog(log, time.Now().Unix())
 
 	return nil

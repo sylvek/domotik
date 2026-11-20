@@ -67,22 +67,28 @@ func (d *SqliteDatabase) Close() {
 	}
 }
 
+// CloseDay implements port.LogRepository.
+func (d *SqliteDatabase) CloseDay() bool {
+	currentDayOfYear := time.Now().YearDay()
+	if currentDayOfYear == d.parameters.CurrentIndex {
+		return false
+	}
+	d.parameters.CurrentIndex = currentDayOfYear
+
+	log.Printf("daily work is starting (%d)\n", currentDayOfYear)
+
+	d.synchronization()
+	d.aggregation()
+	d.cleaning()
+
+	log.Println("daily work is finished")
+
+	return true
+}
+
 // Store implements port.LogRepository.
 func (d *SqliteDatabase) Store(l model.Log) error {
 	t := time.Now()
-
-	currentDayOfYear := t.YearDay()
-	if currentDayOfYear != d.parameters.CurrentIndex {
-		d.parameters.CurrentIndex = currentDayOfYear
-
-		log.Printf("daily work is starting (%d)\n", currentDayOfYear)
-
-		d.synchronization()
-		d.aggregation()
-		d.cleaning()
-
-		log.Println("daily work is finished")
-	}
 
 	db := d.instances[l.GetTopic()].db
 	_, err := db.Exec("INSERT INTO data (ts, name, unit, value) VALUES (?, ?, ?, ?)",
@@ -203,6 +209,21 @@ func (d *SqliteDatabase) Series(name string, unit string, from int64, to int64) 
 func (d *SqliteDatabase) Daily(name string, from int64, to int64) ([]model.Point, error) {
 	return d.daily("SELECT ts, value FROM data WHERE name=? AND ts>=? AND ts<? AND value IS NOT NULL ORDER BY ts",
 		name, from, to)
+}
+
+// DailyValue implements port.MeasureRepository.
+func (d *SqliteDatabase) DailyValue(name string, day int64) (*model.DailyValue, error) {
+	value := model.DailyValue{Name: name}
+	err := d.instances["history"].db.QueryRow(
+		"SELECT ts, unit, value FROM data WHERE name=? AND ts=? AND value IS NOT NULL ORDER BY id DESC LIMIT 1",
+		name, day).Scan(&value.TS, &value.Unit, &value.Value)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	return &value, nil
 }
 
 // DailySum implements port.MeasureRepository.

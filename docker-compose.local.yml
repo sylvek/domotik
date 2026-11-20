@@ -7,5 +7,6 @@ services:
     environment:
       TZ: 'Europe/Paris'
       # SENSOR_LABELS: 'living=séjour,room=chambre'
+      # DAY_ENDED_WEBHOOK_URL: 'https://example.org/webhook'
     volumes:
       - .:/database
