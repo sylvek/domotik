@@ -44,12 +44,16 @@ func (a *Application) GetToday(presenter port.DashboardPresenter) error {
 	to := from.AddDate(0, 0, 1)
 
 	summarize := a.summarize()
+	typicalDay := a.settings.typicalDay(summarize.WattConsumedToday)
 	today := dto.Today{
 		From:                from.Unix(),
 		To:                  to.Unix(),
 		WattConsumedToday:   summarize.WattConsumedToday,
 		EuroSpentToday:      summarize.EuroSpentToday,
 		RatioLowTariffToday: summarize.RatioLowTariffToday,
+		TypicalDay:          typicalDay.Label,
+		TypicalDayLevel:     typicalDay.Level,
+		TypicalDayMaxWatt:   a.settings.TypicalDays[len(a.settings.TypicalDays)-1].Watt,
 		Inside:              []dto.Reading{},
 		Outside:             []dto.Reading{},
 		Temperatures:        []dto.Series{},

@@ -16,6 +16,10 @@
   --s6: #0ca30c;
   --s7: #9085e9;
   --s8: #e66767;
+  --temp-cold: #256abf;
+  --temp-cool: #86b6ef;
+  --temp-mild: #8f8e85;
+  --temp-hot: #e66767;
   --season-winter: #3987e5;
   --season-spring: #199e70;
   --season-summer: #c98500;
@@ -45,6 +49,10 @@
     --s6: #008300;
     --s7: #6250d6;
     --s8: #e34948;
+    --temp-cold: #184f95;
+    --temp-cool: #5598e7;
+    --temp-mild: #a3a299;
+    --temp-hot: #e34948;
     --season-winter: #2a78d6;
     --season-spring: #1baf7a;
     --season-summer: #eda100;
@@ -118,6 +126,7 @@ main { padding: 0 16px 24px; display: grid; gap: 12px; }
 
 .group { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 .group-title { color: var(--text-muted); font-size: 12px; margin: 0 0 8px; }
+.group .reading { border-left: 3px solid transparent; padding-left: 8px; }
 .group .reading .label { color: var(--text-secondary); font-size: 12px; }
 .group .reading .value { font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
 

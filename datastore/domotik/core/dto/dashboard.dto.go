@@ -36,17 +36,22 @@ type Reading struct {
 
 // Today describes the current day, from midnight to midnight (local time).
 type Today struct {
-	From                int64     `json:"from"`
-	To                  int64     `json:"to"`
-	LowTariff           *bool     `json:"lowTariff"`
-	WattNow             *float64  `json:"wattNow"`
-	WattConsumedToday   int64     `json:"wattConsumedToday"`
-	EuroSpentToday      float64   `json:"euroSpentToday"`
-	RatioLowTariffToday float64   `json:"ratioLowTariffToday"`
-	Inside              []Reading `json:"inside"`
-	Outside             []Reading `json:"outside"`
-	Temperatures        []Series  `json:"temperatures"`
-	Power               []Series  `json:"power"`
+	From                int64    `json:"from"`
+	To                  int64    `json:"to"`
+	LowTariff           *bool    `json:"lowTariff"`
+	WattNow             *float64 `json:"wattNow"`
+	WattConsumedToday   int64    `json:"wattConsumedToday"`
+	EuroSpentToday      float64  `json:"euroSpentToday"`
+	RatioLowTariffToday float64  `json:"ratioLowTariffToday"`
+	// TypicalDay qualifies the consumption of the day, so far, by comparison with reference days.
+	TypicalDay      string `json:"typicalDay"`
+	TypicalDayLevel string `json:"typicalDayLevel"`
+	// TypicalDayMaxWatt is the consumption (Wh) of the highest reference day.
+	TypicalDayMaxWatt int64     `json:"typicalDayMaxWatt"`
+	Inside            []Reading `json:"inside"`
+	Outside           []Reading `json:"outside"`
+	Temperatures      []Series  `json:"temperatures"`
+	Power             []Series  `json:"power"`
 }
 
 // Quarter describes the last 90 or 180 days.

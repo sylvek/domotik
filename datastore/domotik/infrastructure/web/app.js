@@ -422,12 +422,23 @@ function trendTile(label, trend, unit, upIs) {
   return tile(label, value, suffix, { hint });
 }
 
+// temperatures go from blue (cold) to red (hot)
+const TEMPERATURES = [
+  { below: 5, name: 'cold', label: '< 5 °C' },
+  { below: 15, name: 'cool', label: '< 15 °C' },
+  { below: 25, name: 'mild', label: '< 25 °C' },
+  { below: Infinity, name: 'hot', label: '≥ 25 °C' },
+];
+const temperatureColor = (v) => `var(--temp-${TEMPERATURES.find((t) => v < t.below).name})`;
+
 function readings(title, list) {
   return h('div', { class: 'tile' },
     h('p', { class: 'group-title' }, title),
-    h('div', { class: 'group' }, list.map((r) => h('div', { class: 'reading' },
+    h('div', { class: 'group' }, list.map((r) => h('div', { class: 'reading', style: `border-left-color:${temperatureColor(r.value)}` },
       h('div', { class: 'label' }, r.label),
-      h('div', { class: 'value' }, fmt.temp(r.value))))));
+      h('div', { class: 'value' }, fmt.temp(r.value))))),
+    h('div', { class: 'keys' }, TEMPERATURES.map((t) => h('span', {},
+      h('span', { class: 'dot', style: `background:var(--temp-${t.name})` }), t.label))));
 }
 
 const LEVELS = { good: 'low', warning: 'moderate', serious: 'high', critical: 'very high' };
@@ -447,9 +458,11 @@ const dashboards = {
         thresholds: [[-Infinity, 'good'], [500, 'warning'], [3000, 'serious'], [6000, 'critical']],
       }));
     }
+    // the consumption of the day is qualified by the server, by comparison with typical days
+    const level = Object.keys(LEVELS).find((st) => LEVELS[st] === d.typicalDayLevel) || 'good';
     tiles.append(tile('today', round(d.wattConsumedToday / 1000, 1), 'kWh', {
-      raw: d.wattConsumedToday, max: 80000, hint: (st) => LEVELS[st],
-      thresholds: [[-Infinity, 'good'], [20000, 'warning'], [35000, 'serious'], [50000, 'critical']],
+      raw: d.wattConsumedToday, max: d.typicalDayMaxWatt, hint: () => `like ${d.typicalDay}`,
+      thresholds: [[-Infinity, level]],
     }));
     tiles.append(tile('cost', round(d.euroSpentToday, 2), '€', {
       raw: d.euroSpentToday, max: 8, hint: (st) => LEVELS[st],
