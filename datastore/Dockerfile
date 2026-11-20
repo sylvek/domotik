@@ -7,9 +7,10 @@ FROM gcr.io/distroless/static
 COPY --from=builder /domotik/datastore /datastore
 
 ENV SERVER_PORT=3333
-ENV MQTT_HOST=tcp://mosquitto:1883
+ENV MQTT_PORT=1883
+ENV MQTT_WEBSOCKET_PORT=9883
 ENV DB_PATH=/database/
 
-EXPOSE 3333
+EXPOSE 3333 1883 9883
 
 CMD ["/datastore"]

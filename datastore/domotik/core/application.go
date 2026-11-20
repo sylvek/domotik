@@ -1,6 +1,7 @@
 package core
 
 import (
+	"sync"
 	"time"
 
 	"github.com/sylvek/domotik/datastore/core/dto"
@@ -13,6 +14,10 @@ type Application struct {
 	state           model.State
 	stateRepository port.StateRepository
 	logRepository   port.LogRepository
+
+	measureRepository port.MeasureRepository
+	settings          Settings
+	mutex             sync.RWMutex
 }
 
 func (a *Application) AddLog(elements []string, value float64) error {
@@ -21,12 +26,28 @@ func (a *Application) AddLog(elements []string, value float64) error {
 		return err
 	}
 
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
 	a.measure.UpdateFromLog(log, time.Now().Unix())
 
 	return nil
 }
 
+// ConvertTasmota publishes the measures of a tasmota device as regular sensors logs.
+func (a *Application) ConvertTasmota(telemetry model.TasmotaTelemetry, publisher port.LogPublisher) error {
+	for _, log := range telemetry.Logs() {
+		if err := publisher.Publish(log); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (a *Application) Process(presenter port.SummarizePresenter) error {
+	a.mutex.Lock()
+	defer a.mutex.Unlock()
+
 	if a.measure.HasNewIndex() {
 
 		t := time.Now()
@@ -52,18 +73,21 @@ func (a *Application) Process(presenter port.SummarizePresenter) error {
 }
 
 func (a *Application) GetSummarize(presenter port.SummarizePresenter) error {
-	output := *dto.NewOutputFromState(a.state)
+	return presenter.Present(a.summarize())
+}
 
-	if err := presenter.Present(output); err != nil {
-		return err
-	}
+func (a *Application) summarize() dto.Output {
+	a.mutex.RLock()
+	defer a.mutex.RUnlock()
 
-	return nil
+	return *dto.NewOutputFromState(a.state)
 }
 
 func NewApplication(
 	stateRepository port.StateRepository,
-	logRepository port.LogRepository) (*Application, error) {
+	logRepository port.LogRepository,
+	measureRepository port.MeasureRepository,
+	settings Settings) (*Application, error) {
 
 	measure := *model.NewMeasure()
 
@@ -77,5 +101,8 @@ func NewApplication(
 		state:           state,
 		stateRepository: stateRepository,
 		logRepository:   logRepository,
+
+		measureRepository: measureRepository,
+		settings:          settings,
 	}, nil
 }
