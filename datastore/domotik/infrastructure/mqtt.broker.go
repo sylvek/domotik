@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"strconv"
 
 	mqtt "github.com/mochi-mqtt/server/v2"
 	"github.com/mochi-mqtt/server/v2/hooks/auth"
@@ -61,13 +62,26 @@ func (m *MqttBroker) Messages(filter string) chan Message {
 	return m.topics[filter]
 }
 
-// Publish queues a retained message. The delivery is done by a dedicated goroutine
-// so that the caller is never blocked by its own subscriptions.
+// Publish queues a retained message, the value is written with 3 decimals.
 func (m *MqttBroker) Publish(topic string, name string, value float64, unit string) {
+	m.publish(topic, name, unit, fmt.Sprintf("%.3f", value))
+}
+
+// PublishValue queues a retained message, the value is written as it is: 12.7 stays 12.7 and not 12.700.
+func (m *MqttBroker) PublishValue(topic string, name string, value float64, unit string) {
+	m.publish(topic, name, unit, formatValue(value))
+}
+
+func formatValue(value float64) string {
+	return strconv.FormatFloat(value, 'f', -1, 64)
+}
+
+// The delivery is done by a dedicated goroutine so that the caller is never blocked by its own subscriptions.
+func (m *MqttBroker) publish(topic string, name string, unit string, payload string) {
 	select {
 	case m.outgoing <- outgoing{
 		topic:   fmt.Sprintf("%s/%s/%s", topic, name, unit),
-		payload: []byte(fmt.Sprintf("%.3f", value))}:
+		payload: []byte(payload)}:
 	default:
 		log.Println("unable to publish, queue is full", topic, name, unit)
 	}

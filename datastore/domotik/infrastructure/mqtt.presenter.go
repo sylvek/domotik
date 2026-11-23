@@ -23,8 +23,9 @@ func (m *MqttPresenter) Present(output dto.Output) error {
 }
 
 // Publish implements port.LogPublisher.
+// A log is republished with the value it was received with, without extra decimals.
 func (m *MqttPresenter) Publish(l model.Log) error {
-	m.broker.Publish(l.GetTopic(), l.GetName(), l.GetValue(), l.GetUnit())
+	m.broker.PublishValue(l.GetTopic(), l.GetName(), l.GetValue(), l.GetUnit())
 	return nil
 }
 
